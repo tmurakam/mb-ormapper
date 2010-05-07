@@ -23,8 +23,6 @@
 
 /**
   @brief Migrate database table
-
-  You must override this to add column.
 */
 
 + (void)migrate:(NSString *)tableName columnTypes:(NSArray *)array
@@ -76,27 +74,12 @@
 
   @param cond Conditions (WHERE phrase and so on)
   @return array of records
+
+  You must override this.
 */
 + (NSMutableArray *)find_cond:(NSString *)cond
 {
-    NSMutableArray *array = [[[NSMutableArray alloc] init] autorelease];
-    Database *db = [Database instance];
-    dbstmt *stmt;
-
-    NSString *sql;
-    if (cond == nil) {
-        sql = @"SELECT * FROM Person;"
-    } else {
-        sql = [NSString stringWithFormat:@"SELECT * FROM Person %@;", cond];
-    }  
-
-    stmt = [db prepare:sql];
-    while ([stmt step] == SQLITE_ROW) {
-        Person e = [[[Person alloc] init] autorelease];
-        [e _loadRow:stmt];
-        [array addObject:e];
-    }
-    return array;
+    return nil;
 }
 
 /**
@@ -105,32 +88,9 @@
   @param id Primary key of the record
   @return record
 */
-+ (Person *)find:(int)id
++ (id)find:(int)id
 {
-    Database *db = [Database instance];
-
-    dbstmt *stmt = [db prepare:@"SELECT * FROM Person WHERE id = ?;"];
-    [stmt bindInt:0 val:id];
-    if ([stmt step] != SQLITE_ROW) {
-        return nil;
-    }
-
-    Person e = [[[Person alloc] init] autorelease];
-    [e _loadRow:stmt];
- 
-    return e;
-}
-
-- (void)_loadRow:(dbstmt *)stmt
-{
-    self.id = [stmt colInt:0];
-    self.name = [stmt colString:1];
-    self.sex = [stmt colInt:2];
-    self.age = [stmt colInt:3];
-    self.birth_date = [stmt colDate:4];
-    self.phone_number = [stmt colString:5];
-
-    isInserted = YES;
+    return nil;
 }
 
 /**
@@ -147,46 +107,12 @@
 
 - (void)_insert
 {
-    Database *db = [Database instance];
-    dbstmt *stmt;
-    
-    [db beginTransaction];
-    stmt = [db prepare:@"INSERT INTO Person VALUES(NULL,?,?,?,?,?);"];
-
-    [stmt bindString:0 val:name];
-    [stmt bindInt:1 val:sex];
-    [stmt bindInt:2 val:age];
-    [stmt bindDate:3 val:birth_date];
-    [stmt bindString:4 val:phone_number];
-    [stmt step];
-
-    self.id = [db lastInsertRowId];
-
-    [db commitTransaction];
-    isInserted = YES;
+    return;
 }
 
 - (void)_update
 {
-    Database *db = [Database instance];
-    [db beginTransaction];
-
-    dbstmt *stmt = [db prepare:@"UPDATE Person SET "
-        "name = ?,"
-        "sex = ?,"
-        "age = ?,"
-        "birth_date = ?,"
-        "phone_number = ?,"
-        " WHERE id = ?;"];
-    [stmt bindString:0 val:name];
-    [stmt bindInt:1 val:sex];
-    [stmt bindInt:2 val:age];
-    [stmt bindDate:3 val:birth_date];
-    [stmt bindString:4 val:phone_number];
-    [stmt bindInt:5 val:id];
-
-    [stmt step];
-    [db commitTransaction];
+    return;
 }
 
 /**
@@ -194,11 +120,7 @@
 */
 - (void)delete
 {
-    Database *db = [Database instance];
-
-    dbstmt *stmt = [db prepare:@"DELETE FROM Person WHERE id = ?;"];
-    [stmt bindInt:0 val:id];
-    [stmt step];
+    return;
 }
 
 @end

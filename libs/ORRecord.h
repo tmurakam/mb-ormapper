@@ -10,6 +10,14 @@
 @property(nonatomic,assign) int id;
 
 + (void)migrate:(NSString *)tableName columnTypes:(NSArray *)array;
++ (NSMutableArray *)find_all;
++ (NSMutableArray *)find_cond:(NSString *)cond;
++ (id)find:(int)id;
+
+- (void)save;
+- (void)insert;
+- (void)update;
+- (void)delete;
 
 @end
 
