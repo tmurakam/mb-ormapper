@@ -1,5 +1,8 @@
 Person
         TEXT: name
+        INTEGER: sex
         INTEGER: age
         DATE: birth_date
+        TEXT: phone_number
+
 
