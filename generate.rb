@@ -309,6 +309,3 @@ schema.defs.each do |cdef|
     generateImplementation(cdef, fh)
     fh.close
 end
-
-        
-    

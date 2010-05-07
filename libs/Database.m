@@ -35,6 +35,8 @@
 #import "Database.h"
 #import "Utils.h"
 
+#pragma mark dbstmt implementation
+
 @implementation dbstmt
 
 @synthesize handle;
@@ -175,6 +177,9 @@
 
 
 /////////////////////////////////////////////////////////////////////////
+
+#pragma mark -
+#pragma mark Database implementation
 
 @implementation Database
 
