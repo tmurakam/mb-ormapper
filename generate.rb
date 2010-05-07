@@ -296,8 +296,16 @@ EOF
 
     dbstmt *stmt = [db prepare:@"UPDATE #{cdef.name} SET "
 EOF
+
+    isFirst = true
     cdef.members.each do |m|
-        fh.puts "        \"#{m} = ?,\""
+        fh.print "        \""
+        if (isFirst)
+            isFirst = false
+        else
+            fh.print ","
+        end
+        fh.puts "#{m} = ?\""
     end
     
     fh.puts "        \" WHERE id = ?;\"];"
