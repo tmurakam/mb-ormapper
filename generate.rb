@@ -80,7 +80,6 @@ def generateHeader(cdef, fh)
 #import "ORRecord.h"
 
 @interface #{cdef.name} : ORRecord {
-    int id; // primary key
 EOF
 
     cdef.members.each do |m|
@@ -93,7 +92,6 @@ EOF
     BOOL isInserted;
 }
 
-@property(nonatomic,assign) int id;
 EOF
     
     cdef.members.each do |m|
@@ -107,7 +105,7 @@ EOF
 
 + (NSMutableArray *)find_all:(NSString *)cond;
 + (NSMutableArray *)find_cond:(NSString *)cond;
-+ (#{cdef.name} *)find:(int)id;
++ (#{cdef.name} *)find:(int)pid;
 - (void)save;
 - (void)delete;
 
@@ -131,7 +129,6 @@ def generateImplementation(cdef, fh)
 
 @implementation #{cdef.name}
 
-@synthesize id;
 EOF
 
     cdef.members.each do |m|
@@ -170,17 +167,17 @@ EOF
 
 + (BOOL)migrate
 {
-    NSMutableArray *a = [[[NSMutableArray alloc] init] autorelease];
+    NSArray *columnTypes = [NSArray arrayWithObjects:
 EOF
 
     cdef.members.each do |m|
-        fh.puts "    [a addObject:@\"#{m}\"];"
-        fh.puts "    [a addObject:@\"#{cdef.types[m]}\"];"
-        fh.puts
+        fh.puts "        @\"#{m}\", @\"#{cdef.types[m]}\","
     end
 
     fh.puts <<EOF
-    [self migrate:@"#{cdef.name}" columnTypes:a];
+        nil];
+
+    [super migrate:@"#{cdef.name}" columnTypes:columnTypes];
 }
 
 /**
@@ -223,15 +220,15 @@ EOF
 /**
   @brief get the record matchs the id
 
-  @param id Primary key of the record
+  @param pid Primary key of the record
   @return record
 */
-+ (#{cdef.name} *)find:(int)id
++ (#{cdef.name} *)find:(int)pid
 {
     Database *db = [Database instance];
 
     dbstmt *stmt = [db prepare:@"SELECT * FROM #{cdef.name} WHERE id = ?;"];
-    [stmt bindInt:0 val:id];
+    [stmt bindInt:0 val:pid];
     if ([stmt step] != SQLITE_ROW) {
         return nil;
     }
@@ -244,7 +241,7 @@ EOF
 
 - (void)_loadRow:(dbstmt *)stmt
 {
-    self.id = [stmt colInt:0];
+    self.pid = [stmt colInt:0];
 EOF
 
     i = 1
@@ -287,7 +284,7 @@ EOF
     fh.puts <<EOF
     [stmt step];
 
-    self.id = [db lastInsertRowId];
+    self.pid = [db lastInsertRowId];
 
     [db commitTransaction];
     isInserted = YES;
@@ -315,7 +312,7 @@ EOF
         i += 1
     end
     fh.puts <<EOF
-    [stmt bindInt:#{i} val:id];
+    [stmt bindInt:#{i} val:pid];
 
     [stmt step];
     [db commitTransaction];
@@ -329,7 +326,7 @@ EOF
     Database *db = [Database instance];
 
     dbstmt *stmt = [db prepare:@"DELETE FROM #{cdef.name} WHERE id = ?;"];
-    [stmt bindInt:0 val:id];
+    [stmt bindInt:0 val:pid];
     [stmt step];
 }
 
