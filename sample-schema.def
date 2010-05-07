@@ -1,0 +1,5 @@
+Person
+        TEXT: name
+        INTEGER: age
+        DATE: birth_date
+
