@@ -69,8 +69,8 @@ EOF
 
 + (BOOL)migrate
 
-+ (NSMutableArray *)find_all:(const char *)cond;
-+ (NSMutableArray *)find_cond:(const char *)cond;
++ (NSMutableArray *)find_all:(NSString *)cond;
++ (NSMutableArray *)find_cond:(NSString *)cond;
 + (#{cdef.name} *)find:(int)id;
 - (void)save;
 - (void)delete;
@@ -201,7 +201,7 @@ EOF
         sql = [NSString stringWithFormat:@"SELECT * FROM #{cdef.name} %@;", cond];
     }  
 
-    stmt = [db prepare:@sql];
+    stmt = [db prepare:sql];
     while ([stmt step] == SQLITE_ROW) {
         #{cdef.name} e = [[[#{cdef.name} alloc] init] autorelease];
         [e _loadRow:stmt];
