@@ -244,6 +244,7 @@ EOF
     self.id = [db lastInsertRowId];
 
     [db commitTransaction];
+    isInserted = YES;
 }
 
 - (void)update
