@@ -88,8 +88,6 @@ EOF
     end
 
     fh.puts <<EOF
-
-    BOOL isInserted;
 }
 
 EOF
@@ -140,7 +138,6 @@ EOF
 - (id)init
 {
     self = [super init];
-    isInserted = NO;                         
     return self;
 }
 
