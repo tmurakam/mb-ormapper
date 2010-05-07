@@ -118,7 +118,7 @@
 */
 - (void)bindDate:(int)idx val:(NSDate*)date
 {
-    NSString *str = [Database stringFromDate:date];
+    NSString *str = [[Database instance] stringFromDate:date];
     sqlite3_bind_text(stmt, idx+1, [str UTF8String], -1, SQLITE_TRANSIENT);
 }
 
@@ -168,7 +168,7 @@
     NSDate *date = nil;
     NSString *ds = [self colString:idx];
     if (ds) {
-        date = [Database dateFromString:ds];
+        date = [[Database instance] dateFromString:ds];
     }
     return date;
 }
@@ -214,6 +214,13 @@ static Database *theDatabase = nil;
         handle = 0;
     }
 	
+    dateFormatter = [[DateFormatter alloc] init];
+
+    // Set US locale, because JP locale for date formatter is buggy,
+    // especially for 12 hour settings.
+    NSLocale *us = [[[NSLocale alloc] initWithLocaleIdentifier:@"US"] autorelease];
+    [dateFormatter setLocale:us];
+
     return self;
 }
 
@@ -225,6 +232,8 @@ static Database *theDatabase = nil;
     if (handle != nil) {
         sqlite3_close(handle);
     }
+
+    [dateFormatter release];
 
     [super dealloc];
 }
@@ -332,30 +341,14 @@ static Database *theDatabase = nil;
 #pragma mark -
 #pragma mark Utilities
 
-static NSDateFormatter *theDateFormatter = nil;
-
-+ (NSDateFormatter *)_dateFormatter
+- (NSDate *)dateFromString:(NSString *)str
 {
-    if (theDateFormatter == nil) {
-        theDateFormatter = [[DateFormatter alloc] init];
-
-        // Set US locale, because JP locale for date formatter is buggy,
-        // especially for 12 hour settings.
-        NSLocale *us = [[[NSLocale alloc] initWithLocaleIdentifier:@"US"] autorelease];
-        [theDateFormatter setLocale:us];
-        
-    }
-    return theDateFormatter;
+    return [dateFormatter dateFromString:str];
 }
 
-+ (NSDate *)dateFromString:(NSString *)str
+- (NSString *)stringFromDate:(NSDate *)date
 {
-    return [[self _dateFormatter] dateFromString:str];
-}
-
-+ (NSString *)stringFromDate:(NSDate *)date
-{
-    return [[Database _dateFormatter] stringFromDate:date];
+    return [dateFormatter stringFromDate:date];
 }
 
 @end

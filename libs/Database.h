@@ -69,6 +69,8 @@
 */
 @interface Database : NSObject {
     sqlite3 *handle; ///< Database handle
+
+    NSDateFormatter *dateFormatter;
 }
 
 @property(nonatomic,readonly) sqlite3 *handle;
@@ -90,8 +92,7 @@
 - (BOOL)open;
 
 // utilities
-+ (NSDateFormatter *)_dateFormatter;
-+ (NSDate*)dateFromString:(NSString *)str;
-+ (NSString *)stringFromDate:(NSDate*)date;
+- (NSDate*)dateFromString:(NSString *)str;
+- (NSString *)stringFromDate:(NSDate*)date;
 
 @end
