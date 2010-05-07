@@ -169,43 +169,17 @@ EOF
 
 + (BOOL)migrate
 {
-    Database *db = [Database instance];
-    dbstmt *stmt;
-    
-    // check if table exists.
-    stmt = [db prepare:@"SELECT sql FROM sqlite_master WHERE type='table' AND name='#{cdef.name}';"];
-    if ([stmt step] != SQLITE_ROW) {
-        [db exec:@"CREATE TABLE #{cdef.name} ("
-            "id INTEGER PRIMARY KEY"
+    NSMutableArray *a = [[[NSMutableArray alloc] init] autorelease];
 EOF
-    
+
     cdef.members.each do |m|
-        fh.puts "            \", #{m} #{cdef.types[m]}\""
+        fh.puts "    [a addObject:@\"#{m}\"];"
+        fh.puts "    [a addObject:@\"#{cdef.types[m]}\"];"
+        fh.puts
     end
 
     fh.puts <<EOF
-            ");"
-         ];
-        return YES; // created
-    }
-
-    // check migration
-    NSString *tablesql = [stmt colString:0];
-    NSRange range;
-EOF
-    
-    cdef.members.each do |m|
-        fh.puts <<EOF
-    range = [tablesql rangeOfString:@" #{m} "];
-    if (range.location == NSNotFound) {
-        [db exec:@"ALTER TABLE #{cdef.name} ADD COLUMN #{m} #{cdef.types[m]}"];
-    }
-EOF
-    end
-
-    fh.puts <<EOF
-
-    return NO;
+    [self migrate:@"#{cdef.name}" columnTypes:a];
 }
 
 /**
