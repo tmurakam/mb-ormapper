@@ -118,7 +118,7 @@
 */
 - (void)bindDate:(int)idx val:(NSDate*)date
 {
-    NSString *str = [DateFormatter2 stringFromDate:date];
+    NSString *str = [Database stringFromDate:date];
     sqlite3_bind_text(stmt, idx+1, [str UTF8String], -1, SQLITE_TRANSIENT);
 }
 
@@ -168,7 +168,7 @@
     NSDate *date = nil;
     NSString *ds = [self colString:idx];
     if (ds) {
-        date = [DateFormatter2 dateFromString:ds];
+        date = [Database dateFromString:ds];
     }
     return date;
 }
@@ -327,6 +327,35 @@ static Database *theDatabase = nil;
     [Person checkTable];
 
     return isExistedDb;
+}
+
+#pragma mark -
+#pragma mark Utilities
+
+static NSDateFormatter *theDateFormatter = nil;
+
++ (NSDateFormatter *)_dateFormatter
+{
+    if (theDateFormatter == nil) {
+        theDateFormatter = [[DateFormatter alloc] init];
+
+        // Set US locale, because JP locale for date formatter is buggy,
+        // especially for 12 hour settings.
+        NSLocale *us = [[[NSLocale alloc] initWithLocaleIdentifier:@"US"] autorelease];
+        [theDateFormatter setLocale:us];
+        
+    }
+    return theDateFormatter;
+}
+
++ (NSDate *)dateFromString:(NSString *)str
+{
+    return [[self _dateFormatter] dateFromString:str];
+}
+
++ (NSString *)stringFromDate:(NSDate *)date
+{
+    return [[Database _dateFormatter] stringFromDate:date];
 }
 
 @end

@@ -89,6 +89,8 @@
 - (NSString *)dbPath;
 - (BOOL)open;
 
+// utilities
++ (NSDateFormatter *)_dateFormatter;
 + (NSDate*)dateFromString:(NSString *)str;
 + (NSString *)stringFromDate:(NSDate*)date;
 
