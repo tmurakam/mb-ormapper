@@ -1,6 +1,6 @@
 // -*-  Mode:ObjC; c-basic-offset:4; tab-width:8; indent-tabs-mode:nil -*-
 /*
-  LifeCal for iPhone/iPod touch
+  O/R Mapper library for iPhone
 
   Copyright (c) 2010, Takuya Murakami. All rights reserved.
 
