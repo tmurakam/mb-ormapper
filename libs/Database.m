@@ -241,12 +241,12 @@ static Database *theDatabase = nil;
 /**
    Execute SQL statement
 */
-- (void)exec:(const char *)sql
+- (void)exec:(NSString *)sql
 {
     //ASSERT(handle != 0);
 
     //LOG(@"SQL: %s", sql);
-    int result = sqlite3_exec(handle, sql, NULL, NULL, NULL);
+    int result = sqlite3_exec(handle, [sql UTF8String], NULL, NULL, NULL);
     if (result != SQLITE_OK) {
         //LOG(@"sqlite3: %s", sqlite3_errmsg(handle));
     }
@@ -258,10 +258,10 @@ static Database *theDatabase = nil;
    @param[in] sql SQL statement
    @return dbstmt instance
 */
-- (dbstmt *)prepare:(const char *)sql
+- (dbstmt *)prepare:(NSString *)sql
 {
     sqlite3_stmt *stmt;
-    int result = sqlite3_prepare_v2(handle, sql, -1, &stmt, NULL);
+    int result = sqlite3_prepare_v2(handle, [sql UTF8String], -1, &stmt, NULL);
     if (result != SQLITE_OK) {
         //LOG(@"sqlite3: %s", sqlite3_errmsg(handle));
         //ASSERT(0);
@@ -285,7 +285,7 @@ static Database *theDatabase = nil;
 */
 - (void)beginTransaction
 {
-    [self exec:"BEGIN;"];
+    [self exec:@"BEGIN;"];
 }
 
 /**
@@ -293,7 +293,7 @@ static Database *theDatabase = nil;
 */
 - (void)commitTransaction
 {
-    [self exec:"COMMIT;"];
+    [self exec:@"COMMIT;"];
 }
 
 /**

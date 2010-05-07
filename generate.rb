@@ -138,9 +138,9 @@ EOF
     dbstmt *stmt;
     
     // check if table exists.
-    stmt = [db prepare:"SELECT sql FROM sqlite_master WHERE type='table' AND name='#{cdef.name}';"];
+    stmt = [db prepare:@"SELECT sql FROM sqlite_master WHERE type='table' AND name='#{cdef.name}';"];
     if ([stmt step] != SQLITE_ROW) {
-        [db exec:"CREATE TABLE #{cdef.name} ("
+        [db exec:@"CREATE TABLE #{cdef.name} ("
             "id INTEGER PRIMARY KEY"
 EOF
     
@@ -163,7 +163,7 @@ EOF
         fh.puts <<EOF
     range = [tablesql rangeOfString:@" #{m} "];
     if (range.location == NSNotFound) {
-        [db exec:"ALTER TABLE #{cdef.name} ADD COLUMN #{m} #{cdef.types[m]}"];
+        [db exec:@"ALTER TABLE #{cdef.name} ADD COLUMN #{m} #{cdef.types[m]}"];
     }
 EOF
     end
@@ -201,7 +201,7 @@ EOF
         sql = [NSString stringWithFormat:@"SELECT * FROM #{cdef.name} %@;", cond];
     }  
 
-    stmt = [db prepare:[sql UTF8String]];
+    stmt = [db prepare:@sql];
     while ([stmt step] == SQLITE_ROW) {
         #{cdef.name} e = [[[#{cdef.name} alloc] init] autorelease];
         [e _loadRow:stmt];
@@ -220,7 +220,7 @@ EOF
 {
     Database *db = [Database instance];
 
-    dbstmt *stmt = [db prepare:"SELECT * FROM #{cdef.name} WHERE id = ?;"];
+    dbstmt *stmt = [db prepare:@"SELECT * FROM #{cdef.name} WHERE id = ?;"];
     [stmt bindInt:0 val:id];
     if ([stmt step] != SQLITE_ROW) {
         return nil;
@@ -270,7 +270,7 @@ EOF
     [db beginTransaction];
 EOF
 
-    fh.print "    stmt = [db prepare:\"INSERT INTO #{cdef.name} VALUES(NULL"
+    fh.print "    stmt = [db prepare:@\"INSERT INTO #{cdef.name} VALUES(NULL"
     cdef.members.each do |m|
         fh.print ",?"
     end
@@ -298,7 +298,7 @@ EOF
     Database *db = [Database instance];
     [db beginTransaction];
 
-    dbstmt *stmt = [db prepare:"UPDATE #{cdef.name} SET "
+    dbstmt *stmt = [db prepare:@"UPDATE #{cdef.name} SET "
 EOF
     cdef.members.each do |m|
         fh.puts "        \"#{m} = ?,\""
@@ -326,7 +326,7 @@ EOF
 {
     Database *db = [Database instance];
 
-    dbstmt *stmt = [db prepare:"DELETE FROM #{cdef.name} WHERE id = ?;"];
+    dbstmt *stmt = [db prepare:@"DELETE FROM #{cdef.name} WHERE id = ?;"];
     [stmt bindInt:0 val:id];
     [stmt step];
 }

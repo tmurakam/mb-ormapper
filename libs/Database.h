@@ -81,8 +81,8 @@
 - (id)init;
 - (void)dealloc;
 
-- (void)exec:(const char *)sql;
-- (dbstmt*)prepare:(const char *)sql;
+- (void)exec:(NSString *)sql;
+- (dbstmt*)prepare:(NSString *)sql;
 - (int)lastInsertRowId;
 
 - (void)beginTransaction;
