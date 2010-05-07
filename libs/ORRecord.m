@@ -99,18 +99,19 @@
 - (void)save
 {
     if (isInserted) {
-        [self _update];
+        [self update];
     } else {
-        [self _insert];
+        [self insert];
     }
 }
 
-- (void)_insert
+- (void)insert
 {
+    isInserted = YES;
     return;
 }
 
-- (void)_update
+- (void)update
 {
     return;
 }
