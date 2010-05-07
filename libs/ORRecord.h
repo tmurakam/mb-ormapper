@@ -4,10 +4,10 @@
 
 @class ORRecord : NSObject
 {
-    int id;
+    int pid;
 }
 
-@property(nonatomic,assign) int id;
+@property(nonatomic,assign) int pid;
 
 + (void)migrate:(NSString *)tableName columnTypes:(NSArray *)array;
 + (NSMutableArray *)find_all;

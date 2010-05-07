@@ -2,7 +2,7 @@
 
 @implementation ORRecord
 
-@synthesize id;
+@synthesize pid;
 
 - (id)init
 {
@@ -88,7 +88,7 @@
   @param id Primary key of the record
   @return record
 */
-+ (id)find:(int)id
++ (id)find:(int)pid
 {
     return nil;
 }
