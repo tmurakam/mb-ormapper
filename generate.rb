@@ -53,6 +53,8 @@ EOF
     end
 
     fh.puts <<EOF
+
+    BOOL isInserted;
 }
 
 @property(nonatomic,assign) int id;
@@ -66,12 +68,16 @@ EOF
     fh.puts <<EOF
 
 + (void)migrate
-+ (NSMutableArray *)select:(const char *)cond;
-+ (#{cdef.name} *)selectWithId:(int)id;
-- (void)insert;
-- (void)update;
+
++ (NSMutableArray *)find_all:(const char *)cond;
++ (NSMutableArray *)find_cond:(const char *)cond;
++ (#{cdef.name} *)find:(int)id;
+- (void)save;
 - (void)delete;
 
+// internal functions
+- (void)insert;
+- (void)update;
 - (void)_loadRow:(dbstmt *)stmt;
 
 @end
@@ -100,6 +106,7 @@ EOF
 - (id)init
 {
     self = [super init];
+    isInserted = NO;                         
     return self;
 }
 
@@ -139,14 +146,19 @@ EOF
     }
 }
 
-+ (NSMutableArray *)select:(const char *)cond
++ (NSMutableArray *)find_all
+{
+    return [self find_cond:nil];
+}
+
++ (NSMutableArray *)find_cond:(NSString *)cond
 {
     NSMutableArray *array = [[[NSMutableArray alloc] init] autorelease];
     Database *db = [Database instance];
     dbstmt *stmt;
 
     NSString *sql;
-    if (cond == NULL) {
+    if (cond == nil) {
         sql = @"SELECT * FROM #{cdef.name};"
     } else {
         sql = [NSString stringWithFormat:@"SELECT * FROM #{cdef.name} %@;", cond];
@@ -161,7 +173,7 @@ EOF
     return array;
 }
 
-+ (#{cdef.name} *)selectWithId:(int)id
++ (#{cdef.name} *)find:(int)id
 {
     Database *db = [Database instance];
 
@@ -191,6 +203,17 @@ EOF
     end
     
     fh.puts <<EOF
+
+    isInserted = YES;
+}
+
+- (void)save
+{
+    if (isInserted) {
+        [self update];
+    } else {
+        [self insert];
+    }
 }
 
 - (void)insert
