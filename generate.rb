@@ -63,6 +63,7 @@ EOF
     fh.puts <<EOF
 
 + (NSMutableArray *)select:(const char *)cond;
++ (#{cdef.name} *)selectWithId:(int)id;
 - (void)insert;
 - (void)update;
 - (void)delete;
@@ -153,6 +154,22 @@ EOF
         [array addObject:e];
     }
     return array;
+}
+
++ (#{cdef.name} *)selectWithId:(int)id
+{
+    Database *db = [Database instance];
+
+    dbstmt *stmt = [db prepare:"SELECT * FROM #{cdef.name} WHERE id = ?;"];
+    [stmt bindInt:0 val:id];
+    if ([stmt step] != SQLITE_ROW) {
+        return nil;
+    }
+
+    #{cdef.name} e = [[[#{cdef.name} alloc] init] autorelease];
+    [e _loadRow:stmt];
+ 
+    return e;
 }
 
 - (void)_loadRow:(dbstmt *)stmt
