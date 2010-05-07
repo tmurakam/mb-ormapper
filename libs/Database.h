@@ -87,6 +87,7 @@
 
 - (void)beginTransaction;
 - (void)commitTransaction;
+- (void)rollbackTransaction;
 
 - (NSString *)dbPath;
 - (BOOL)open;

@@ -239,6 +239,31 @@ static Database *theDatabase = nil;
 }
 
 /**
+   Open database
+
+   @return Returns YES if database exists, otherwise create database and returns NO.
+*/
+- (BOOL)open
+{
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+
+    // Load from DB
+    NSString *dbPath = [self dbPath];
+    BOOL isExistedDb = [fileManager fileExistsAtPath:dbPath];
+
+    if (sqlite3_open([dbPath UTF8String], &handle) != 0) {
+        // ouch!
+        // re-create database
+        [fileManager removeItemAtPath:dbPath error:NULL];
+        sqlite3_open([dbPath UTF8String], &handle);
+
+        isExistedDb = NO;
+    }
+
+    return isExistedDb;
+}
+
+/**
    Execute SQL statement
 */
 - (void)exec:(NSString *)sql
@@ -297,6 +322,14 @@ static Database *theDatabase = nil;
 }
 
 /**
+   Rollback transaction
+*/
+- (void)rollbackTransaction
+{
+    [self exec:@"ROLLBACK;"];
+}
+
+/**
    Return database file name
 */
 - (NSString*)dbPath
@@ -308,34 +341,6 @@ static Database *theDatabase = nil;
     NSLog(@"dbPath = %@", dbPath);
 
     return dbPath;
-}
-
-/**
-   Open database
-
-   @return Returns YES if database exists, otherwise create database and returns NO.
-*/
-- (BOOL)open
-{
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-
-    // Load from DB
-    NSString *dbPath = [self dbPath];
-    BOOL isExistedDb = [fileManager fileExistsAtPath:dbPath];
-
-    if (sqlite3_open([dbPath UTF8String], &handle) != 0) {
-        // ouch!
-        // re-create database
-        [fileManager removeItemAtPath:dbPath error:NULL];
-        sqlite3_open([dbPath UTF8String], &handle);
-
-        isExistedDb = NO;
-    }
-
-    // check tables
-    [Person checkTable];
-
-    return isExistedDb;
 }
 
 #pragma mark -
