@@ -25,14 +25,14 @@
   @brief Migrate database table
 */
 
-+ (BOOL)migrate:(NSString *)tableName columnTypes:(NSArray *)array
++ (BOOL)migrate:(NSArray *)array
 {
     Database *db = [Database instance];
     dbstmt *stmt;
     
     // check if table exists.
     NSString *sql, *tablesql;
-    sql = [NSString stringWithFormat:@"SELECT sql FROM sqlite_master WHERE type='table' AND name='%@';", tableName];
+    sql = [NSString stringWithFormat:@"SELECT sql FROM sqlite_master WHERE type='table' AND name='%@';", [self tableName]];
     stmt = [db prepare:sql];
 
     // create table
@@ -54,7 +54,7 @@
         NSRange range = [tablesql rangeOfString:[NSString stringWithFormat:@" %@ ", column]];
         if (range.location == NSNotFound) {
             sql = [NSString stringWithFormat:@"ALTER TABLE %@ ADD COLUMN %@ %@;",
-                            tableName, column, type];
+                            [self tableName], column, type];
             [db exec:sql];
         }
     }
@@ -106,6 +106,11 @@
     }
 }
 
++ (NSString *)tableName
+{
+    return nil; // must be override
+}
+
 - (void)insert
 {
     isInserted = YES;
@@ -123,6 +128,11 @@
 - (void)delete
 {
     return;
+}
+
++ (void)delete_all
+{
+    // must be override
 }
 
 @end

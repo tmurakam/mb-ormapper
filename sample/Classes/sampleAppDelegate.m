@@ -27,12 +27,17 @@
     // Migrate tables
     [Person migrate];
     
-    // add test data
-    Person *person = [[[Person alloc] init] autorelease];
-    person.name = @"John Doe";
-    person.age = 26;
-    person.sex = 0;
-    [person save];
+    //[Person delete_all];
+    
+    NSMutableArray *persons = [Person find_all];
+    if ([persons count] == 0) {
+        // add test data
+        Person *person = [[[Person alloc] init] autorelease];
+        person.name = @"John Doe";
+        person.age = 26;
+        person.sex = 0;
+        [person save];
+    }
     
     [window addSubview:[navigationController view]];
     [window makeKeyAndVisible];

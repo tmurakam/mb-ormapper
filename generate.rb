@@ -103,10 +103,12 @@ EOF
 
 + (NSMutableArray *)find_cond:(NSString *)cond;
 + (#{cdef.name} *)find:(int)pid;
-- (void)save;
 - (void)delete;
++ (void)delete_cond:(NSString *)cond;
++ (void)delete_all;
 
 // internal functions
++ (NSString *)tableName;
 - (void)insert;
 - (void)update;
 - (void)_loadRow:(dbstmt *)stmt;
@@ -173,7 +175,7 @@ EOF
     fh.puts <<EOF
         nil];
 
-    return [super migrate:@"#{cdef.name}" columnTypes:columnTypes];
+    return [super migrate:columnTypes];
 }
 
 /**
@@ -242,6 +244,11 @@ EOF
     fh.puts <<EOF
 
     isInserted = YES;
+}
+
++ (NSString *)tableName
+{
+    return @"#{cdef.name}";
 }
 
 - (void)insert
@@ -323,6 +330,25 @@ EOF
     dbstmt *stmt = [db prepare:@"DELETE FROM #{cdef.name} WHERE id = ?;"];
     [stmt bindInt:0 val:pid];
     [stmt step];
+}
+
+/**
+  @brief Delete all records
+*/
++ (void)delete_cond:(NSString *)cond
+{
+    Database *db = [Database instance];
+
+    if (cond == nil) {
+        cond = @"";
+    }
+    NSString *sql = [NSString stringWithFormat:@"DELETE FROM #{cdef.name} %@;", cond];
+    [db exec:sql];
+}
+
++ (void)delete_all
+{
+    [#{cdef.name} delete_cond:nil];
 }
 
 @end
