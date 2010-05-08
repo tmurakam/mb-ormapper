@@ -33,7 +33,6 @@
 */
 
 #import "Database.h"
-#import "Utils.h"
 
 #pragma mark dbstmt implementation
 
@@ -214,7 +213,7 @@ static Database *theDatabase = nil;
         handle = 0;
     }
 	
-    dateFormatter = [[DateFormatter alloc] init];
+    dateFormatter = [[NSDateFormatter alloc] init];
 
     // Set US locale, because JP locale for date formatter is buggy,
     // especially for 12 hour settings.

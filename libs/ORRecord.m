@@ -1,4 +1,5 @@
 #import "Database.h"
+#import "ORRecord.h"
 
 @implementation ORRecord
 
@@ -9,7 +10,6 @@
     self = [super init];
     if (self) {
         isInserted = NO;
-        tablesql = nil;
     }
         
     return self;
@@ -32,7 +32,7 @@
     
     // check if table exists.
     NSString *sql, *tablesql;
-    sql = [NSString stringWithFormat::@"SELECT sql FROM sqlite_master WHERE type='table' AND name='%@';", tableName];
+    sql = [NSString stringWithFormat:@"SELECT sql FROM sqlite_master WHERE type='table' AND name='%@';", tableName];
     stmt = [db prepare:sql];
 
     // create table
@@ -45,7 +45,7 @@
     }
 
     // add columns
-    int count = array.size / 2;
+    int count = [array count] / 2;
 
     for (int i = 0; i < count; i++) {
         NSString *column = [array objectAtIndex:i * 2];

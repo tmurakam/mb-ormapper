@@ -2,9 +2,10 @@
 #import <UIKit/UIKit.h>
 #import "Database.h"
 
-@class ORRecord : NSObject
+@interface ORRecord : NSObject
 {
     int pid;
+    BOOL isInserted;
 }
 
 @property(nonatomic,assign) int pid;
