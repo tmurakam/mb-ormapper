@@ -99,9 +99,8 @@ EOF
 
     fh.puts <<EOF
 
-+ (BOOL)migrate
++ (BOOL)migrate;
 
-+ (NSMutableArray *)find_all:(NSString *)cond;
 + (NSMutableArray *)find_cond:(NSString *)cond;
 + (#{cdef.name} *)find:(int)pid;
 - (void)save;
@@ -174,16 +173,7 @@ EOF
     fh.puts <<EOF
         nil];
 
-    [super migrate:@"#{cdef.name}" columnTypes:columnTypes];
-}
-
-/**
-  @brief get all records
-  @return array of all record
-*/
-+ (NSMutableArray *)find_all
-{
-    return [self find_cond:nil];
+    return [super migrate:@"#{cdef.name}" columnTypes:columnTypes];
 }
 
 /**
@@ -200,14 +190,14 @@ EOF
 
     NSString *sql;
     if (cond == nil) {
-        sql = @"SELECT * FROM #{cdef.name};"
+        sql = @"SELECT * FROM #{cdef.name};";
     } else {
         sql = [NSString stringWithFormat:@"SELECT * FROM #{cdef.name} %@;", cond];
     }  
 
     stmt = [db prepare:sql];
     while ([stmt step] == SQLITE_ROW) {
-        #{cdef.name} e = [[[#{cdef.name} alloc] init] autorelease];
+        #{cdef.name} *e = [[[#{cdef.name} alloc] init] autorelease];
         [e _loadRow:stmt];
         [array addObject:e];
     }
@@ -230,7 +220,7 @@ EOF
         return nil;
     }
 
-    #{cdef.name} e = [[[#{cdef.name} alloc] init] autorelease];
+    #{cdef.name} *e = [[[#{cdef.name} alloc] init] autorelease];
     [e _loadRow:stmt];
  
     return e;

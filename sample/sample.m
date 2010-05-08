@@ -1,6 +1,6 @@
 #import "Person.h"
 
-@class Sample
+@interface Sample
 
 - (void)sample;
 
@@ -22,7 +22,7 @@
 
     // add data
     Person *person = [[[Person alloc] init] autorelease];
-    person.name = "John Doe";
+    person.name = @"John Doe";
     person.age = 26;
     person.sex = 0;
     [person save];

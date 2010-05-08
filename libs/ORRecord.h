@@ -10,7 +10,7 @@
 
 @property(nonatomic,assign) int pid;
 
-+ (void)migrate:(NSString *)tableName columnTypes:(NSArray *)array;
++ (BOOL)migrate:(NSString *)tableName columnTypes:(NSArray *)array;
 + (NSMutableArray *)find_all;
 + (NSMutableArray *)find_cond:(NSString *)cond;
 + (id)find:(int)id;

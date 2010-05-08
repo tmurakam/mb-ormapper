@@ -25,7 +25,7 @@
   @brief Migrate database table
 */
 
-+ (void)migrate:(NSString *)tableName columnTypes:(NSArray *)array
++ (BOOL)migrate:(NSString *)tableName columnTypes:(NSArray *)array
 {
     Database *db = [Database instance];
     dbstmt *stmt;
@@ -58,6 +58,7 @@
             [db exec:sql];
         }
     }
+    return YES;
 }
 
 /**
