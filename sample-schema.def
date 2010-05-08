@@ -1,8 +1,7 @@
 Person
-        TEXT: name
-        INTEGER: sex
-        INTEGER: age
-        DATE: birth_date
-        TEXT: phone_number
-
+	name :TEXT
+     	sex :INTEGER
+        age :INTEGER
+        birth_date :DATE
+        phone_number :TEXT
 

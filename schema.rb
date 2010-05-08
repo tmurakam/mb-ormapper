@@ -71,9 +71,9 @@ class Schema
                     end
                     classdef = ClassDef.new
                     classdef.name = $1
-                elsif (line =~ /\s+(\S+):\s*(\S+)/)
-                    member = $2
-                    type = $1
+                elsif (line =~ /\s+(\S+)\s*:(\S+)/)
+                    member = $1
+                    type = $2
                     classdef.members.push(member)
                     classdef.types[member] = type
                 end
