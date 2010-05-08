@@ -15,6 +15,10 @@
 		28AD73600D9D9599002E5188 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28AD735F0D9D9599002E5188 /* MainWindow.xib */; };
 		28C286E10D94DF7D0034E888 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28C286E00D94DF7D0034E888 /* RootViewController.m */; };
 		28F335F11007B36200424DE2 /* RootViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28F335F01007B36200424DE2 /* RootViewController.xib */; };
+		3E6A01AE11951B970012E5C8 /* Database.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E6A01AB11951B970012E5C8 /* Database.m */; };
+		3E6A01AF11951B970012E5C8 /* ORRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E6A01AD11951B970012E5C8 /* ORRecord.m */; };
+		3E6A01B211951BA30012E5C8 /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E6A01B111951BA30012E5C8 /* Person.m */; };
+		3E6A01BC11951BFE0012E5C8 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E6A01BB11951BFE0012E5C8 /* libsqlite3.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +34,13 @@
 		28C286E00D94DF7D0034E888 /* RootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
 		28F335F01007B36200424DE2 /* RootViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RootViewController.xib; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		3E6A01AA11951B970012E5C8 /* Database.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Database.h; path = ../libs/Database.h; sourceTree = SOURCE_ROOT; };
+		3E6A01AB11951B970012E5C8 /* Database.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Database.m; path = ../libs/Database.m; sourceTree = SOURCE_ROOT; };
+		3E6A01AC11951B970012E5C8 /* ORRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRecord.h; path = ../libs/ORRecord.h; sourceTree = SOURCE_ROOT; };
+		3E6A01AD11951B970012E5C8 /* ORRecord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRecord.m; path = ../libs/ORRecord.m; sourceTree = SOURCE_ROOT; };
+		3E6A01B011951BA30012E5C8 /* Person.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Person.h; path = ../Person.h; sourceTree = SOURCE_ROOT; };
+		3E6A01B111951BA30012E5C8 /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Person.m; path = ../Person.m; sourceTree = SOURCE_ROOT; };
+		3E6A01BB11951BFE0012E5C8 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		8D1107310486CEB800E47090 /* sample-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "sample-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -41,6 +52,7 @@
 				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
 				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
 				2892E4100DC94CBA00A64D0F /* CoreGraphics.framework in Frameworks */,
+				3E6A01BC11951BFE0012E5C8 /* libsqlite3.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -69,6 +81,8 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				3E6A01A911951B840012E5C8 /* libs */,
+				3E6A01A811951B760012E5C8 /* GeneratedModels */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
@@ -103,8 +117,29 @@
 				1DF5F4DF0D08C38300B7A737 /* UIKit.framework */,
 				1D30AB110D05D00D00671497 /* Foundation.framework */,
 				2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */,
+				3E6A01BB11951BFE0012E5C8 /* libsqlite3.dylib */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		3E6A01A811951B760012E5C8 /* GeneratedModels */ = {
+			isa = PBXGroup;
+			children = (
+				3E6A01B011951BA30012E5C8 /* Person.h */,
+				3E6A01B111951BA30012E5C8 /* Person.m */,
+			);
+			name = GeneratedModels;
+			sourceTree = "<group>";
+		};
+		3E6A01A911951B840012E5C8 /* libs */ = {
+			isa = PBXGroup;
+			children = (
+				3E6A01AA11951B970012E5C8 /* Database.h */,
+				3E6A01AB11951B970012E5C8 /* Database.m */,
+				3E6A01AC11951B970012E5C8 /* ORRecord.h */,
+				3E6A01AD11951B970012E5C8 /* ORRecord.m */,
+			);
+			name = libs;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -171,6 +206,9 @@
 				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
 				1D3623260D0F684500981E51 /* sampleAppDelegate.m in Sources */,
 				28C286E10D94DF7D0034E888 /* RootViewController.m in Sources */,
+				3E6A01AE11951B970012E5C8 /* Database.m in Sources */,
+				3E6A01AF11951B970012E5C8 /* ORRecord.m in Sources */,
+				3E6A01B211951BA30012E5C8 /* Person.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

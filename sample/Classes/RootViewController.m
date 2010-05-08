@@ -7,7 +7,7 @@
 //
 
 #import "RootViewController.h"
-
+#import "Person.h"
 
 @implementation RootViewController
 
@@ -15,14 +15,12 @@
 #pragma mark -
 #pragma mark View lifecycle
 
-/*
 - (void)viewDidLoad {
     [super viewDidLoad];
-
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    
+     // load data
+     persons = [Person find_all];
 }
-*/
 
 /*
 - (void)viewWillAppear:(BOOL)animated {
@@ -65,7 +63,7 @@
 
 // Customize the number of rows in the table view.
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 0;
+    return [persons count];
 }
 
 
@@ -79,7 +77,8 @@
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
     }
     
-	// Configure the cell.
+    Person *p = [persons objectAtIndex:indexPath.row];
+    cell.textLabel.text = p.name;
 
     return cell;
 }

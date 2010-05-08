@@ -8,7 +8,7 @@
 
 #import "sampleAppDelegate.h"
 #import "RootViewController.h"
-
+#import "Person.h"
 
 @implementation sampleAppDelegate
 
@@ -20,16 +20,28 @@
 #pragma mark Application lifecycle
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {    
-    // Override point for customization after app launch    
-	
-	[window addSubview:[navigationController view]];
+    // Open & create database
+    Database *db = [Database instance];
+    [db open];
+    
+    // Migrate tables
+    [Person migrate];
+    
+    // add test data
+    Person *person = [[[Person alloc] init] autorelease];
+    person.name = @"John Doe";
+    person.age = 26;
+    person.sex = 0;
+    [person save];
+    
+    [window addSubview:[navigationController view]];
     [window makeKeyAndVisible];
-	return YES;
+    return YES;
 }
 
 
 - (void)applicationWillTerminate:(UIApplication *)application {
-	// Save data if appropriate
+    // Save data if appropriate
 }
 
 
@@ -37,9 +49,9 @@
 #pragma mark Memory management
 
 - (void)dealloc {
-	[navigationController release];
-	[window release];
-	[super dealloc];
+    [navigationController release];
+    [window release];
+    [super dealloc];
 }
 
 
