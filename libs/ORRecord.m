@@ -38,7 +38,7 @@
 
     // create table
     if ([stmt step] != SQLITE_ROW) {
-        sql = [NSString stringWithFormat:@"CREATE TABLE %@ (id INTEGER PRIMARY KEY);"];
+        sql = [NSString stringWithFormat:@"CREATE TABLE %@ (id INTEGER PRIMARY KEY);", [self tableName]];
         [db exec:sql];
         tablesql = sql;
 	ret = YES;

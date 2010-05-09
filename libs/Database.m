@@ -117,8 +117,12 @@
 */
 - (void)bindDate:(int)idx val:(NSDate*)date
 {
-    NSString *str = [[Database instance] stringFromDate:date];
-    sqlite3_bind_text(stmt, idx+1, [str UTF8String], -1, SQLITE_TRANSIENT);
+    NSString *str;
+    
+    if (date != NULL) {
+        str = [[Database instance] stringFromDate:date];
+        sqlite3_bind_text(stmt, idx+1, [str UTF8String], -1, SQLITE_TRANSIENT);
+    }
 }
 
 /**
@@ -166,7 +170,7 @@
 {
     NSDate *date = nil;
     NSString *ds = [self colString:idx];
-    if (ds) {
+    if (ds && [ds length] > 0) {
         date = [[Database instance] dateFromString:ds];
     }
     return date;
@@ -193,7 +197,6 @@ static Database *theDatabase = nil;
 {
     if (!theDatabase) {
         theDatabase = [[Database alloc] init];
-        [theDatabase open];
     }
     return theDatabase;
 }
@@ -214,6 +217,8 @@ static Database *theDatabase = nil;
     }
 	
     dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setTimeZone: [NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
+    [dateFormatter setDateFormat: @"yyyyMMddHHmmss"];
 
     // Set US locale, because JP locale for date formatter is buggy,
     // especially for 12 hour settings.
@@ -242,12 +247,12 @@ static Database *theDatabase = nil;
 
    @return Returns YES if database exists, otherwise create database and returns NO.
 */
-- (BOOL)open
+- (BOOL)open:(NSString *)dbname
 {
     NSFileManager *fileManager = [NSFileManager defaultManager];
 
     // Load from DB
-    NSString *dbPath = [self dbPath];
+    NSString *dbPath = [self dbPath:dbname];
     BOOL isExistedDb = [fileManager fileExistsAtPath:dbPath];
 
     if (sqlite3_open([dbPath UTF8String], &handle) != 0) {
@@ -331,12 +336,12 @@ static Database *theDatabase = nil;
 /**
    Return database file name
 */
-- (NSString*)dbPath
+- (NSString*)dbPath:(NSString *)dbname
 {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     
     NSString *dataDir = [paths objectAtIndex:0];
-    NSString *dbPath = [dataDir stringByAppendingPathComponent:@"main.db"];
+    NSString *dbPath = [dataDir stringByAppendingPathComponent:dbname];
     NSLog(@"dbPath = %@", dbPath);
 
     return dbPath;
@@ -352,7 +357,8 @@ static Database *theDatabase = nil;
 
 - (NSString *)stringFromDate:(NSDate *)date
 {
-    return [dateFormatter stringFromDate:date];
+    NSString *str = [dateFormatter stringFromDate:date];
+    return str;
 }
 
 @end
