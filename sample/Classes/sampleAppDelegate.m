@@ -22,7 +22,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {    
     // Open & create database
     Database *db = [Database instance];
-    [db open];
+    [db open:@"sample.db"];
     
     // Migrate tables
     [Person migrate];
