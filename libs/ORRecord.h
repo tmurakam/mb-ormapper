@@ -2,6 +2,8 @@
 #import <UIKit/UIKit.h>
 #import "Database.h"
 
+#define PKEY @"id"
+
 @interface ORRecord : NSObject
 {
     int pid;
