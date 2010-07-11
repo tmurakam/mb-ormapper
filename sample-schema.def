@@ -1,4 +1,4 @@
-Person
+Person:PersonBase
 	name :TEXT
      	sex :INTEGER
         age :INTEGER

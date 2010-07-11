@@ -34,10 +34,11 @@
 =end
 
 class ClassDef
-    attr_accessor :name, :members, :types
+    attr_accessor :name, :bcname, :members, :types
 
     def initialize
         @name = nil
+        @bcname = nil
         @members = Array.new
         @types = Hash.new
     end
@@ -71,6 +72,10 @@ class Schema
                     end
                     classdef = ClassDef.new
                     classdef.name = $1
+                    classdef.bcname = $1
+                    if (line =~ /^\S+\s*:\s*(\S+)/)
+                        classdef.bcname = $1
+                    end
                 elsif (line =~ /\s+(\S+)\s*:(\S+)/)
                     member = $1
                     type = $2
