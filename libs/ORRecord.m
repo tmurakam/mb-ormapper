@@ -29,7 +29,8 @@
 {
     Database *db = [Database instance];
     dbstmt *stmt;
-    
+    BOOL ret;
+
     // check if table exists.
     NSString *sql, *tablesql;
     sql = [NSString stringWithFormat:@"SELECT sql FROM sqlite_master WHERE type='table' AND name='%@';", [self tableName]];
@@ -40,8 +41,10 @@
         sql = [NSString stringWithFormat:@"CREATE TABLE %@ (id INTEGER PRIMARY KEY);"];
         [db exec:sql];
         tablesql = sql;
+	ret = YES;
     } else {
         tablesql = [stmt colString:0];
+	ret = NO;
     }
 
     // add columns
@@ -58,7 +61,7 @@
             [db exec:sql];
         }
     }
-    return YES;
+    return ret;
 }
 
 /**
