@@ -38,6 +38,7 @@ $LOAD_PATH.push(File.expand_path(File.dirname($0)))
 require "schema.rb"
 
 VER = "0.1"
+PKEY = "id"
 
 def getObjcType(type)
     case type
@@ -101,6 +102,7 @@ EOF
 
 + (BOOL)migrate;
 
++ (id)allocator;
 + (NSMutableArray *)find_cond:(NSString *)cond;
 + (#{cdef.bcname} *)find:(int)pid;
 - (void)delete;
@@ -179,6 +181,15 @@ EOF
 }
 
 /**
+  @brief allocate entry
+*/
++ (id)allocator
+{
+    id e = [[#{cdef.bcname} alloc] init];
+    return e;
+}
+
+/**
   @brief get all records matche the conditions
 
   @param cond Conditions (WHERE phrase and so on)
@@ -199,7 +210,7 @@ EOF
 
     stmt = [db prepare:sql];
     while ([stmt step] == SQLITE_ROW) {
-        #{cdef.bcname} *e = [[[#{cdef.bcname} alloc] init] autorelease];
+        #{cdef.bcname} *e = [[self allocator] autorelease];
         [e _loadRow:stmt];
         [array addObject:e];
     }
@@ -216,13 +227,13 @@ EOF
 {
     Database *db = [Database instance];
 
-    dbstmt *stmt = [db prepare:@"SELECT * FROM #{cdef.name} WHERE id = ?;"];
+    dbstmt *stmt = [db prepare:@"SELECT * FROM #{cdef.name} WHERE #{PKEY} = ?;"];
     [stmt bindInt:0 val:pid];
     if ([stmt step] != SQLITE_ROW) {
         return nil;
     }
 
-    #{cdef.bcname} *e = [[[#{cdef.bcname} alloc] init] autorelease];
+    #{cdef.bcname} *e = [[self allocator] autorelease];
     [e _loadRow:stmt];
  
     return e;
@@ -305,7 +316,7 @@ EOF
         fh.puts "#{m} = ?\""
     end
     
-    fh.puts "        \" WHERE id = ?;\"];"
+    fh.puts "        \" WHERE #{PKEY} = ?;\"];"
 
     i = 0
     cdef.members.each do |m|
@@ -327,7 +338,7 @@ EOF
 {
     Database *db = [Database instance];
 
-    dbstmt *stmt = [db prepare:@"DELETE FROM #{cdef.name} WHERE id = ?;"];
+    dbstmt *stmt = [db prepare:@"DELETE FROM #{cdef.name} WHERE #{PKEY} = ?;"];
     [stmt bindInt:0 val:pid];
     [stmt step];
 }
