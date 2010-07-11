@@ -66,16 +66,23 @@ class Schema
             fh.each do |line|
                 line.chop!
                 
-                if (line =~ /^(\S+)/)
+                if (line =~ /^\S/)
+                    name = bcname = nil
+                    if (line =~ /(.*)\s*:\s*(.*)/)
+                        name = $1
+                        bcname = $2
+                    else
+                        line =~ /^(\S+)/
+                        name = $1
+                        bcname = name
+                    end
+
                     if (classdef != nil)
                         @defs.push(classdef)
                     end
                     classdef = ClassDef.new
-                    classdef.name = $1
-                    classdef.bcname = $1
-                    if (line =~ /^\S+\s*:\s*(\S+)/)
-                        classdef.bcname = $1
-                    end
+                    classdef.name = name
+                    classdef.bcname = bcname
                 elsif (line =~ /\s+(\S+)\s*:(\S+)/)
                     member = $1
                     type = $2
