@@ -37,12 +37,16 @@
 #import <UIKit/UIKit.h>
 #import <sqlite3.h>
 
+@class Database;
+
 /**
    Wrapper class of sqlite3_stmt
 */
 @interface dbstmt : NSObject {
     sqlite3_stmt *stmt;	///< sqlite3_stmt handle.
     sqlite3 *handle;    ///< database handle.
+
+    Database *db; ///< Database class handle
 }
 
 @property(nonatomic,assign) sqlite3 *handle;
@@ -74,6 +78,7 @@
 }
 
 @property(nonatomic,readonly) sqlite3 *handle;
+@property(nonatomic,readonly) BOOL needFixDateFormat;
 
 + (Database*)instance;
 + (void)shutdown;

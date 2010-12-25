@@ -37,8 +37,8 @@ $LOAD_PATH.push(File.expand_path(File.dirname($0)))
 
 require "schema.rb"
 
-VER = "0.1"
-PKEY = "id"
+VER = "0.2"
+PKEY = "key"
 
 def getObjcType(type)
     case type
@@ -103,16 +103,28 @@ EOF
 + (BOOL)migrate;
 
 + (id)allocator;
-+ (NSMutableArray *)find_cond:(NSString *)cond;
+
+// CRUD (Create/Read/Update/Delete) operations
+
+// Create operations
+- (void)insert;
+
+// Read operations
 + (#{cdef.bcname} *)find:(int)pid;
++ (NSMutableArray *)find_cond:(NSString *)cond;
++ (dbstmt *)gen_stmt:(NSString *)cond;
++ (NSMutableArray *)find_stmt:(dbstmt *)cond;
+
+// Update operations
+- (void)update;
+
+// Delete operations
 - (void)delete;
 + (void)delete_cond:(NSString *)cond;
 + (void)delete_all;
 
 // internal functions
 + (NSString *)tableName;
-- (void)insert;
-- (void)update;
 - (void)_loadRow:(dbstmt *)stmt;
 
 @end
@@ -185,37 +197,11 @@ EOF
 */
 + (id)allocator
 {
-    id e = [[#{cdef.bcname} alloc] init];
+    id e = [[[#{cdef.bcname} alloc] init] autorelease];
     return e;
 }
 
-/**
-  @brief get all records matche the conditions
-
-  @param cond Conditions (WHERE phrase and so on)
-  @return array of records
-*/
-+ (NSMutableArray *)find_cond:(NSString *)cond
-{
-    NSMutableArray *array = [[[NSMutableArray alloc] init] autorelease];
-    Database *db = [Database instance];
-    dbstmt *stmt;
-
-    NSString *sql;
-    if (cond == nil) {
-        sql = @"SELECT * FROM #{cdef.name};";
-    } else {
-        sql = [NSString stringWithFormat:@"SELECT * FROM #{cdef.name} %@;", cond];
-    }  
-
-    stmt = [db prepare:sql];
-    while ([stmt step] == SQLITE_ROW) {
-        #{cdef.bcname} *e = [[self allocator] autorelease];
-        [e _loadRow:stmt];
-        [array addObject:e];
-    }
-    return array;
-}
+#pragma mark Read operations
 
 /**
   @brief get the record matchs the id
@@ -233,10 +219,59 @@ EOF
         return nil;
     }
 
-    #{cdef.bcname} *e = [[self allocator] autorelease];
+    #{cdef.bcname} *e = [self allocator];
     [e _loadRow:stmt];
  
     return e;
+}
+
+/**
+  @brief get all records matche the conditions
+
+  @param cond Conditions (WHERE phrase and so on)
+  @return array of records
+*/
++ (NSMutableArray *)find_cond:(NSString *)cond
+{
+    dbstmt *stmt = [self gen_stmt:cond];
+    NSMutableArray *array = [self find_stmt:stmt];
+    return array;
+}
+
+/**
+  @brief create dbstmt
+
+  @param s condition
+  @return dbstmt
+*/
++ (dbstmt *)gen_stmt:(NSString *)cond
+{
+    NSString *sql;
+    if (cond == nil) {
+        sql = @"SELECT * FROM #{cdef.name};";
+    } else {
+        sql = [NSString stringWithFormat:@"SELECT * FROM #{cdef.name} %@;", cond];
+    }  
+    dbstmt *stmt = [[Database instance] prepare:sql];
+    return stmt;
+}
+
+/**
+  @brief get all records matche the conditions
+
+  @param stmt Statement
+  @return array of records
+*/
++ (NSMutableArray *)find_stmt:(dbstmt *)stmt
+{
+    NSMutableArray *array = [[[NSMutableArray alloc] init] autorelease];
+
+    while ([stmt step] == SQLITE_ROW) {
+        #{cdef.bcname} *e = [self allocator];
+        [e _loadRow:stmt];
+        [array addObject:e];
+    }
+    return array;
 }
 
 - (void)_loadRow:(dbstmt *)stmt
@@ -257,10 +292,7 @@ EOF
     isInserted = YES;
 }
 
-+ (NSString *)tableName
-{
-    return @"#{cdef.name}";
-}
+#pragma mark Create operations
 
 - (void)insert
 {
@@ -269,7 +301,7 @@ EOF
     Database *db = [Database instance];
     dbstmt *stmt;
     
-    [db beginTransaction];
+    //[db beginTransaction];
 EOF
 
     fh.print "    stmt = [db prepare:@\"INSERT INTO #{cdef.name} VALUES(NULL"
@@ -291,16 +323,18 @@ EOF
 
     self.pid = [db lastInsertRowId];
 
-    [db commitTransaction];
+    //[db commitTransaction];
     isInserted = YES;
 }
+
+#pragma mark Update operations
 
 - (void)update
 {
     [super update];
 
     Database *db = [Database instance];
-    [db beginTransaction];
+    //[db beginTransaction];
 
     dbstmt *stmt = [db prepare:@"UPDATE #{cdef.name} SET "
 EOF
@@ -328,8 +362,10 @@ EOF
     [stmt bindInt:#{i} val:pid];
 
     [stmt step];
-    [db commitTransaction];
+    //[db commitTransaction];
 }
+
+#pragma mark Delete operations
 
 /**
   @brief Delete record
@@ -360,6 +396,13 @@ EOF
 + (void)delete_all
 {
     [#{cdef.bcname} delete_cond:nil];
+}
+
+#pragma mark Internal functions
+
++ (NSString *)tableName
+{
+    return @"#{cdef.name}";
 }
 
 @end

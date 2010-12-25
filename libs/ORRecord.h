@@ -2,7 +2,7 @@
 #import <UIKit/UIKit.h>
 #import "Database.h"
 
-#define PKEY @"id"
+#define PKEY @"key"
 
 @interface ORRecord : NSObject
 {

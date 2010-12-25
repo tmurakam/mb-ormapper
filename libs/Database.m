@@ -32,7 +32,8 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#import "Database.h"
+#import "AppDelegate.h"
+#import "DateFormatter2.h"
 
 #pragma mark dbstmt implementation
 
@@ -48,6 +49,7 @@
     self = [super init];
     if (self != nil) {
         stmt = st;
+        db = [Database instance];
     }
     return self;
 }
@@ -120,7 +122,7 @@
     NSString *str;
     
     if (date != NULL) {
-        str = [[Database instance] stringFromDate:date];
+        str = [db stringFromDate:date];
         sqlite3_bind_text(stmt, idx+1, [str UTF8String], -1, SQLITE_TRANSIENT);
     }
 }
@@ -171,7 +173,7 @@
     NSDate *date = nil;
     NSString *ds = [self colString:idx];
     if (ds && [ds length] > 0) {
-        date = [[Database instance] dateFromString:ds];
+        date = [db dateFromString:ds];
     }
     return date;
 }
@@ -215,11 +217,11 @@ static Database *theDatabase = nil;
     if (self != nil) {
         handle = 0;
     }
-	
+    
     dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setTimeZone: [NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
+    [dateFormatter setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
     [dateFormatter setDateFormat: @"yyyyMMddHHmmss"];
-
+    
     // Set US locale, because JP locale for date formatter is buggy,
     // especially for 12 hour settings.
     NSLocale *us = [[[NSLocale alloc] initWithLocaleIdentifier:@"US"] autorelease];
@@ -264,6 +266,7 @@ static Database *theDatabase = nil;
         isExistedDb = NO;
     }
 
+    NSLog(@"Database:open: %d", isExistedDb);
     return isExistedDb;
 }
 
@@ -352,7 +355,15 @@ static Database *theDatabase = nil;
 
 - (NSDate *)dateFromString:(NSString *)str
 {
-    return [dateFormatter dateFromString:str];
+    NSDate *date = nil;
+    
+    if ([str length] == 14) { // yyyyMMddHHmmss
+        date = [dateFormatter dateFromString:str];
+    }
+    if (date == nil) {
+        date = [dateFormatter dateFromString:@"20000101000000"]; // fallback
+    }
+    return date;
 }
 
 - (NSString *)stringFromDate:(NSDate *)date
