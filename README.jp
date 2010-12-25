@@ -1,20 +1,23 @@
-■ iPhone SDK 用 O/R マッパー
+■ iOS / Android 用 O/R マッパー
 
-iPhone SDK 用の O/R マッパーツールです。
+iOS / Android 用の O/R マッパーツールです。
 データベース定義 (schema) から自動的にモデルを生成します。
 
-素直に CoreData を使ったほうが良いような気がするので、
-使うのは正直お勧めできないw
+iOS と Android 両対応のアプリを書くときには、特に便利。
+
+ただ、iOS しかアプリ作らない場合は、素直に CoreData を使ったほうが
+良いような気がするので、使うのは正直お勧めできないw
 
 
-○ 使い方
+○ iOS 版の使い方
 
 データベース定義のサンプルが sample-schema.def にあります。
 以下のようにすることでモデルを生成できます。
 
- $ ./generate.rb sample-schema.def
+ $ cd iOS
+ $ ./generate.rb ../sample-schema.def
 
-sample.m とモデルのソースを見ればだいたい使い方はわかると思います。
+生成されたファイルを見ればだいたい使い方はわかると思います。
 
 最初に [Database instance] を呼び出してデータベースのインス
 タンスを作成し、open メソッドを呼び出してデータベースを
@@ -35,6 +38,9 @@ sample.m とモデルのソースを見ればだいたい使い方はわかる�
 
 レコードの削除は delete で行います。
 
+○ Android 版の使い方
+
+TBD
 
 ○ schema について
 
