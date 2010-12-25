@@ -14,7 +14,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.*;
 
-public class Database extends SQLiteOpenHelper {
+public class ORDatabase extends SQLiteOpenHelper {
     private static final String TAG = "ORMapper";
 
     private static final int VERSION = 1;
@@ -26,7 +26,7 @@ public class Database extends SQLiteOpenHelper {
     private static String mDatabaseName;
     
     /** データベースインスタンス */
-    private static Database sInstance;
+    private static ORDatabase sInstance;
 
     private static SimpleDateFormat sDateFormat;
     
@@ -59,7 +59,7 @@ public class Database extends SQLiteOpenHelper {
     public static SQLiteDatabase getDB() {
         assert(mApplicationContext != null);
         if (sInstance == null) {
-            sInstance = new Database(mApplicationContext, mDatabaseName);
+            sInstance = new ORDatabase(mApplicationContext, mDatabaseName);
         }
         return sInstance._getDB();
     }
@@ -80,7 +80,7 @@ public class Database extends SQLiteOpenHelper {
 
     // --- Internal methods
 
-    private Database(Context context, String databaseName) {
+    private ORDatabase(Context context, String databaseName) {
         super(context.getApplicationContext(), databaseName, null, VERSION);
     }
 
@@ -140,7 +140,7 @@ public class Database extends SQLiteOpenHelper {
         BufferedReader b = new BufferedReader(new InputStreamReader(in));
 
         // execute each sql
-        SQLiteDatabase db = Database.getDB();
+        SQLiteDatabase db = ORDatabase.getDB();
         String sql;
         try {
             while ((sql = b.readLine()) != null) {
