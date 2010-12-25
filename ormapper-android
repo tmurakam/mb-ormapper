@@ -355,8 +355,14 @@ if (!schema.vers.has_key?("PKGNAME"))
    exit 1
 end
 
+# output dir
+outdir = "."
+if (schema.vers.has_key?("OUTDIR"))
+    outdir = schema.vers["OUTDIR"]
+end
+
 # create output dir
-outdir = "src/" + schema.vers["PKGNAME"].gsub(/\./, "/")
+outdir = outdir + "/" + schema.vers["PKGNAME"].gsub(/\./, "/")
 system "mkdir -p " + outdir
 
 # generate
