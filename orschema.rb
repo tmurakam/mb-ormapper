@@ -79,11 +79,16 @@ class Schema
 
             fh.each do |line|
                 line.chop!
-                
-                if (line =~ /^(\S+)\s*=\s*(\S+)/)
+
+                if (line =~ /^\s*#/)
+                   # comment
+                   next                   
+
+                elsif (line =~ /^(\S+)\s*=\s*(\S+)/)
                     name = $1
                     value = $2
                     @vers[name] = value
+
                 elsif (line =~ /^\S/)
                     name = bcname = rcname = nil
                     if (line =~ /(.*)\s*:\s*(.*)\s*,\s*(.*)/)
