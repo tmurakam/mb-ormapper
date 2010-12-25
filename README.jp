@@ -9,15 +9,24 @@ iOS と Android 両対応のアプリを書くときには、特に便利。
 良いような気がするので、使うのは正直お勧めできないw
 
 
-○ iOS 版の使い方
+○ モデルの生成手順
 
 データベース定義のサンプルが sample-schema.def にあります。
 以下のようにすることでモデルを生成できます。
 
- $ cd iOS
- $ ./generate.rb ../sample-schema.def
+iOS の場合:
 
-生成されたファイルを見ればだいたい使い方はわかると思います。
+ $ ./ormapper-ios sample-schema.def
+
+Android の場合:
+
+ $ ./ormapper-android sample-schema.def
+
+生成されたファイルとプロジェクトに追加してください。
+また、iOS/Android ディレクトリ内のファイルも適宜追加してください。
+
+
+○ 使用方法 : iOS の場合
 
 最初に [Database instance] を呼び出してデータベースのインス
 タンスを作成し、open メソッドを呼び出してデータベースを
@@ -26,19 +35,18 @@ iOS と Android 両対応のアプリを書くときには、特に便利。
 次に各モデルの migrate メソッドを呼び出してテーブルの作成・
 マイグレーションを行います。
 
-テーブルの読み込みには find_all, find_cond のメソッドを
-使います。これらのメソッドはモデルの NSMutableArray 配列
-を返します。
+テーブルの読み込みにはファインダメソッド群 (find) を使います。
+これらのメソッドはモデルの NSMutableArray 配列を返します。
 
-特定の ID を持つレコードを読み出したい場合は find メソッド
-を使ってください。
+特定の ID を持つレコードを読み出したい場合は find(int pid)
+メソッドを使ってください。
 
 レコードの作成、保存を行う場合は、モデルのインスタンスを
 生成し、save メソッドを呼ぶだけです。
 
 レコードの削除は delete で行います。
 
-○ Android 版の使い方
+○ 使用方法 : Android の場合
 
 TBD
 
@@ -57,19 +65,23 @@ schema は以下のように記述します
 ----
 
 「モデル名」と同じ名前でモデルクラスが生成されます。
-ファイル名は "モデル名.h", "モデル名.m" になります。
+iOSの場合、ファイル名は "モデル名.h", "モデル名.m" になります。
+Androidの場合は"モデル名.java" になります。
+
 また、SQL テーブル名はクラス名と同じ名前になります。
 (RoR のように複数形にしたりはしません)
 
 型には SQLite のデータ型を指定します。今のところサポートしている
-型、およびこれに対応する Objective-C の型は以下の通りです。
+型、およびこれに対応する Objective-C、および Java の型は以下の通りです。
 
-   SQL type   Obj-C type
-   -----------------------
-   INTEGER    int
-   REAL       double
-   TEXT       NSString *
-   DATE       NSDate *
+   SQL type   Obj-C type    Java type
+   -----------------------------------
+   INTEGER    int           int
+   REAL       double        double
+   TEXT       NSString *    String
+   DATE       NSDate *      long (*1)
+
+   *1: 1970/1/1 0:00 UTC からの経過ミリ秒数
 
 カラム名に指定した名前で、モデルクラスのプロパティが自動的に作成
 されます。
