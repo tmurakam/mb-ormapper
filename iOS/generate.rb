@@ -35,7 +35,7 @@
 
 $LOAD_PATH.push(File.expand_path(File.dirname($0)))
 
-require "schema.rb"
+require "../schema.rb"
 
 VER = "0.2"
 PKEY = "key"

@@ -1,3 +1,5 @@
+PKGNAME = com.example.person
+
 Person:PersonBase
 	name :TEXT
      	sex :INTEGER

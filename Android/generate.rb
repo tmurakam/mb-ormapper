@@ -34,8 +34,9 @@
 =end
 
 $LOAD_PATH.push(File.expand_path(File.dirname($0)))
+$LOAD_PATH.push(File.expand_path(File.dirname($0)) + "/../")
 
-require "../schema.rb"
+require "schema.rb"
 
 VER = "0.2"
 PKEY = "key"
@@ -185,25 +186,25 @@ EOF
 
     /**
      * Get all records matches the conditions
-     * @where where Conditions (WHERE phrase and so on)
+     * @param cond Conditions (WHERE phrase and so on)
      * @return array of records
      */
-    public static List<#{cdef.rcname}> find(String where) {
-        return find(where, null);
+    public static List<#{cdef.rcname}> find(String cond) {
+        return find(cond, null);
     }
 
     /**
      * Get all records match the conditions
-     * @where where Conditions (WHERE phrase and so on)
-     * @param params WHERE parameters
+     * @param cond Conditions (WHERE phrase and so on)
+     * @param params parameters
      * @return array of records
      */
-    public static List<#{cdef.rcname}> find(String where, String[] params) {
+    public static List<#{cdef.rcname}> find(String cond, String[] params) {
         String sql;
         sql = "SELECT * FROM " + tableName;
-        if (where != null) {
+        if (cond != null) {
             sql += " ";
-            sql += where;
+            sql += cond;
         }
         SQLiteDatabase db = Database.getDB();
         Cursor cursor = db.rawQuery(sql, params);
@@ -229,12 +230,12 @@ EOF
     i = 1
     cdef.members.each do |m|
         type = cdef.types[m]
-        upcase = cdef.camelCase(m)
+        mname = "m" + cdef.CamelCase(m)
         if (type == "DATE")
-            fh.puts "        this.m#{upcase} = Database.str2date(cursor.getString(#{i}));"
+            fh.puts "        this.#{mname} = Database.str2date(cursor.getString(#{i}));"
         else    
             method = getMethodType(type);
-            fh.puts "        this.m#{upcase} = cursor.get#{method}(#{i});"
+            fh.puts "        this.#{mname} = cursor.get#{method}(#{i});"
         end
         i+=1
     end
@@ -289,11 +290,11 @@ EOF
 
     i = 1
     cdef.members.each do |m|
-        upcase = cdef.camelCase(m)
+        mname = "m" + cdef.CamelCase(m)
         if (cdef.types[m] == "DATE")
-            fh.puts "        cv.put(\"#{m}\", Database.date2str(this.m#{upcase}));"
+            fh.puts "        cv.put(\"#{m}\", Database.date2str(this.#{mname}));"
         else
-            fh.puts "        cv.put(\"#{m}\", this.m#{upcase});"
+            fh.puts "        cv.put(\"#{m}\", this.#{mname});"
         end
     end
 
@@ -319,8 +320,9 @@ EOF
 
     /**
      * Delete records
+     * @param cond Conditions
      */
-    public static void delete(String where) {
+    public static void delete(String cond) {
         SQLiteDatabase db = Database.getDB();
 
         if (cond == null) {
@@ -329,6 +331,10 @@ EOF
         String sql = "DELETE FROM " + tableName + " " + cond;
         db.execSQL(sql);
     }
+
+    public static void delete_all() {
+        delete(null);
+    }     
 }
 EOF
 

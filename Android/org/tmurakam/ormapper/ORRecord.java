@@ -94,15 +94,4 @@ public abstract class ORRecord {
      * Update record
      */
     public abstract void update();
-
-    /**    
-     * Delete record
-     */
-    public abstract void delete();
-
-    public abstract void delete_cond(String cond);
-
-    final public void delete_all() {
-        delete_cond(null);
-    }
 }
