@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 =begin
-  O/R Mapper library for iPhone
+  O/R Mapper library for Android
 
   Copyright (c) 2010, Takuya Murakami. All rights reserved.
 
@@ -34,14 +34,26 @@
 =end
 
 class ClassDef
-    attr_accessor :name, :bcname, :members, :types
+    attr_accessor :name, :bcname, :rcname, :members, :types
 
     def initialize
-        @name = nil
-        @bcname = nil
-        @members = Array.new
-        @types = Hash.new
+        @name = nil             # table name
+        @bcname = nil           # base class name
+        @rcname = nil           # real class name
+        @members = Array.new    # members
+        @types = Hash.new       # types
     end
+
+    def camelCase(name)
+        name = name.gsub(/_./) { |x| x.gsub(/_/, "").upcase }
+        return name
+    end 
+
+    def CamelCase(name)
+        name = name.gsub(/^./) { |x| x.upcase }
+        name = name.gsub(/_./) { |x| x.gsub(/_/, "").upcase }
+        return name
+    end 
 
     def dump
         puts "-- #{@name} --"
@@ -53,9 +65,11 @@ end
 
 class Schema
     attr_reader :defs
+    attr_reader :vers
 
     def initialize
         @defs = Array.new
+        @vers = Hash.new
     end
 
     def loadFromFile(filename)
@@ -66,14 +80,24 @@ class Schema
             fh.each do |line|
                 line.chop!
                 
-                if (line =~ /^\S/)
-                    name = bcname = nil
-                    if (line =~ /(.*)\s*:\s*(.*)/)
+                if (line =~ /^(\S+)\s*=\s*(\S+)/)
+                    name = $1
+                    value = $2
+                    @vers[name] = value
+                elsif (line =~ /^\S/)
+                    name = bcname = rcname = nil
+                    if (line =~ /(.*)\s*:\s*(.*)\s*,\s*(.*)/)
                         name = $1
-                        bcname = $2
+                        rcname = $2
+                        bcname = $3
+                    elsif (line =~ /(.*)\s*:\s*(.*)/)
+                        name = $1
+                        rcname = $2
+                        bcname = rcname
                     else
                         line =~ /^(\S+)/
                         name = $1
+                        rcname = name
                         bcname = name
                     end
 
@@ -82,6 +106,7 @@ class Schema
                     end
                     classdef = ClassDef.new
                     classdef.name = name
+                    classdef.rcname = rcname
                     classdef.bcname = bcname
                 elsif (line =~ /\s+(\S+)\s*:(\S+)/)
                     member = $1
