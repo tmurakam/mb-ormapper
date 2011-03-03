@@ -120,7 +120,7 @@ EOF
 + (NSMutableArray *)find_all:(NSString *)cond;
 
 + (dbstmt *)gen_stmt:(NSString *)cond;
-+ (#{cdef.bcname} *)find_first_stmt:(dbstmt *)cond;
++ (#{cdef.rcname} *)find_first_stmt:(dbstmt *)cond;
 + (NSMutableArray *)find_all_stmt:(dbstmt *)cond;
 
 // Delete operations

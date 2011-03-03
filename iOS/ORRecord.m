@@ -122,7 +122,7 @@
 
    @note You must override this.
 */
-+ (NSMutableArray *)find_cond:(NSString *)cond
++ (NSMutableArray *)find_all:(NSString *)cond
 {
     return nil;
 }
