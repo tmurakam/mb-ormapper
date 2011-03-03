@@ -136,7 +136,7 @@ static Database *sDatabase = nil;
     }
 
     dbstmt *dbs = [[[dbstmt alloc] initWithStmt:stmt] autorelease];
-    dbs.handle = self.handle;
+    //dbs.handle = self.handle;
     return dbs;
 }
 
