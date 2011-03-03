@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 #-*-  Mode:ruby; c-basic-offset:4; tab-width:8; indent-tabs-mode:nil -*-
 =begin
   O/R Mapper library for Android
