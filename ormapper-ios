@@ -220,6 +220,12 @@ EOF
 
     dbstmt *stmt = [db prepare:@"SELECT * FROM #{cdef.name} WHERE #{vers["PKEY"]} = ?;"];
     [stmt bindInt:0 val:pid];
+<<<<<<< HEAD
+=======
+    if ([stmt step] != SQLITE_ROW) {
+        return nil;
+    }
+>>>>>>> c478035... updated
 
     return [self find_first_stmt:stmt];
 }

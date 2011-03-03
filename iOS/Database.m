@@ -49,6 +49,11 @@ static Database *sDatabase = nil;
     return sDatabase;
 }
 
++ (void)setSingletonInstance:(Database *)database
+{
+    sDatabase = database;
+}
+
 + (void)shutdown
 {
     [sDatabase release];
@@ -131,7 +136,7 @@ static Database *sDatabase = nil;
     }
 
     dbstmt *dbs = [[[dbstmt alloc] initWithStmt:stmt] autorelease];
-    dbs.mHandle = self.mHandle;
+    dbs.handle = self.handle;
     return dbs;
 }
 
@@ -201,7 +206,7 @@ static Database *sDatabase = nil;
     // default impl.
     NSDate *date = [[self dateFormatter] dateFromString:str];
     if (date == nil) {
-        date = [dateFormatter dateFromString:@"20000101000000"]; // fallback
+        date = [[self dateFormatter] dateFromString:@"20000101000000"]; // fallback
     }
     return date;
 }
@@ -209,7 +214,7 @@ static Database *sDatabase = nil;
 - (NSString *)stringFromDate:(NSDate *)date
 {
     // default impl.
-    return [[self dateFormatter] dateFormatter stringFromDate:str];
+    return [[self dateFormatter] stringFromDate:date];
 }
 
 @end
