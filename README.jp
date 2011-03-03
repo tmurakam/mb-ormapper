@@ -1,4 +1,5 @@
-■ iOS / Android 用 O/R マッパー
+iOS / Android 用 O/R マッパー
+=============================
 
 iOS / Android 用の O/R マッパーツールです。
 データベース定義 (schema) から自動的にモデルを生成します。
@@ -9,31 +10,36 @@ iOS と Android 両対応のアプリを書くときには、特に便利。
 良いような気がするので、使うのは正直お勧めできないw
 
 
-○ モデルの生成手順
+モデルの生成手順
+----------------
 
 データベース定義のサンプルが sample-schema.def にあります。
 以下のようにすることでモデルを生成できます。
 
 iOS の場合:
 
- $ ./ormapper-ios sample-schema.def
+    $ ./ormapper-ios sample-schema.def
 
 Android の場合:
 
- $ ./ormapper-android sample-schema.def
+    $ ./ormapper-android sample-schema.def
 
 生成されたファイルとプロジェクトに追加してください。
 また、iOS/Android ディレクトリ内のファイルも適宜追加してください。
 
 
-○ 使用方法 : iOS の場合
+使用方法 : iOS の場合
+---------------------
 
-最初に [Database instance] を呼び出してデータベースのインス
-タンスを作成し、open メソッドを呼び出してデータベースを
-作成・ロードします。
+最初に以下のようにしてデータベースのインスタンスを生成し、シングルトン
+として登録します。そして open を呼び出してデータベースの作成、ロードを
+行い、migrate を呼び出してテーブルの作成・マイグレーションを行います。
 
-次に各モデルの migrate メソッドを呼び出してテーブルの作成・
-マイグレーションを行います。
+    Database *db = [[Database alloc] init];
+    [Database setSingletonInstance:db];
+
+    [db open:@"MyDatabase.db"];
+    [db migrate];
 
 テーブルの読み込みにはファインダメソッド群 (find) を使います。
 これらのメソッドはモデルの NSMutableArray 配列を返します。
@@ -46,23 +52,24 @@ Android の場合:
 
 レコードの削除は delete で行います。
 
-○ 使用方法 : Android の場合
 
+使用方法 : Android の場合
+-------------------------
 TBD
 
-○ schema について
+schema について
+---------------
 
 schema は以下のように記述します
 
-----
-モデル名
-        型: カラム名
-        ...
+    モデル名
+            型: カラム名
+            ...
 
-モデル名
-        型: カラム名
-        ...
-----
+    モデル名
+            型: カラム名
+            ...
+
 
 「モデル名」と同じ名前でモデルクラスが生成されます。
 iOSの場合、ファイル名は "モデル名.h", "モデル名.m" になります。
@@ -74,14 +81,15 @@ Androidの場合は"モデル名.java" になります。
 型には SQLite のデータ型を指定します。今のところサポートしている
 型、およびこれに対応する Objective-C、および Java の型は以下の通りです。
 
-   SQL type   Obj-C type    Java type
-   -----------------------------------
-   INTEGER    int           int
-   REAL       double        double
-   TEXT       NSString *    String
-   DATE       NSDate *      long (*1)
+    SQL type   Obj-C type    Java type
+    -----------------------------------
+    INTEGER    int           int
+    REAL       double        double
+    TEXT       NSString *    String
+    DATE (*1)  NSDate *      long (*2)
 
-   *1: 1970/1/1 0:00 UTC からの経過ミリ秒数
+    *1: 内部的には14桁の文字列("yyyyMMddHHmmss") となる
+    *2: 1970/1/1 0:00 UTC からの経過ミリ秒数
 
 カラム名に指定した名前で、モデルクラスのプロパティが自動的に作成
 されます。

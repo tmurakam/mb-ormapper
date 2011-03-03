@@ -33,7 +33,10 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =end
 
-$LOAD_PATH.push(File.expand_path(File.dirname($0)))
+require 'fileutils'
+
+ORMDIR = File.expand_path(File.dirname($0))
+$LOAD_PATH.push(ORMDIR)
 
 require "orschema.rb"
 
@@ -105,8 +108,10 @@ EOF
 
 // CRUD (Create/Read/Update/Delete) operations
 
-// Create operations
-- (void)insert;
+// Create/update operations
+// Note: You should use 'save' method
+- (void)_insert;
+- (void)_update;
 
 // Read operations (Finder)
 + (#{cdef.bcname} *)find:(int)pid;
@@ -117,9 +122,6 @@ EOF
 + (dbstmt *)gen_stmt:(NSString *)cond;
 + (#{cdef.bcname} *)find_first_stmt:(dbstmt *)cond;
 + (NSMutableArray *)find_all_stmt:(dbstmt *)cond;
-
-// Update operations
-- (void)update;
 
 // Delete operations
 - (void)delete;
@@ -313,14 +315,14 @@ EOF
     
     fh.puts <<EOF
 
-    isInserted = YES;
+    mIsNew = NO;
 }
 
 #pragma mark Create operations
 
-- (void)insert
+- (void)_insert
 {
-    [super insert];
+    [super _insert];
 
     Database *db = [Database instance];
     dbstmt *stmt;
@@ -348,14 +350,14 @@ EOF
     self.pid = [db lastInsertRowId];
 
     //[db commitTransaction];
-    isInserted = YES;
+    mIsNew = NO;
 }
 
 #pragma mark Update operations
 
-- (void)update
+- (void)_update
 {
-    [super update];
+    [super _update];
 
     Database *db = [Database instance];
     //[db beginTransaction];
@@ -383,7 +385,7 @@ EOF
         i += 1
     end
     fh.puts <<EOF
-    [stmt bindInt:#{i} val:pid];
+    [stmt bindInt:#{i} val:mPid];
 
     [stmt step];
     //[db commitTransaction];
@@ -399,7 +401,7 @@ EOF
     Database *db = [Database instance];
 
     dbstmt *stmt = [db prepare:@"DELETE FROM #{cdef.name} WHERE #{vers["PKEY"]} = ?;"];
-    [stmt bindInt:0 val:pid];
+    [stmt bindInt:0 val:mPid];
     [stmt step];
 }
 
@@ -435,13 +437,13 @@ EOF
 end
 
 # start from here
-if (ARGV.size != 1)
-    STDERR.puts "usage: #{$0} [deffile]"
-    exit 1
+deffile = "schema.def"
+if (ARGV.size == 1)
+    deffile = ARGV[0]
 end
 
 schema = Schema.new
-schema.loadFromFile(ARGV[0])
+schema.loadFromFile(deffile)
 #schema.dump
 
 # primary key name
@@ -460,4 +462,12 @@ schema.defs.each do |cdef|
     fh = open(cdef.bcname + ".m", "w")
     generateImplementation(cdef, fh, schema.vers)
     fh.close
+end
+
+# copy needed files
+files = ["ORRecord.h", "ORRecord.m", "Dbstmt.h", "Dbstmt.m",
+         "Database.h", "Database.m"]
+
+files.each do |f|
+    FileUtils.cp(ORMDIR + "/iOS/" + f, f)
 end
