@@ -2,7 +2,7 @@
 /*
   O/R Mapper library for iPhone
 
-  Copyright (c) 2010-2011, Takuya Murakami. All rights reserved.
+  Copyright (c) 2010, Takuya Murakami. All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are
@@ -37,38 +37,29 @@
 #import <UIKit/UIKit.h>
 #import <sqlite3.h>
 
-#import "Dbstmt.h"
+@class Database;
 
 /**
-   Wrapper class of sqlite3 database (base class)
+   Wrapper class of sqlite3_stmt
 */
-@interface Database : NSObject {
-    sqlite3 *mHandle; ///< Database handle
+@interface dbstmt : NSObject {
+    sqlite3_stmt *mStmt;	///< sqlite3_stmt handle.
+    Database *mDb; ///< Database class handle
 }
 
-@property(nonatomic,readonly) sqlite3 *handle;
+- (id)initWithStmt:(sqlite3_stmt *)st;
+- (int)step;
+- (void)reset;
 
-+ (Database*)instance;
-+ (void)setSingletonInstance:(Database*)db;
-+ (void)shutdown;
+- (void)bindInt:(int)idx val:(int)val;
+- (void)bindDouble:(int)idx val:(double)val;
+- (void)bindCString:(int)idx val:(const char *)val;
+- (void)bindString:(int)idx val:(NSString*)val;
+- (void)bindDate:(int)idx val:(NSDate*)date;
 
-- (id)init;
-- (void)dealloc;
-
-- (void)exec:(NSString *)sql;
-- (dbstmt*)prepare:(NSString *)sql;
-- (int)lastInsertRowId;
-
-- (void)beginTransaction;
-- (void)commitTransaction;
-- (void)rollbackTransaction;
-
-- (NSString *)dbPath:(NSString *)dbname;
-- (BOOL)open:(NSString *)dbname;
-
-// utilities
-- (NSDateFormatter *)dateFormatter;
-- (NSDate*)dateFromString:(NSString *)str;
-- (NSString *)stringFromDate:(NSDate*)date;
-
+- (int)colInt:(int)idx;
+- (double)colDouble:(int)idx;
+- (const char*)colCString:(int)idx;
+- (NSString*)colString:(int)idx;
+- (NSDate*)colDate:(int)idx;
 @end
