@@ -37,7 +37,7 @@ $LOAD_PATH.push(File.expand_path(File.dirname($0)))
 
 require "orschema.rb"
 
-VER = "0.2"
+VER = "1.0"
 
 def getJavaType(type)
     case type
