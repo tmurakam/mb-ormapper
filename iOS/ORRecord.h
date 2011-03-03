@@ -14,7 +14,7 @@
 
 + (BOOL)migrate:(NSArray *)array;
 + (NSMutableArray *)find_all;
-+ (NSMutableArray *)find_cond:(NSString *)cond;
++ (NSMutableArray *)find_all:(NSString *)cond;
 + (id)find:(int)id;
 
 - (void)save;

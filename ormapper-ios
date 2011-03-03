@@ -109,11 +109,15 @@ EOF
 // Create operations
 - (void)insert;
 
-// Read operations
+// Read operations (Finder)
 + (#{cdef.bcname} *)find:(int)pid;
-+ (NSMutableArray *)find_cond:(NSString *)cond;
+//+ (#{cdef.bcname} *)find_first:(NSString *)cond;
+
++ (NSMutableArray *)find_all:(NSString *)cond;
+
 + (dbstmt *)gen_stmt:(NSString *)cond;
-+ (NSMutableArray *)find_stmt:(dbstmt *)cond;
++ (#{cdef.bcname} *)find_first_stmt:(dbstmt *)cond;
++ (NSMutableArray *)find_all_stmt:(dbstmt *)cond;
 
 // Update operations
 - (void)update;
@@ -213,29 +217,34 @@ EOF
 {
     Database *db = [Database instance];
 
-    dbstmt *stmt = [db prepare:@"SELECT * FROM #{cdef.name} WHERE #{PKEY} = ?;"];
+    dbstmt *stmt = [db prepare:@"SELECT * FROM #{cdef.name} WHERE #{PKEY} = ?;"];    
     [stmt bindInt:0 val:pid];
-    if ([stmt step] != SQLITE_ROW) {
-        return nil;
-    }
 
-    #{cdef.bcname} *e = [self allocator];
-    [e _loadRow:stmt];
- 
-    return e;
+    return [self find_first_stmt:stmt];
 }
 
 /**
-  @brief get all records matche the conditions
+  Get first record matches the conditions
 
   @param cond Conditions (WHERE phrase and so on)
   @return array of records
 */
-+ (NSMutableArray *)find_cond:(NSString *)cond
++ (#{cdef.bcname} *)find_first:(NSString *)cond
 {
     dbstmt *stmt = [self gen_stmt:cond];
-    NSMutableArray *array = [self find_stmt:stmt];
-    return array;
+    return  [self find_first_stmt:stmt];
+}
+
+/**
+  Get all records match the conditions
+
+  @param cond Conditions (WHERE phrase and so on)
+  @return array of records
+*/
++ (NSMutableArray *)find_all:(NSString *)cond
+{
+    dbstmt *stmt = [self gen_stmt:cond];
+    return  [self find_all_stmt:stmt];
 }
 
 /**
@@ -257,12 +266,28 @@ EOF
 }
 
 /**
-  @brief get all records matche the conditions
+  Get first record matches the conditions
 
   @param stmt Statement
   @return array of records
 */
-+ (NSMutableArray *)find_stmt:(dbstmt *)stmt
++ (#{cdef.bcname} *)find_first_stmt:(dbstmt *)stmt
+{
+    if ([stmt step] == SQLITE_ROW) {
+        #{cdef.bcname} *e = [self allocator];
+        [e _loadRow:stmt];
+        return e;
+    }
+    return nil;
+}
+
+/**
+  Get all records match the conditions
+
+  @param stmt Statement
+  @return array of records
+*/
++ (NSMutableArray *)find_all_stmt:(dbstmt *)stmt
 {
     NSMutableArray *array = [[[NSMutableArray alloc] init] autorelease];
 
