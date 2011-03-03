@@ -25,7 +25,7 @@
   @brief Migrate database table
 */
 
-+ (BOOL)migrate:(NSArray *)array
++ (BOOL)migrate:(NSArray *)array primaryKey:(NSString*)key
 {
     Database *db = [Database instance];
     dbstmt *stmt;
@@ -38,7 +38,8 @@
 
     // create table
     if ([stmt step] != SQLITE_ROW) {
-        sql = [NSString stringWithFormat:@"CREATE TABLE %@ (" PKEY @" INTEGER PRIMARY KEY);", [self tableName]];
+        sql = [NSString stringWithFormat:@"CREATE TABLE %@ ( %@ INTEGER PRIMARY KEY);",
+			[self tableName], key];
         [db exec:sql];
         tablesql = sql;
 	ret = YES;

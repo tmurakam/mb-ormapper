@@ -38,7 +38,6 @@ $LOAD_PATH.push(File.expand_path(File.dirname($0)))
 require "orschema.rb"
 
 VER = "0.2"
-PKEY = "key"
 
 def getJavaType(type)
     case type
@@ -101,24 +100,23 @@ EOF
 
     # declare member variables
     cdef.members.each do |m|
-        type = getJavaType(cdef.types[m])
-        fh.puts "    protected #{type} m#{cdef.CamelCase(m)};"
+        type = getJavaType(m.type)
+        fh.puts "    protected #{type} #{m.memberName};"
         fh.puts
     end
 
     # declare getter / setter
     fh.puts "    // getter / setter"
     cdef.members.each do |m|
-        type = getJavaType(cdef.types[m])
-        mname = "m" + cdef.CamelCase(m)
+        type = getJavaType(m.type)
 
         fh.puts <<EOF
-    public #{type} #{cdef.camelCase(m)}() {
-        return #{mname};
+    public #{type} #{m.getter}() {
+        return #{m.memberName};
     }
 
-    public void set#{cdef.CamelCase(m)}(#{type} #{cdef.camelCase(m)}) {
-        this.#{mname} = #{cdef.camelCase(m)};
+    public void #{m.setter}(#{type} #{m.propName}) {
+        this.#{m.memberName} = #{m.propName};
     }
 
 EOF
@@ -135,7 +133,7 @@ EOF
 EOF
 
     cdef.members.each do |m|
-        fh.puts "            \"#{m}\", \"#{cdef.types[m]}\","
+        fh.puts "            \"#{m.fieldName}\", \"#{m.type}\","
     end
 
     fh.puts <<EOF
@@ -228,13 +226,12 @@ EOF
 
     i = 1
     cdef.members.each do |m|
-        type = cdef.types[m]
-        mname = "m" + cdef.CamelCase(m)
+        type = m.type
         if (type == "DATE")
-            fh.puts "        this.#{mname} = ORDatabase.str2date(cursor.getString(#{i}));"
+            fh.puts "        this.#{m.memberName} = ORDatabase.str2date(cursor.getString(#{i}));"
         else    
             method = getMethodType(type);
-            fh.puts "        this.#{mname} = cursor.get#{method}(#{i});"
+            fh.puts "        this.#{m.memberName} = cursor.get#{method}(#{i});"
         end
         i+=1
     end
@@ -289,11 +286,10 @@ EOF
 
     i = 1
     cdef.members.each do |m|
-        mname = "m" + cdef.CamelCase(m)
-        if (cdef.types[m] == "DATE")
-            fh.puts "        cv.put(\"#{m}\", ORDatabase.date2str(this.#{mname}));"
+        if (m.type == "DATE")
+            fh.puts "        cv.put(\"#{m.fieldName}\", ORDatabase.date2str(this.#{m.memberName}));"
         else
-            fh.puts "        cv.put(\"#{m}\", this.#{mname});"
+            fh.puts "        cv.put(\"#{m.fieldName}\", this.#{m.memberName});"
         end
     end
 
@@ -339,6 +335,7 @@ EOF
 
 end
 
+##############################################################
 # start from here
 if (ARGV.size != 1)
     STDERR.puts "usage: #{$0} [deffile]"
@@ -353,6 +350,11 @@ schema.loadFromFile(ARGV[0])
 if (!schema.vers.has_key?("PKGNAME"))
    STDERR.puts "You must declare PKGNAME"
    exit 1
+end
+
+# primary key name
+if (!schema.vers.has_key?("PKEY"))
+    schema.vers["PKEY"] = "key"
 end
 
 # output dir

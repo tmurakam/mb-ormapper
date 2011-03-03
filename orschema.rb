@@ -33,17 +33,28 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =end
 
-class ClassDef
-    attr_accessor :name, :bcname, :rcname, :members, :types
+class MemberVar
+    attr_reader :type, :fieldName, :memberName
+    attr_reader :getter, :setter, :propName
 
-    def initialize
-        @name = nil             # table name
-        @bcname = nil           # base class name
-        @rcname = nil           # real class name
-        @members = Array.new    # members
-        @types = Hash.new       # types
+    def initialize(type, name, fieldName = nil)
+        @type = type
+
+        @getter = camelCase(name)
+        @setter = "set" + CamelCase(name)
+        @propName = @getter
+
+        @memberName = "m" + CamelCase(name)
+
+        if (fieldName != nil)
+            @fieldName = fieldName
+        else
+            @fieldName = name
+        end
+
     end
 
+    private
     def camelCase(name)
         name = name.gsub(/_./) { |x| x.gsub(/_/, "").upcase }
         return name
@@ -56,9 +67,24 @@ class ClassDef
     end 
 
     def dump
+        puts "  #{@type}: #{@fieldName} => #{@propertyName}"
+    end
+end
+
+class ClassDef
+    attr_accessor :name, :bcname, :rcname, :members
+
+    def initialize
+        @name = nil             # table name
+        @bcname = nil           # base class name
+        @rcname = nil           # real class name
+        @members = Array.new    # members
+    end
+
+    def dump
         puts "-- #{@name} --"
         @members.each do |member|
-            puts "  #{@types[member]}: #{member}"
+            member.dump
         end
     end
 end
@@ -113,11 +139,14 @@ class Schema
                     classdef.name = name
                     classdef.rcname = rcname
                     classdef.bcname = bcname
-                elsif (line =~ /\s+(\S+)\s*:(\S+)/)
-                    member = $1
-                    type = $2
+                elsif (line =~ /\s+(\S+)\s*=>\s*(\S+)\s*:(\S+)/)
+                    # property,column :type
+                    member = MemberVar.new($3, $1, $2)
                     classdef.members.push(member)
-                    classdef.types[member] = type
+                elsif (line =~ /\s+(\S+)\s*:(\S+)/)
+                    # column :type
+                    member = MemberVar.new($2, $1)
+                    classdef.members.push(member)
                 end
             end
             if (classdef != nil)
