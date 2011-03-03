@@ -2,10 +2,12 @@
 #import <UIKit/UIKit.h>
 #import "Database.h"
 
+#define PKEY @"key"
+
 @interface ORRecord : NSObject
 {
-    int pid;
-    BOOL isInserted;
+    int mPid;
+    BOOL mIsNew;
 }
 
 @property(nonatomic,assign) int pid;
@@ -16,8 +18,8 @@
 + (id)find:(int)id;
 
 - (void)save;
-- (void)insert;
-- (void)update;
+- (void)_insert;
+- (void)_update;
 - (void)delete;
 + (void)delete_all;
 

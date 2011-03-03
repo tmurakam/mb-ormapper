@@ -3,13 +3,13 @@
 
 @implementation ORRecord
 
-@synthesize pid;
+@synthesize pid = mPid;
 
 - (id)init
 {
     self = [super init];
     if (self) {
-        isInserted = NO;
+        mIsNew = YES;
     }
         
     return self;
@@ -103,27 +103,25 @@
 */
 - (void)save
 {
-    if (isInserted) {
-        [self update];
+    if (mIsNew) {
+        [self _insert];
     } else {
-        [self insert];
+        [self _update];
     }
+}
+
+- (void)_insert
+{
+    mIsNew = NO;
+}
+
+- (void)_update
+{
 }
 
 + (NSString *)tableName
 {
     return nil; // must be override
-}
-
-- (void)insert
-{
-    isInserted = YES;
-    return;
-}
-
-- (void)update
-{
-    return;
 }
 
 /**
