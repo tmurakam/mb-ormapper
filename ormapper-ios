@@ -106,8 +106,6 @@ EOF
 
 + (BOOL)migrate;
 
-+ (id)allocator;
-
 // CRUD (Create/Read/Update/Delete) operations
 
 // Create/update operations
@@ -207,15 +205,6 @@ EOF
         nil];
 
     return [super migrate:columnTypes primaryKey:@"#{vers["PKEY"]}"];
-}
-
-/**
-  @brief allocate entry
-*/
-+ (id)allocator
-{
-    id e = [[[#{cdef.baseClassName} alloc] init] autorelease];
-    return e;
 }
 
 #pragma mark Read operations
@@ -331,7 +320,7 @@ EOF
 + (#{cdef.className} *)find_first_stmt:(dbstmt *)stmt
 {
     if ([stmt step] == SQLITE_ROW) {
-        #{cdef.baseClassName} *e = [self allocator];
+        #{cdef.baseClassName} *e = [[[[self class] alloc] init] autorelease];
         [e _loadRow:stmt];
         return (#{cdef.className} *)e;
     }
