@@ -122,6 +122,7 @@ EOF
     cdef.members.each do |m|
         type, mem = getObjcType(m.type)
         fh.puts <<EOF
++ (#{cdef.className} *)find_by_#{m.fieldName}:(#{type})key cond:(NSString*)cond;
 + (#{cdef.className} *)find_by_#{m.fieldName}:(#{type})key;
 EOF
     end
@@ -247,12 +248,28 @@ EOF
         type, mem = getObjcType(m.type)
         fh.puts <<EOF
 
-/** finder */
-+ (#{cdef.className}*)find_by_#{m.fieldName}:(#{type})key
+/**
+  finder with #{m.fieldName}
+
+  @param key Key value
+  @param cond Conditions (ORDER BY etc)
+  @note If you specify WHERE conditions, you must start cond with "AND" keyword.
+*/
++ (#{cdef.className}*)find_by_#{m.fieldName}:(#{type})key cond:(NSString *)cond
 {
-    dbstmt *stmt = [[Database instance] prepare:@"SELECT * FROM #{cdef.tableName} WHERE #{m.fieldName} = ?;"];
+    if (cond == nil) {
+        cond = @"WHERE #{m.fieldName} = ? LIMIT 1";
+    } else {
+        cond = [NSString stringWithFormat:@"WHERE #{m.fieldName} = ? %@ LIMIT 1", cond];
+    }
+    dbstmt *stmt = [self gen_stmt:cond];
     [stmt bind#{getMethodType(m.type)}:0 val:key];
     return [self find_first_stmt:stmt];
+}
+
++ (#{cdef.className}*)find_by_#{m.fieldName}:(#{type})key
+{
+    return [self find_by_#{m.fieldName}:key cond:nil];
 }
 EOF
     end
@@ -266,6 +283,11 @@ EOF
 */
 + (#{cdef.className} *)find_first:(NSString *)cond
 {
+    if (cond == nil) {
+        cond = @"LIMIT 1";
+    } else {
+        cond = [cond stringByAppendingString:@" LIMIT 1";
+    }
     dbstmt *stmt = [self gen_stmt:cond];
     return  [self find_first_stmt:stmt];
 }
@@ -311,7 +333,7 @@ EOF
     if ([stmt step] == SQLITE_ROW) {
         #{cdef.baseClassName} *e = [self allocator];
         [e _loadRow:stmt];
-        return (#{cdef.className})e;
+        return (#{cdef.className} *)e;
     }
     return nil;
 }
