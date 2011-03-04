@@ -338,9 +338,10 @@ EOF
     NSMutableArray *array = [[[NSMutableArray alloc] init] autorelease];
 
     while ([stmt step] == SQLITE_ROW) {
-        #{cdef.baseClassName} *e = [self allocator];
+        #{cdef.baseClassName} *e = [[[self class] alloc] init];
         [e _loadRow:stmt];
         [array addObject:e];
+        [e release];
     }
     return array;
 }
