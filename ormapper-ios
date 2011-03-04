@@ -114,14 +114,23 @@ EOF
 - (void)_update;
 
 // Read operations (Finder)
-+ (#{cdef.bcname} *)find:(int)pid;
-//+ (#{cdef.bcname} *)find_first:(NSString *)cond;
++ (#{cdef.rcname} *)find:(int)pid;
+EOF
+
+    cdef.members.each do |m|
+        type, mem = getObjcType(m.type)
+        fh.puts <<EOF
++ (#{cdef.rcname} *)find_by_#{m.fieldName}:(#{type})key;
+EOF
+    end
+
+    fh.puts <<EOF
 
 + (NSMutableArray *)find_all:(NSString *)cond;
 
 + (dbstmt *)gen_stmt:(NSString *)cond;
-+ (#{cdef.rcname} *)find_first_stmt:(dbstmt *)cond;
-+ (NSMutableArray *)find_all_stmt:(dbstmt *)cond;
++ (#{cdef.rcname} *)find_first_stmt:(dbstmt *)stmt;
++ (NSMutableArray *)find_all_stmt:(dbstmt *)stmt;
 
 // Delete operations
 - (void)delete;
@@ -214,7 +223,7 @@ EOF
   @param pid Primary key of the record
   @return record
 */
-+ (#{cdef.bcname} *)find:(int)pid
++ (#{cdef.rcname} *)find:(int)pid
 {
     Database *db = [Database instance];
 
@@ -230,13 +239,30 @@ EOF
     return [self find_first_stmt:stmt];
 }
 
+EOF
+
+    cdef.members.each do |m|
+        type, mem = getObjcType(m.type)
+        fh.puts <<EOF
+
+/** finder */
++ (#{cdef.rcname}*)find_by_#{m.fieldName}:(#{type})key
+{
+    dbstmt *stmt = [[Database instance] prepare:@"SELECT * FROM #{cdef.name} WHERE #{m.fieldName} = ?;"];
+    [stmt bind#{getMethodType(m.type)}:0 val:key];
+    return [self find_first_stmt:stmt];
+}
+EOF
+    end
+
+    fh.puts <<EOF
 /**
   Get first record matches the conditions
 
   @param cond Conditions (WHERE phrase and so on)
   @return array of records
 */
-+ (#{cdef.bcname} *)find_first:(NSString *)cond
++ (#{cdef.rcname} *)find_first:(NSString *)cond
 {
     dbstmt *stmt = [self gen_stmt:cond];
     return  [self find_first_stmt:stmt];
@@ -278,12 +304,12 @@ EOF
   @param stmt Statement
   @return array of records
 */
-+ (#{cdef.bcname} *)find_first_stmt:(dbstmt *)stmt
++ (#{cdef.rcname} *)find_first_stmt:(dbstmt *)stmt
 {
     if ([stmt step] == SQLITE_ROW) {
         #{cdef.bcname} *e = [self allocator];
         [e _loadRow:stmt];
-        return e;
+        return (#{cdef.rcname})e;
     }
     return nil;
 }
@@ -442,6 +468,7 @@ EOF
 
 end
 
+##############################################################
 # start from here
 deffile = "schema.def"
 if (ARGV.size == 1)

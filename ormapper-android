@@ -163,22 +163,10 @@ EOF
      * @return record
      */
     public #{cdef.rcname} find(int pid) {
-        SQLiteDatabase db = ORDatabase.getDB();
-
         String[] param = {
             Integer.toString(pid)
         };
-        Cursor cursor = db.rawQuery("SELECT * FROM " + tableName + " WHERE key = ?;", param);
-
-        #{cdef.rcname} e = null;
-        cursor.moveToFirst();
-        if (!cursor.isAfterLast()) {
-            e = new #{cdef.rcname}();
-            e._loadRow(cursor);
-        }
-        cursor.close();
-
-        return e;
+        return findFirst("WHERE key = ?;", param);
     }
 
     /**
@@ -218,6 +206,33 @@ EOF
         cursor.close();
 
         return array;
+    }
+
+    /**
+     * Get first record matches the conditions
+     * @param cond Conditions (WHERE phrase and so on)
+     * @param params parameters
+     * @return record
+     */
+    public static #{cdef.rcname} findFirst(String cond, String[] params) {
+        String sql;
+        sql = "SELECT * FROM " + tableName;
+        if (cond != null) {
+            sql += " ";
+            sql += cond;
+        }
+        SQLiteDatabase db = ORDatabase.getDB();
+        Cursor cursor = db.rawQuery(sql, params);
+        cursor.moveToFirst();
+
+        #{cdef.rcname} e = null;
+        if (!cursor.isAfterLast()) {
+            e = new #{cdef.rcname}();
+            e._loadRow(cursor);
+        }
+        cursor.close();
+
+        return e;
     }
 
     protected void _loadRow(Cursor cursor) {
@@ -337,9 +352,9 @@ end
 
 ##############################################################
 # start from here
-if (ARGV.size != 1)
-    STDERR.puts "usage: #{$0} [deffile]"
-    exit 1
+deffile = "schema.def"
+if (ARGV.size == 1)
+    deffile = ARGV[0]
 end
 
 schema = Schema.new
