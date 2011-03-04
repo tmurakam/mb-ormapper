@@ -34,16 +34,22 @@
 static Database *sDatabase = nil;
 
 /**
+   Class initializer
+*/
++ (void)initialize
+{
+    NSLog(@"Database class initializer called.");
+    sDatabase = [[Database alloc] init];
+}
+
+/**
    Return the database instance (singleton)
 
    @return Database singleton instance
+   @note If you want to modify this class, use category.
 */
 + (Database *)instance
 {
-    if (sDatabase == nil) {
-        NSLog(@"WARNING: [Database instance] is called but it is nil!");
-    }
-
     return sDatabase;
 }
 

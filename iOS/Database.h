@@ -40,6 +40,7 @@
 
 @property(nonatomic,readonly) sqlite3 *handle;
 
++ (void)initialize;
 + (Database*)instance;
 + (void)setInstance:(Database*)db;
 + (void)shutdown;
