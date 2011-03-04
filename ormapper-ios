@@ -286,7 +286,7 @@ EOF
     if (cond == nil) {
         cond = @"LIMIT 1";
     } else {
-        cond = [cond stringByAppendingString:@" LIMIT 1";
+        cond = [cond stringByAppendingString:@" LIMIT 1"];
     }
     dbstmt *stmt = [self gen_stmt:cond];
     return  [self find_first_stmt:stmt];

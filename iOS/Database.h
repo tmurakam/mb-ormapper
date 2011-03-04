@@ -41,7 +41,7 @@
 @property(nonatomic,readonly) sqlite3 *handle;
 
 + (Database*)instance;
-+ (void)setSingletonInstance:(Database*)db;
++ (void)setInstance:(Database*)db;
 + (void)shutdown;
 
 - (id)init;
