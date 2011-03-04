@@ -43,23 +43,44 @@ static Database *sDatabase = nil;
 
 /**
    Return the database instance (singleton)
+
+   @return Database singleton instance
 */
 + (Database *)instance
 {
+    if (sDatabase == nil) {
+        NSLog(@"WARNING: [Database instance] is called but it is nil!");
+    }
+
     return sDatabase;
 }
 
-+ (void)setSingletonInstance:(Database *)database
+/**
+   Set the database instance (singleton)
+
+   @param database Database singleton instance
+*/
++ (void)setInstance:(Database *)database
 {
-    sDatabase = database;
+    if (sDatabase != nil) {
+        [sDatabase release];
+        NSLog(@"WARNING: Old Database instance was released.");
+    }
+    [sDatabase retain];
 }
 
+/**
+   Shutdown the database
+*/
 + (void)shutdown
 {
     [sDatabase release];
     sDatabase = nil;
 }
 
+/**
+   Constructor
+*/
 - (id)init
 {
     self = [super init];
@@ -69,10 +90,16 @@ static Database *sDatabase = nil;
     return self;
 }
 
+/**
+   Destructor
+*/
 - (void)dealloc
 {
-    //ASSERT(self == theDatabase);
-    sDatabase = nil;
+    if (self == sDatabase) {
+        sDatabase = nil;
+    } else {
+        NSLog(@"WARNING: database instance was released, but it didn't match the singleton");
+    }
 
     if (mHandle != nil) {
         sqlite3_close(mHandle);
@@ -173,22 +200,36 @@ static Database *sDatabase = nil;
 }
 
 /**
-   Return database file name
+   Return database file path
+
+   @param dbname Database file name, if it is nil, data folder name will be return.
+   @return Full path of the file name or directory path.
 */
 - (NSString*)dbPath:(NSString *)dbname
 {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     
     NSString *dataDir = [paths objectAtIndex:0];
-    NSString *dbPath = [dataDir stringByAppendingPathComponent:dbname];
-    NSLog(@"dbPath = %@", dbPath);
+    NSString *dbPath;
 
+    if (dbname == nil) {
+        dbPath = dataDir;
+    } else {
+        dbPath = [dataDir stringByAppendingPathComponent:dbname];
+    }
+
+    NSLog(@"dbPath = %@", dbPath);
     return dbPath;
 }
 
 #pragma mark -
 #pragma mark Utilities
 
+/**
+   Return NSDateFormatter instance to format DATE field
+
+   @note You can override this.
+ */
 - (NSDateFormatter *)dateFormatter
 {
     static NSDateFormatter *dateFormatter = nil;
@@ -196,11 +237,21 @@ static Database *sDatabase = nil;
         dateFormatter = [[NSDateFormatter alloc] init];
         [dateFormatter setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
         [dateFormatter setDateFormat: @"yyyyMMddHHmmss"];
+
+        // Avoid trivial bug for 'AM/PM' handling for some locales.
         [dateFormatter setLocale:[[[NSLocale alloc] initWithLocaleIdentifier:@"US"] autorelease]];
     }
     return dateFormatter;
 }
 
+/**
+   Convert date string to NSDate
+
+   @param str Date string
+   @return date
+
+   @note You can override this.
+*/
 - (NSDate *)dateFromString:(NSString *)str
 {
     // default impl.
@@ -211,6 +262,14 @@ static Database *sDatabase = nil;
     return date;
 }
 
+/**
+   Convert NSDate to string
+
+   @parem date NSDate
+   @return Date string
+
+   @note You can override this.
+*/
 - (NSString *)stringFromDate:(NSDate *)date
 {
     // default impl.

@@ -35,8 +35,8 @@ Android の場合:
 として登録します。そして open を呼び出してデータベースの作成、ロードを
 行い、migrate を呼び出してテーブルの作成・マイグレーションを行います。
 
-    Database *db = [[Database alloc] init];
-    [Database setSingletonInstance:db];
+    Database *db = [[[Database alloc] init] autorelease];
+    [Database setInstance:db];
 
     [db open:@"MyDatabase.db"];
     [db migrate];
