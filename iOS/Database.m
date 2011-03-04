@@ -58,6 +58,7 @@ static Database *sDatabase = nil;
         [sDatabase release];
         NSLog(@"WARNING: Old Database instance was released.");
     }
+    sDatabase = database;
     [sDatabase retain];
 }
 
