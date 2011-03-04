@@ -34,15 +34,6 @@
 static Database *sDatabase = nil;
 
 /**
-   Class initializer
-*/
-+ (void)initialize
-{
-    NSLog(@"Database class initializer called.");
-    sDatabase = [[Database alloc] init];
-}
-
-/**
    Return the database instance (singleton)
 
    @return Database singleton instance
@@ -50,15 +41,18 @@ static Database *sDatabase = nil;
 */
 + (Database *)instance
 {
+    if (sDatabase == nil) {
+        sDatabase = [[[self class] alloc] init];
+    }
     return sDatabase;
 }
 
-/**
-   Set the database instance (singleton)
++ (Database *)_instance
+{
+    return sDatabase;
+}
 
-   @param database Database singleton instance
-*/
-+ (void)setInstance:(Database *)database
++ (void)_setInstance:(Database *)database
 {
     if (sDatabase != nil) {
         [sDatabase release];
