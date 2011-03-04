@@ -71,6 +71,23 @@ def getMethodType(type)
     end
 end
 
+def getToString(type, var)
+    case type
+    when "INTEGER"
+        return "Integer.toString(#{var})"
+    when "REAL"
+        return "Double.toString(#{var})"
+    when "TEXT"
+        return var
+    when "DATE"
+        return "ORDatabase.date2str(#{var})"
+    else
+        puts "#{type} not supported"
+        exit 1
+    end
+end
+
+
 #
 # generate implementation
 #
@@ -163,12 +180,24 @@ EOF
      * @return record
      */
     public #{cdef.className} find(int pid) {
-        String[] param = {
-            Integer.toString(pid)
-        };
+        String[] param = { Integer.toString(pid) };
         return findFirst("WHERE key = ?;", param);
     }
+EOF
 
+    # find_by finders
+    cdef.members.each do |m|
+        fh.puts <<EOF
+
+    public #{cdef.className} find_by_#{m.fieldName}(#{getJavaType(m.type)} key) {
+        String[] param = { #{getToString(m.type, "key")} };
+        return findFirst("WHERE #{m.fieldName} = ?;", param);
+    }
+EOF
+    end
+    
+
+    fh.puts <<EOF
     /**
      * Get all records matches the conditions
      * @param cond Conditions (WHERE phrase and so on)
