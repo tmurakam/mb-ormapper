@@ -72,12 +72,12 @@ class MemberVar
 end
 
 class ClassDef
-    attr_accessor :name, :bcname, :rcname, :members
+    attr_accessor :tableName, :baseClassName, :className, :members
 
     def initialize
-        @name = nil             # table name
-        @bcname = nil           # base class name
-        @rcname = nil           # real class name
+        @tableName = nil             # table name
+        @baseClassName = nil           # base class name
+        @className = nil           # real class name
         @members = Array.new    # members
     end
 
@@ -121,29 +121,29 @@ class Schema
 
                 elsif (line =~ /^\S/)
                     # start class def
-                    name = bcname = rcname = nil
+                    tableName = baseClassName = className = nil
                     if (line =~ /(.*)\s*:\s*(.*)\s*,\s*(.*)/)
-                        name = $1
-                        rcname = $2
-                        bcname = $3
+                        tableName = $1
+                        className = $2
+                        baseClassName = $3
                     elsif (line =~ /(.*)\s*:\s*(.*)/)
-                        name = $1
-                        rcname = $2
-                        bcname = rcname
+                        tableName = $1
+                        className = $2
+                        baseClassName = className
                     else
                         line =~ /^(\S+)/
-                        name = $1
-                        rcname = name
-                        bcname = name
+                        tableName = $1
+                        className = name
+                        baseClassName = name
                     end
 
                     if (classdef != nil)
                         @defs.push(classdef)
                     end
                     classdef = ClassDef.new
-                    classdef.name = name
-                    classdef.rcname = rcname
-                    classdef.bcname = bcname
+                    classdef.tableName = tableName
+                    classdef.className = className
+                    classdef.baseClassName = baseClassName
                 elsif (line =~ /\s+(\S+)\s*=>\s*(\S+)\s*:(\S+)/)
                     # property,column :type
                     member = MemberVar.new($3, $1, $2)

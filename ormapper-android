@@ -91,10 +91,10 @@ import android.util.Log;
 
 import java.util.*;
 
-public class #{cdef.bcname} extends ORRecord {
+public class #{cdef.baseClassName} extends ORRecord {
     public final static String TAG = "ORMapper";
 
-    public final static String tableName = "#{cdef.name}";
+    public final static String tableName = "#{cdef.tableName}";
 
 EOF
 
@@ -143,7 +143,7 @@ EOF
     }
 
     // Constructor
-    public #{cdef.bcname}() {
+    public #{cdef.baseClassName}() {
         super();
     }
 
@@ -153,7 +153,7 @@ EOF
      * Get all records
      * @return array of all record
      */
-    public static List<#{cdef.rcname}> find() {
+    public static List<#{cdef.className}> find() {
         return find(null, null);
     }
 
@@ -162,7 +162,7 @@ EOF
      * @param pid Primary key of the record
      * @return record
      */
-    public #{cdef.rcname} find(int pid) {
+    public #{cdef.className} find(int pid) {
         String[] param = {
             Integer.toString(pid)
         };
@@ -174,7 +174,7 @@ EOF
      * @param cond Conditions (WHERE phrase and so on)
      * @return array of records
      */
-    public static List<#{cdef.rcname}> find(String cond) {
+    public static List<#{cdef.className}> find(String cond) {
         return find(cond, null);
     }
 
@@ -184,7 +184,7 @@ EOF
      * @param params parameters
      * @return array of records
      */
-    public static List<#{cdef.rcname}> find(String cond, String[] params) {
+    public static List<#{cdef.className}> find(String cond, String[] params) {
         String sql;
         sql = "SELECT * FROM " + tableName;
         if (cond != null) {
@@ -195,10 +195,10 @@ EOF
         Cursor cursor = db.rawQuery(sql, params);
         cursor.moveToFirst();
 
-        ArrayList<#{cdef.rcname}> array = new ArrayList<#{cdef.rcname}>();
+        ArrayList<#{cdef.className}> array = new ArrayList<#{cdef.className}>();
 
         while (!cursor.isAfterLast()) {
-            #{cdef.rcname} e = new #{cdef.rcname}();
+            #{cdef.className} e = new #{cdef.className}();
             e._loadRow(cursor);
             array.add(e);
             cursor.moveToNext();
@@ -214,7 +214,7 @@ EOF
      * @param params parameters
      * @return record
      */
-    public static #{cdef.rcname} findFirst(String cond, String[] params) {
+    public static #{cdef.className} findFirst(String cond, String[] params) {
         String sql;
         sql = "SELECT * FROM " + tableName;
         if (cond != null) {
@@ -225,9 +225,9 @@ EOF
         Cursor cursor = db.rawQuery(sql, params);
         cursor.moveToFirst();
 
-        #{cdef.rcname} e = null;
+        #{cdef.className} e = null;
         if (!cursor.isAfterLast()) {
-            e = new #{cdef.rcname}();
+            e = new #{cdef.className}();
             e._loadRow(cursor);
         }
         cursor.close();
@@ -268,7 +268,7 @@ EOF
             // TODO: pid should be long?
             this.pid = (int)db.insert(tableName, "key", getContentValues());
             isInserted = true;
-            Log.d(TAG, "#{cdef.name}.insert : pid = " + pid);
+            Log.d(TAG, "#{cdef.tableName}.insert : pid = " + pid);
 
             db.setTransactionSuccessful();
         } finally {
@@ -288,7 +288,7 @@ EOF
                 Long.toString(pid)
             };
             int n = db.update(tableName, cv, "key = ?", whereArgs);
-            Log.d(TAG, "#{cdef.name}.update : count = " + n);
+            Log.d(TAG, "#{cdef.tableName}.update : count = " + n);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
@@ -325,7 +325,7 @@ EOF
             Long.toString(pid)
         };
         int n = db.delete(tableName, "key = ?", whereArgs);
-        Log.d(TAG, "#{cdef.name}.delete : n = " + n);
+        Log.d(TAG, "#{cdef.tableName}.delete : n = " + n);
     }
 
     /**
@@ -384,7 +384,7 @@ system "mkdir -p " + outdir
 
 # generate
 schema.defs.each do |cdef|
-    path = outdir + "/" + cdef.bcname + ".java"
+    path = outdir + "/" + cdef.baseClassName + ".java"
 
     STDERR.puts "generate #{path}"
     fh = open(path, "w")
