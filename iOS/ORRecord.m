@@ -29,23 +29,23 @@
 
 @implementation ORRecord
 
+#define UNASSIGNED_PID -1
+
 @synthesize pid = mPid;
 
 /** Constructor */ 
 - (id)init
 {
     self = [super init];
-    if (self) {
-        mIsNew = YES;
+    if (self != nil) {
+        mPid = UNASSIGNED_PID;
     }
-        
     return self;
 }
 
 /** Destructor */
 - (void)dealloc
 {
-    
     [super dealloc];
 }
 
@@ -135,7 +135,7 @@
 */
 - (void)save
 {
-    if (mIsNew) {
+    if (mPid == UNASSIGNED_PID) {
         [self _insert];
     } else {
         [self _update];
@@ -144,7 +144,6 @@
 
 - (void)_insert
 {
-    mIsNew = NO;
 }
 
 - (void)_update

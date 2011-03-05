@@ -360,8 +360,6 @@ EOF
     end
     
     fh.puts <<EOF
-
-    mIsNew = NO;
 }
 
 #pragma mark Create operations
@@ -396,7 +394,6 @@ EOF
     self.pid = [db lastInsertRowId];
 
     //[db commitTransaction];
-    mIsNew = NO;
 }
 
 #pragma mark Update operations
