@@ -387,7 +387,7 @@ if (ARGV.size == 1)
 end
 
 schema = Schema.new
-schema.loadFromFile(ARGV[0])
+schema.loadFromFile(deffile)
 #schema.dump
 
 # check vers
