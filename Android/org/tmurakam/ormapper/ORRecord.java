@@ -52,7 +52,7 @@ public abstract class ORRecord {
      * @return true: table newly created, false: table exists
      */
     static protected boolean migrate(String tableName, String[] array) {
-        SQLiteDatabase db = Database.getDB();
+        SQLiteDatabase db = ORDatabase.getDB();
         boolean ret;
         String tablesql;
 
