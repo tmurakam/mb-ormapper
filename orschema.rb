@@ -131,7 +131,7 @@ class Schema
                         className = $2
                         baseClassName = className
                     else
-                        line =~ /^(\S+)/
+                        line =~ /^(\S+):?/
                         tableName = $1
                         className = name
                         baseClassName = name
