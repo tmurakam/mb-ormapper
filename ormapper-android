@@ -179,7 +179,7 @@ EOF
      * @param pid Primary key of the record
      * @return record
      */
-    public #{cdef.className} find(int pid) {
+    public static #{cdef.className} find(int pid) {
         String[] param = { Integer.toString(pid) };
         return findFirst("WHERE key = ?;", param);
     }
@@ -189,7 +189,7 @@ EOF
     cdef.members.each do |m|
         fh.puts <<EOF
 
-    public #{cdef.className} find_by_#{m.fieldName}(#{getJavaType(m.type)} key) {
+    public static #{cdef.className} find_by_#{m.fieldName}(#{getJavaType(m.type)} key) {
         String[] param = { #{getToString(m.type, "key")} };
         return findFirst("WHERE #{m.fieldName} = ?;", param);
     }
