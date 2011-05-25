@@ -69,19 +69,36 @@ public class ORDatabase extends SQLiteOpenHelper {
     }
 
     /**
-     * 初期化
-     * @param context
+     * 初期化 : getDB() 前に呼び出されている必要がある
+     * @param context コンテキスト
+     * @param databaseName データベース名 (null時は無指定)
      */
     public static void initialize(Context context, String databaseName) {
-        mApplicationContext = context.getApplicationContext();
-        mDatabaseName = databaseName;
+        initialize(context);
+        setDatabaseName(databaseName);
     }
     
+    public static void initialize(Context context) {
+        mApplicationContext = context.getApplicationContext();
+    }
+
+    /**
+     * データベース名を指定する
+     */
+    public static void setDatabaseName(String databaseName) {
+        if (databaseName != null) {
+            mDatabaseName = databaseName;
+        }
+    }
+
     /**
      * データベースをオープンして SQLiteDatabase ハンドルを返す
+     * 
+     * すでにインスタンスがある場合はこれを返す
      */
     public static SQLiteDatabase getDB() {
         assert(mApplicationContext != null);
+        assert(mDatabaseName != null);
         if (sInstance == null) {
             sInstance = new ORDatabase(mApplicationContext, mDatabaseName);
         }
@@ -90,6 +107,8 @@ public class ORDatabase extends SQLiteOpenHelper {
 
     /**
      * 開いているデータベースを閉じる
+     * 
+     * シングルトンインスタンスは解放される
      */
     public static void closeDB() {
         if (sInstance != null) {
