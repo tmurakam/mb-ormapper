@@ -1,6 +1,6 @@
 // -*-  Mode:ObjC; c-basic-offset:4; tab-width:8; indent-tabs-mode:nil -*-
 /*
-  O/R Mapper library for iPhone
+  O/R Mapper library for iOS
 
   Copyright (c) 2010-2011, Takuya Murakami. All rights reserved.
 
