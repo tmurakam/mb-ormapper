@@ -26,6 +26,9 @@
 
 // sqlite3 wrapper
 
+// To use with ARC, set this to 1.
+#define ENABLE_ARC      0
+
 #import <UIKit/UIKit.h>
 #import <sqlite3.h>
 

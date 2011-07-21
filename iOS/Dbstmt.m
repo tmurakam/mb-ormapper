@@ -46,7 +46,9 @@
     if (mStmt) {
         sqlite3_finalize(mStmt);
     }
+#if !ENABLE_ARC
     [super dealloc];
+#endif
 }
 
 /**
