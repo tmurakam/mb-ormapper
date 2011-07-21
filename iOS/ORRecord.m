@@ -43,12 +43,6 @@
     return self;
 }
 
-/** Destructor */
-- (void)dealloc
-{
-    [super dealloc];
-}
-
 /**
    Migrate database table
 
