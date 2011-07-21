@@ -7,6 +7,9 @@ PKGNAME = com.example.person
 # Primary key name (iOS only)
 #PKEY = key
 
+# ARC (iOS Only)
+ARC = false
+
 # class definition
 person: Person, PersonBase
 	name :TEXT
