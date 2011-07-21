@@ -52,6 +52,15 @@ Android の場合:
 
 レコードの削除は delete で行います。
 
+ARCへの対応
+-----------
+
+iOS で ARC (Automatic Reference Counting) 対応する場合は、schema.def
+ファイルの ARC = false を true に変更してください。
+
+また、iOS/Database.h にある ENABLE_ARC の値を 0 から 1 に変更してくだ
+さい。
+
 
 使用方法 : Android の場合
 -------------------------
