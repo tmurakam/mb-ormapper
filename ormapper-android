@@ -373,7 +373,28 @@ EOF
 
     public static void delete_all() {
         delete(null);
-    }     
+    }
+
+    /**
+     * Dump SQL
+     */
+    public String dumpSql() {
+        String[] values = new String[#{cdef.members.length}];
+EOF
+
+    i = 0
+    cdef.members.each do |m|
+        if (m.type == "TEXT")
+            fh.puts "        values[#{i}] = quoteString(#{m.memberName});"
+        else
+            fh.puts "        values[#{i}] = #{getToString(m.type, m.memberName)};"
+        end
+        i += 1
+    end
+
+    fh.puts <<EOF
+        return dumpSql(tableName, values);
+    }
 }
 EOF
 

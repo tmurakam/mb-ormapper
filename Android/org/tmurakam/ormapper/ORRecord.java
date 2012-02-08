@@ -118,4 +118,27 @@ public abstract class ORRecord {
      * Update record
      */
     public abstract void update();
+
+    /**
+     * dump SQL
+     */
+    public abstract void dumpSql();
+
+    protected String dumpSql(String tableName, String[] values) {
+        StringBuilder b = new StringBuilder("INSERT INTO ");
+        b.append(tableName);
+        b.append(" VALUES(");
+        b.append(pid);
+        
+        for (String value : values) {
+            b.append(",");
+            b.append(value);
+        }
+        b.append(");");
+        return b.toString();
+    }
+
+    protected String quoteString(String s) {
+        return "'" + s.replaceAll("'", "''") + "'";
+    }
 }
