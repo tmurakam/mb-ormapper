@@ -120,11 +120,6 @@ public abstract class ORRecord {
     public abstract void update();
 
     /**
-     * dump SQL
-     */
-    public abstract void dumpSql();
-
-    /**
      * Quote SQL string
      */
     protected String quoteSqlString(String s) {

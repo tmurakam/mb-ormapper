@@ -270,9 +270,9 @@ public class <%= cdef.baseClassName %> extends ORRecord {
     /**
      * get table sql
      */
-    public static void getTableSql(Writer wr) {
+    public static void getTableSql(Writer wr) throws IOException {
         wr.write(String.format("DROP TABLE %s;\n", tableName));
-        wr.write(String.format("CREATE TABLE %s (key INTEGER PRIMARY KEY"), tableName);
+        wr.write(String.format("CREATE TABLE %s (key INTEGER PRIMARY KEY", tableName));
 
         for (int i = 0; i < COLUMN_TYPES.length / 2; i++) {
             wr.write(String.format(", %s %s", 
@@ -282,16 +282,15 @@ public class <%= cdef.baseClassName %> extends ORRecord {
 
         List<<%= cdef.className %>> ary = find();
         for (<%= cdef.className %> e : ary) {
-            e.getInsertSql(s);
+            e.getInsertSql(wr);
             wr.write("\n");
         }
-        return b.toString();
     }
 
     /**
      * get "INSERT" SQL
      */
-    public void getInsertSql(Writer wr) {
+    public void getInsertSql(Writer wr) throws IOException {
         wr.write("INSERT INTO ");
         wr.write(tableName);
         wr.write(" VALUES(");
