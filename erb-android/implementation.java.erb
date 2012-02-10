@@ -297,13 +297,9 @@ public class <%= cdef.baseClassName %> extends ORRecord {
 <%
   i = 0
   cdef.members.each do |m|
-    if (m.type == "TEXT")
 -%>
-        values[<%= i %>] = quoteSqlString(<%= m.memberName %>);
-<%  else -%>
-        values[<%= i %>] = <%= getToString(m.type, m.memberName) %>;
-<%  end
-    i += 1
+        values[<%= i %>] = quoteSqlString(<%= getToString(m.type, m.memberName) %>);
+<%  i += 1
   end
 -%>
         return getInsertSql(tableName, values);

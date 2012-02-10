@@ -52,6 +52,10 @@
 + (void)delete_cond:(NSString *)cond;
 + (void)delete_all;
 
+// Dump SQL
++ (NSString *)getTableSql;
+- (NSString *)getInsertSql;
+
 // internal functions
 + (NSString *)tableName;
 - (void)_loadRow:(dbstmt *)stmt;

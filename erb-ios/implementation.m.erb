@@ -340,13 +340,9 @@
 <%
   i = 0
   cdef.members.each do |m|
-    if (m.type == "TEXT")
 -%>
-    [values addObject:[self quoteSqlString:<%= m.memberName %>]];
-<%  else -%>
-    [values addObject:<%= getToString(m.type, m.memberName) %>];
-<%  end
-    i += 1
+    [values addObject:[self quoteSqlString:<%= getToString(m.type, m.memberName) %>]];
+<%  i += 1
   end
 -%>
     return getInsertSql(tableName, values);
