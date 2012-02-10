@@ -53,8 +53,8 @@
 + (void)delete_all;
 
 // Dump SQL
-+ (NSString *)getTableSql;
-- (NSString *)getInsertSql;
++ (void)getTableSql:(NSMutableString *)s;
+- (void)getInsertSql:(NSMutableString *)s;
 
 // internal functions
 + (NSString *)tableName;

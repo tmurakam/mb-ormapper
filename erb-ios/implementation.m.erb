@@ -311,9 +311,8 @@
 /**
  * get table sql
  */
-+ (NSString *)getTableSql
++ (void)getTableSql:(NSMutableString *)s
 {
-    NSMutableString s = [NSMutableString new];
     [s appendString:@"DROP TABLE <%= cdef.tableName %>;\n"];
     [s appendString:@"CREATE TABLE <%= cdef.tableName %> (key INTEGER PRIMARY KEY"];
 
@@ -324,28 +323,22 @@
 
     NSMutableArray *ary = [self find_all:nil];
     for (<%= cdef.className %> *e in ary) {
-        [s appendString:[e getInsertSql]];
+        [e getInsertSql:s];
         [s appendString:@"\n"];
     }
-
-    return s;
 }
 
 /**
  * get "INSERT" SQL
  */
-- (NSString *)getInsertSql
+- (void)getInsertSql:(NSMutableString )*s
 {
-    NSMutableArray *values = [NSMutableArray new];
-<%
-  i = 0
-  cdef.members.each do |m|
--%>
-    [values addObject:[self quoteSqlString:<%= getToString(m.type, m.memberName) %>]];
-<%  i += 1
-  end
--%>
-    return getInsertSql(tableName, values);
+    [s appendFormat:@"INSERT INTO %@ VALUES(%d", [self tableName], mPid];
+<% cdef.members.each do |m| -%>
+    [s appendString:@","];
+    [s appendString:[self quoteSqlString:<%= getToString(m.type, m.memberName) %>]];
+<% end -%>
+    [s appendString:@");"];
 }
 
 #pragma mark Internal functions
