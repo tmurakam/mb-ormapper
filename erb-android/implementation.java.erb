@@ -18,6 +18,12 @@ public class <%= cdef.baseClassName %> extends ORRecord {
 
     public final static String tableName = "<%= cdef.tableName %>";
 
+    private final static String[] COLUMN_TYPES = {
+<% cdef.members.each do |m| -%>
+        "<%= m.fieldName %>", "<%= m.type %>",
+<% end -%>
+    };
+
 <%
   # declare member variables
   cdef.members.each do |m|
@@ -46,13 +52,7 @@ public class <%= cdef.baseClassName %> extends ORRecord {
      * @return true - table was newly created, false - table already exists
      */
     public static boolean migrate() {
-        String[] columnTypes = {
-<% cdef.members.each do |m| -%>
-            "<%= m.fieldName %>", "<%= m.type %>",
-<% end -%>
-        };
-
-        return migrate(tableName, columnTypes);
+        return migrate(tableName, COLUMN_TYPES);
     }
 
     // Constructor
@@ -267,23 +267,45 @@ public class <%= cdef.baseClassName %> extends ORRecord {
     }
 
     /**
-     * Dump SQL
+     * get table sql
      */
-    public String dumpSql() {
-        String[] values = new String[<%= cdef.members.length %>];
+    public static String getTableSql() {
+        StringBuilder b = new StringBuilder();
+        b.append(String.format("DROP TABLE %s;\n", tableName));
+        b.append(String.format("CREATE TABLE %s (key INTEGER PRIMARY KEY"), tableName);
 
+        for (int i = 0; i < COLUMN_TYPES.length / 2; i++) {
+            b.append(String.format(", %s %s", 
+                                   COLUMN_TYPES[i*2], COLUMN_TYPES[i*2+1]));
+        }
+        b.append(");\n");
+
+        List<<%= cdef.className %>> ary = find();
+        for (<%= cdef.className %> e : ary) {
+            b.append(e.getInsertSql());
+            b.append("\n");
+        }
+        return b.toString();
+    }
+
+    /**
+     * get "INSERT" SQL
+     */
+    public String getInsertSql() {
+        String[] values = new String[<%= cdef.members.length %>];
+        
 <%
   i = 0
   cdef.members.each do |m|
     if (m.type == "TEXT")
 -%>
-        values[<%= i %>] = quoteString(<%= m.memberName %>);
+        values[<%= i %>] = quoteSqlString(<%= m.memberName %>);
 <%  else -%>
         values[<%= i %>] = <%= getToString(m.type, m.memberName) %>;
 <%  end
     i += 1
   end
 -%>
-        return dumpSql(tableName, values);
+        return getInsertSql(tableName, values);
     }
 }

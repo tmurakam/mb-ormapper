@@ -308,6 +308,50 @@
     [<%= cdef.baseClassName %> delete_cond:nil];
 }
 
+/**
+ * get table sql
+ */
++ (NSString *)getTableSql
+{
+    NSMutableString s = [NSMutableString new];
+    [s appendString:@"DROP TABLE <%= cdef.tableName %>;\n"];
+    [s appendString:@"CREATE TABLE <%= cdef.tableName %> (key INTEGER PRIMARY KEY"];
+
+<% cdef.members.each do |m| -%>
+    [s appendFormat:@", <%= m.fieldName %> <%= m.type %>"];
+<% end -%>    
+    [s appendString:@");\n"];
+
+    NSMutableArray *ary = [self find_all:nil];
+    for (<%= cdef.className %> *e in ary) {
+        [s appendString:[e getInsertSql]];
+        [s appendString:@"\n"];
+    }
+
+    return s;
+}
+
+/**
+ * get "INSERT" SQL
+ */
+- (NSString *)getInsertSql
+{
+    NSMutableArray *values = [NSMutableArray new];
+<%
+  i = 0
+  cdef.members.each do |m|
+    if (m.type == "TEXT")
+-%>
+    [values addObject:[self quoteSqlString:<%= m.memberName %>]];
+<%  else -%>
+    [values addObject:<%= getToString(m.type, m.memberName) %>];
+<%  end
+    i += 1
+  end
+-%>
+    return getInsertSql(tableName, values);
+}
+
 #pragma mark Internal functions
 
 + (NSString *)tableName

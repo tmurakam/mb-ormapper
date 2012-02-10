@@ -33,7 +33,8 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =end
 
-$LOAD_PATH.push(File.expand_path(File.dirname($0)))
+ORMDIR = File.expand_path(File.dirname($0))
+$LOAD_PATH.push(ORMDIR)
 
 require "orschema.rb"
 require 'erb'
@@ -93,7 +94,7 @@ end
 # generate implementation
 #
 def generateImplementation(vers, cdef, fh)
-  erb = ERB.new(File.read("erb-android/implementation.java.erb"), nil, '-')
+  erb = ERB.new(File.read(ORMDIR + "/erb-android/implementation.java.erb"), nil, '-')
   fh.puts erb.result(binding)
 end
 
