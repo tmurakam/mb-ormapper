@@ -172,7 +172,7 @@
 */
 - (NSString *)quoteSqlString:(NSString *)string
 {
-    return [string stringByReplacingOccurrencesOfString:@"'" withString:@"''"];
+    return [NSString stringWithFormat:@"'%@'", [string stringByReplacingOccurrencesOfString:@"'" withString:@"''"]];
 }
 
 @end
