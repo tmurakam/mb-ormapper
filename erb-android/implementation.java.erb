@@ -293,8 +293,7 @@ public class <%= cdef.baseClassName %> extends ORRecord {
     public void getInsertSql(Writer wr) throws IOException {
         wr.write("INSERT INTO ");
         wr.write(tableName);
-        wr.write(" VALUES(");
-        wr.write(pid);
+        wr.write(String.format(" VALUES(%d", pid));
 <% cdef.members.each do |m| -%>
         wr.write(",");
         wr.write(quoteSqlString(<%= getToString(m.type, m.memberName) %>));
