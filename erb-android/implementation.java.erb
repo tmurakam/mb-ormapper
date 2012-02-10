@@ -269,21 +269,20 @@ public class <%= cdef.baseClassName %> extends ORRecord {
     /**
      * get table sql
      */
-    public static String getTableSql() {
-        StringBuilder b = new StringBuilder();
-        b.append(String.format("DROP TABLE %s;\n", tableName));
-        b.append(String.format("CREATE TABLE %s (key INTEGER PRIMARY KEY"), tableName);
+    public static void getTableSql(PrintStream s) {
+        s.println(String.format("DROP TABLE %s;\n", tableName));
+        s.print(String.format("CREATE TABLE %s (key INTEGER PRIMARY KEY"), tableName);
 
         for (int i = 0; i < COLUMN_TYPES.length / 2; i++) {
-            b.append(String.format(", %s %s", 
-                                   COLUMN_TYPES[i*2], COLUMN_TYPES[i*2+1]));
+            s.print(String.format(", %s %s", 
+                                  COLUMN_TYPES[i*2], COLUMN_TYPES[i*2+1]));
         }
-        b.append(");\n");
+        s.println(");");
 
         List<<%= cdef.className %>> ary = find();
         for (<%= cdef.className %> e : ary) {
-            b.append(e.getInsertSql());
-            b.append("\n");
+            e.getInsertSql(s);
+            s.println();
         }
         return b.toString();
     }
@@ -291,17 +290,15 @@ public class <%= cdef.baseClassName %> extends ORRecord {
     /**
      * get "INSERT" SQL
      */
-    public String getInsertSql() {
-        String[] values = new String[<%= cdef.members.length %>];
-        
-<%
-  i = 0
-  cdef.members.each do |m|
--%>
-        values[<%= i %>] = quoteSqlString(<%= getToString(m.type, m.memberName) %>);
-<%  i += 1
-  end
--%>
-        return getInsertSql(tableName, values);
+    public void getInsertSql(PrintStream s) {
+        s.print("INSERT INTO ");
+        s.print(tableName);
+        s.print(" VALUES(");
+        s.print(pid);
+<% cdef.members.each do |m| -%>
+        s.print(",");
+        s.print(quoteSqlString(<%= getToString(m.type, m.memberName) %>));
+<% end -%>
+        s.print(");");
     }
 }

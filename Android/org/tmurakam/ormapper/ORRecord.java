@@ -125,21 +125,6 @@ public abstract class ORRecord {
     public abstract void dumpSql();
 
     /**
-     * get "INSERT" SQL
-     */
-    protected String getInsertSql(String tableName, String[] values) {
-        StringBuilder b = new StringBuilder();
-        b.append(String.format("INSERT INTO %s VALUES(%d", tableName, pid));
-        
-        for (String value : values) {
-            b.append(",");
-            b.append(value);
-        }
-        b.append(");");
-        return b.toString();
-    }
-
-    /**
      * Quote SQL string
      */
     protected String quoteSqlString(String s) {
