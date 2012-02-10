@@ -125,7 +125,7 @@ static Database *sDatabase = nil;
 /**
    Execute SQL statement
 */
-- (void)exec:(NSString *)sql
+- (BOOL)exec:(NSString *)sql
 {
     //ASSERT(mHandle != 0);
 
@@ -133,7 +133,9 @@ static Database *sDatabase = nil;
     int result = sqlite3_exec(mHandle, [sql UTF8String], NULL, NULL, NULL);
     if (result != SQLITE_OK) {
         //LOG(@"sqlite3: %s", sqlite3_errmsg(mHandle));
+        return NO;
     }
+    return YES;
 }
 
 /**

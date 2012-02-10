@@ -54,7 +54,6 @@
 
 + (NSString *)tableName;
 
-- (NSString *)getInsertSql:(NSArray *)values;
 - (NSString *)quoteSqlString:(NSString *)string;
 
 @end

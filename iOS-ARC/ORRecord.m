@@ -168,22 +168,6 @@
 }
 
 /**
-   get "INSERT" SQL
-*/
-- (NSString*)getInsertSql:(NSArray*)values
-{
-    NSMutableString *s = [[NSMutalbeString alloc] initWithCapacity:1024];
-    [s appendString:@"INSERT INTO %@ VALUES(%d", [self tableName], mPid];
-
-    for (NSString *value in values) {
-        [s appendString:@","];
-        [s appendString:value];
-    }
-    [s appendString:@");"];
-    return s;
-}
-
-/**
    Quote SQL string
 */
 - (NSString *)quoteSqlString:(NSString *)string

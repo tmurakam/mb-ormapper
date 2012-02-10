@@ -322,7 +322,7 @@
     [s appendString:@");\n"];
 
     NSMutableArray *ary = [self find_all:nil];
-    for (<%= cdef.className %> *e in ary) {
+    for (<%= cdef.baseClassName %> *e in ary) {
         [e getInsertSql:s];
         [s appendString:@"\n"];
     }
@@ -331,9 +331,9 @@
 /**
  * get "INSERT" SQL
  */
-- (void)getInsertSql:(NSMutableString )*s
+- (void)getInsertSql:(NSMutableString *)s
 {
-    [s appendFormat:@"INSERT INTO %@ VALUES(%d", [self tableName], mPid];
+    [s appendFormat:@"INSERT INTO <%= cdef.tableName %> VALUES(%d", mPid];
 <% cdef.members.each do |m| -%>
     [s appendString:@","];
     [s appendString:[self quoteSqlString:<%= getToString(m.type, m.memberName) %>]];
