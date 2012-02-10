@@ -54,16 +54,12 @@ static Database *sDatabase = nil;
 
 + (void)_setInstance:(Database *)database
 {
-#if ENABLE_ARC
-    sDatabase = database;
-#else
     if (sDatabase != nil) {
         [sDatabase release];
         NSLog(@"WARNING: Old Database instance was released.");
     }
     sDatabase = database;
     [sDatabase retain];
-#endif
 }
 
 /**
@@ -71,9 +67,7 @@ static Database *sDatabase = nil;
 */
 + (void)shutdown
 {
-#if !ENABLE_ARC
     [sDatabase release];
-#endif
     sDatabase = nil;
 }
 
@@ -103,9 +97,7 @@ static Database *sDatabase = nil;
     if (mHandle != nil) {
         sqlite3_close(mHandle);
     }
-#if !ENABLE_ARC
     [super dealloc];
-#endif
 }
 
 /**
@@ -164,9 +156,7 @@ static Database *sDatabase = nil;
     }
 
     dbstmt *dbs = [[dbstmt alloc] initWithStmt:stmt];
-#if !ENABLE_ARC
     [dbs autorelease];
-#endif
     //dbs.handle = self.handle;
     return dbs;
 }
@@ -245,9 +235,7 @@ static Database *sDatabase = nil;
         // Avoid trivial bug for 'AM/PM' handling for some locales.
         NSLocale *loc = [[NSLocale alloc] initWithLocaleIdentifier:@"US"];
         [dateFormatter setLocale:loc];
-#if !ENABLE_ARC
         [loc release];
-#endif
     }
     return dateFormatter;
 }

@@ -482,5 +482,9 @@ files = ["ORRecord.h", "ORRecord.m", "Dbstmt.h", "Dbstmt.m",
          "Database.h", "Database.m"]
 
 files.each do |f|
-  FileUtils.cp(ORMDIR + "/iOS/" + f, f)
+  if (schema.vers["ARC"])
+    FileUtils.cp(ORMDIR + "/iOS-ARC/" + f, f)
+  else
+    FileUtils.cp(ORMDIR + "/iOS/" + f, f)
+  end
 end
