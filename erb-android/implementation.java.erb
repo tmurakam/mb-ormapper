@@ -12,6 +12,7 @@ import android.database.sqlite.*;
 import android.util.Log;
 
 import java.util.*;
+import java.io.*;
 
 public class <%= cdef.baseClassName %> extends ORRecord {
     public final static String TAG = "ORMapper";
@@ -269,20 +270,20 @@ public class <%= cdef.baseClassName %> extends ORRecord {
     /**
      * get table sql
      */
-    public static void getTableSql(PrintStream s) {
-        s.println(String.format("DROP TABLE %s;\n", tableName));
-        s.print(String.format("CREATE TABLE %s (key INTEGER PRIMARY KEY"), tableName);
+    public static void getTableSql(Writer wr) {
+        wr.write(String.format("DROP TABLE %s;\n", tableName));
+        wr.write(String.format("CREATE TABLE %s (key INTEGER PRIMARY KEY"), tableName);
 
         for (int i = 0; i < COLUMN_TYPES.length / 2; i++) {
-            s.print(String.format(", %s %s", 
+            wr.write(String.format(", %s %s", 
                                   COLUMN_TYPES[i*2], COLUMN_TYPES[i*2+1]));
         }
-        s.println(");");
+        wr.write(");\n");
 
         List<<%= cdef.className %>> ary = find();
         for (<%= cdef.className %> e : ary) {
             e.getInsertSql(s);
-            s.println();
+            wr.write("\n");
         }
         return b.toString();
     }
@@ -290,15 +291,15 @@ public class <%= cdef.baseClassName %> extends ORRecord {
     /**
      * get "INSERT" SQL
      */
-    public void getInsertSql(PrintStream s) {
-        s.print("INSERT INTO ");
-        s.print(tableName);
-        s.print(" VALUES(");
-        s.print(pid);
+    public void getInsertSql(Writer wr) {
+        wr.write("INSERT INTO ");
+        wr.write(tableName);
+        wr.write(" VALUES(");
+        wr.write(pid);
 <% cdef.members.each do |m| -%>
-        s.print(",");
-        s.print(quoteSqlString(<%= getToString(m.type, m.memberName) %>));
+        wr.write(",");
+        wr.write(quoteSqlString(<%= getToString(m.type, m.memberName) %>));
 <% end -%>
-        s.print(");");
+        wr.write(");");
     }
 }
