@@ -8,7 +8,7 @@ PKGNAME = com.example.person
 #PKEY = key
 
 # ARC (iOS Only)
-ARC = false
+ARC = true
 
 # class definition
 person: Person, PersonBase

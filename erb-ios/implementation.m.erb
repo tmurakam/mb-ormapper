@@ -5,9 +5,9 @@
 
 @implementation <%= cdef.baseClassName %>
 
-<% cdef.members.each do |m| %>
+<% cdef.members.each do |m| -%>
 @synthesize <%= m.propName %> = <%= m.memberName %>;
-<% end %>
+<% end -%>
 
 - (id)init
 {
@@ -15,12 +15,13 @@
     return self;
 }
 
+<% if (!vers["ARC"]) -%>
 - (void)dealloc
 {
 <%    
   cdef.members.each do |m|
     type, mem = getObjcType(m.type)
-    if (mem == "retain" && !vers["ARC"])
+    if (mem == "retain")
 -%>
     [<%= m.memberName %> release];
 <%
@@ -30,6 +31,7 @@
 
     [super dealloc];
 }
+<% end -%>
 
 /**
   @brief Migrate database table
@@ -40,7 +42,6 @@
 + (BOOL)migrate
 {
     NSArray *columnTypes = [NSArray arrayWithObjects:
-
 <% cdef.members.each do |m| -%>
         @"<%= m.fieldName %>", @"<%= m.type %>",
 <% end -%>
@@ -70,8 +71,7 @@
 <%
   cdef.members.each do |m|
     type, mem = getObjcType(m.type)
-%>
-
+-%>
 /**
   finder with <%= m.fieldName %>
 
@@ -95,6 +95,7 @@
 {
     return [self find_by_<%= m.fieldName %>:key cond:nil];
 }
+
 <% end -%>
 
 /**
@@ -193,7 +194,6 @@
 - (void)_loadRow:(dbstmt *)stmt
 {
     self.pid = [stmt colInt:0];
-
 <%
     i = 1
     cdef.members.each do |m|
@@ -201,10 +201,8 @@
       method = "col" + getMethodType(type)
 -%>
     self.<%= m.propName %> = [stmt <%= method %>:<%= i %>];
-<%
-      i += 1
-    end
--%>    
+<%    i += 1 -%>
+<%  end -%>
 }
 
 #pragma mark Create operations
@@ -232,7 +230,6 @@
     [stmt <%= method %>:<%= i %> val:<%= m.memberName %>];
 <%    i += 1 -%>
 <%  end -%>
-
     [stmt step];
 
     self.pid = [db lastInsertRowId];
