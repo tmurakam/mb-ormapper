@@ -124,11 +124,12 @@ public abstract class ORRecord {
      */
     public abstract void dumpSql();
 
-    protected String dumpSql(String tableName, String[] values) {
-        StringBuilder b = new StringBuilder("INSERT INTO ");
-        b.append(tableName);
-        b.append(" VALUES(");
-        b.append(pid);
+    /**
+     * get "INSERT" SQL
+     */
+    protected String getInsertSql(String tableName, String[] values) {
+        StringBuilder b = new StringBuilder();
+        b.append(String.format("INSERT INTO %s VALUES(%d", tableName, pid));
         
         for (String value : values) {
             b.append(",");
@@ -138,7 +139,10 @@ public abstract class ORRecord {
         return b.toString();
     }
 
-    protected String quoteString(String s) {
+    /**
+     * Quote SQL string
+     */
+    protected String quoteSqlString(String s) {
         return "'" + s.replaceAll("'", "''") + "'";
     }
 }
