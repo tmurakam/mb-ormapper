@@ -42,7 +42,7 @@ static Database *sDatabase = nil;
 + (Database *)instance
 {
     if (sDatabase == nil) {
-        sDatabase = [[[self class] alloc] init];
+        sDatabase = [[self class] new];
     }
     return sDatabase;
 }
@@ -76,6 +76,7 @@ static Database *sDatabase = nil;
     self = [super init];
     if (self != nil) {
         mHandle = nil;
+        mIsDirty = false;
     }
     return self;
 }
@@ -106,14 +107,14 @@ static Database *sDatabase = nil;
     NSFileManager *fileManager = [NSFileManager defaultManager];
 
     // Load from DB
-    NSString *dbPath = [self dbPath:dbname];
-    BOOL isExistedDb = [fileManager fileExistsAtPath:dbPath];
+    NSString *mDbPath = [self dbPath:dbname];
+    BOOL isExistedDb = [fileManager fileExistsAtPath:mDbPath];
 
-    if (sqlite3_open([dbPath UTF8String], &mHandle) != 0) {
+    if (sqlite3_open([mDbPath UTF8String], &mHandle) != 0) {
         // ouch!
         // re-create database
-        [fileManager removeItemAtPath:dbPath error:NULL];
-        sqlite3_open([dbPath UTF8String], &mHandle);
+        [fileManager removeItemAtPath:mDbPath error:NULL];
+        sqlite3_open([mDbPath UTF8String], &mHandle);
 
         isExistedDb = NO;
     }
@@ -211,6 +212,29 @@ static Database *sDatabase = nil;
 
     NSLog(@"dbPath = %@", dbPath);
     return dbPath;
+}
+
+/**
+   Modification hook
+*/
+- (void)setModified
+{
+    mIsDirty = YES;
+}
+
+/**
+   Update modification date of database
+*/
+- (void)updateModificationDate
+{
+    if (mIsDirty) {
+        mIsDirty = NO;
+
+        NSFileManager *m = [NSFileManager defaultManager];
+        NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithDictionary:[m attributesOfItemAtPath:mDbPath error:nil]];
+        [dict setObject:[NSDate new] forKey:NSFileModificationDate];
+        [m setAttributes:dict ofItemAtPath:mDbPath error:nil];
+    }
 }
 
 #pragma mark -
