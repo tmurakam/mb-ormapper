@@ -65,6 +65,7 @@
 - (BOOL)open:(NSString *)dbname;
 
 - (void)setModified;
+- (void)updateModificationDate;
 
 // utilities
 - (NSDateFormatter *)dateFormatter;

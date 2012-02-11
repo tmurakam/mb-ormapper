@@ -234,7 +234,7 @@
 
     //[db commitTransaction];
 
-    [Database isModified];
+    [[Database instance] setModified];
 }
 
 #pragma mark Update operations
@@ -272,7 +272,7 @@
     [stmt step];
     //[db commitTransaction];
 
-    [Database isModified];
+    [[Database instance] setModified];
 }
 
 #pragma mark Delete operations
@@ -288,7 +288,7 @@
     [stmt bindInt:0 val:mPid];
     [stmt step];
 
-    [Database isModified];
+    [[Database instance] setModified];
 }
 
 /**
@@ -304,7 +304,7 @@
     NSString *sql = [NSString stringWithFormat:@"DELETE FROM <%= cdef.tableName %> %@;", cond];
     [db exec:sql];
 
-    [Database isModified];
+    [[Database instance] setModified];
 }
 
 + (void)delete_all

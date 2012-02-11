@@ -107,7 +107,7 @@ static Database *sDatabase = nil;
     NSFileManager *fileManager = [NSFileManager defaultManager];
 
     // Load from DB
-    NSString *mDbPath = [self dbPath:dbname];
+    mDbPath = [self dbPath:dbname];
     BOOL isExistedDb = [fileManager fileExistsAtPath:mDbPath];
 
     if (sqlite3_open([mDbPath UTF8String], &mHandle) != 0) {
