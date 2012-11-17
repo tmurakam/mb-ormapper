@@ -2,7 +2,7 @@
 /*
   O/R Mapper library for iOS
 
-  Copyright (c) 2010-2011, Takuya Murakami. All rights reserved.
+  Copyright (c) 2010-2012, Takuya Murakami. All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are
@@ -78,8 +78,8 @@
     int count = [array count] / 2;
 
     for (int i = 0; i < count; i++) {
-        NSString *column = [array objectAtIndex:i * 2];
-        NSString *type = [array objectAtIndex:i * 2 + 1];
+        NSString *column = array[i * 2];
+        NSString *type = array[i * 2 + 1];
 
         NSRange range = [tablesql rangeOfString:[NSString stringWithFormat:@" %@ ", column]];
         if (range.location == NSNotFound) {

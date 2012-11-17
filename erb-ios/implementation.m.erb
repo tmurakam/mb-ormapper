@@ -41,11 +41,11 @@
 
 + (BOOL)migrate
 {
-    NSArray *columnTypes = [NSArray arrayWithObjects:
+    NSArray *columnTypes = @[
 <% cdef.members.each do |m| -%>
         @"<%= m.fieldName %>", @"<%= m.type %>",
 <% end -%>
-        nil];
+        ];
 
     return [super migrate:columnTypes primaryKey:@"<%= vers["PKEY"] %>"];
 }
