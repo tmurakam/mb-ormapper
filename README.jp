@@ -9,6 +9,7 @@ iOS と Android 両対応のアプリを書くときには、特に便利。
 ただ、iOS しかアプリ作らない場合は、素直に CoreData を使ったほうが
 良いような気がするので、使うのは正直お勧めできないw
 
+注: iOS では ARC 必須です。
 
 モデルの生成手順
 ----------------
@@ -35,7 +36,7 @@ Android の場合:
 として登録します。そして open を呼び出してデータベースの作成、ロードを
 行い、migrate を呼び出してテーブルの作成・マイグレーションを行います。
 
-    Database *db = [[[Database alloc] init] autorelease];
+    Database *db = [Database new];
     [Database setInstance:db];
 
     [db open:@"MyDatabase.db"];
