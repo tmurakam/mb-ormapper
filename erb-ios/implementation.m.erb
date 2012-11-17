@@ -179,6 +179,8 @@
 
 - (void)_insert
 {
+    [super _insert];
+
     Database *db = [Database instance];
     dbstmt *stmt;
     
@@ -211,6 +213,8 @@
 
 - (void)_update
 {
+    [super _update];
+
     Database *db = [Database instance];
     //[db beginTransaction];
 

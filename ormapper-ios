@@ -50,9 +50,9 @@ def getObjcType(type)
   when "REAL"
     return "double", "assign"
   when "TEXT"
-    return "NSString*", "retain"
+    return "NSString*", "strong"
   when "DATE"
-    return "NSDate*", "retain"
+    return "NSDate*", "strong"
   else
     puts "#{type} is not supported."
     exit 1
