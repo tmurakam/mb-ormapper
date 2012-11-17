@@ -232,7 +232,7 @@ static Database *sDatabase = nil;
 
         NSFileManager *m = [NSFileManager defaultManager];
         NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithDictionary:[m attributesOfItemAtPath:mDbPath error:nil]];
-        [dict setObject:[NSDate new] forKey:NSFileModificationDate];
+        dict[NSFileModificationDate] = [NSDate new];
         [m setAttributes:dict ofItemAtPath:mDbPath error:nil];
     }
 }

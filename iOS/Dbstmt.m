@@ -147,7 +147,7 @@
     if (!s) {
         return @"";
     }
-    NSString *ns = [NSString stringWithCString:s encoding:NSUTF8StringEncoding];
+    NSString *ns = @(s);
     return ns;
 }
 
