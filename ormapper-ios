@@ -41,7 +41,7 @@ $LOAD_PATH.push(ORMDIR)
 
 require "orschema.rb"
 
-VER = "1.1"
+VER = "1.2"
 
 def getObjcType(type)
   case type
@@ -472,13 +472,6 @@ if (!schema.vers.has_key?("PKEY"))
   schema.vers["PKEY"] = "key"
 end
 
-# ARC for iOS
-if (!schema.vers.has_key?("ARC") || schema.vers["ARC"] != "false")
-  schema.vers["ARC"] = true
-else
-  schema.vers["ARC"] = false
-end
-
 # generate
 schema.defs.each do |cdef|
   STDERR.puts "generate #{cdef.baseClassName}.h"
@@ -491,17 +484,3 @@ schema.defs.each do |cdef|
   generateImplementation(cdef, fh, schema.vers)
   fh.close
 end
-
-# copy needed files
-=begin
-files = ["ORRecord.h", "ORRecord.m", "Dbstmt.h", "Dbstmt.m",
-         "Database.h", "Database.m"]
-
-files.each do |f|
-  if (schema.vers["ARC"])
-    FileUtils.cp(ORMDIR + "/iOS-ARC/" + f, f)
-  else
-    FileUtils.cp(ORMDIR + "/iOS/" + f, f)
-  end
-end
-=end

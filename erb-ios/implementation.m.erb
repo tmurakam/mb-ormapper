@@ -15,24 +15,6 @@
     return self;
 }
 
-<% if (!vers["ARC"]) -%>
-- (void)dealloc
-{
-<%    
-  cdef.members.each do |m|
-    type, mem = getObjcType(m.type)
-    if (mem == "retain")
--%>
-    [<%= m.memberName %> release];
-<%
-    end
-  end
--%>
-
-    [super dealloc];
-}
-<% end -%>
-
 /**
   @brief Migrate database table
 
@@ -154,11 +136,7 @@
 + (<%= cdef.className %> *)find_first_stmt:(dbstmt *)stmt
 {
     if ([stmt step] == SQLITE_ROW) {
-<% if (vers["ARC"]) -%>
         <%= cdef.baseClassName %> *e = [[self class] new];
-<% else -%>
-        <%= cdef.baseClassName %> *e = [[[self class] new] autorelease];
-<% end -%>
         [e _loadRow:stmt];
         return (<%= cdef.className %> *)e;
     }
@@ -173,20 +151,12 @@
 */
 + (NSMutableArray *)find_all_stmt:(dbstmt *)stmt
 {
-<% if (vers["ARC"]) -%>
     NSMutableArray *array = [NSMutableArray new];
-<% else -%>
-    NSMutableArray *array = [[NSMutableArray new] autorelease];
-<% end -%>
 
     while ([stmt step] == SQLITE_ROW) {
         <%= cdef.baseClassName %> *e = [[[self class] alloc] init];
         [e _loadRow:stmt];
         [array addObject:e];
-
-<% if (!vers["ARC"]) -%>
-        [e release];
-<% end -%>
     }
     return array;
 }
