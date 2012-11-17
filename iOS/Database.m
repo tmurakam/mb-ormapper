@@ -55,11 +55,9 @@ static Database *sDatabase = nil;
 + (void)_setInstance:(Database *)database
 {
     if (sDatabase != nil) {
-        [sDatabase release];
         NSLog(@"WARNING: Old Database instance was released.");
     }
     sDatabase = database;
-    [sDatabase retain];
 }
 
 /**
@@ -67,7 +65,6 @@ static Database *sDatabase = nil;
 */
 + (void)shutdown
 {
-    [sDatabase release];
     sDatabase = nil;
 }
 
@@ -79,6 +76,7 @@ static Database *sDatabase = nil;
     self = [super init];
     if (self != nil) {
         mHandle = nil;
+        mIsDirty = false;
     }
     return self;
 }
@@ -97,7 +95,6 @@ static Database *sDatabase = nil;
     if (mHandle != nil) {
         sqlite3_close(mHandle);
     }
-    [super dealloc];
 }
 
 /**
@@ -110,14 +107,14 @@ static Database *sDatabase = nil;
     NSFileManager *fileManager = [NSFileManager defaultManager];
 
     // Load from DB
-    NSString *dbPath = [self dbPath:dbname];
-    BOOL isExistedDb = [fileManager fileExistsAtPath:dbPath];
+    mDbPath = [self dbPath:dbname];
+    BOOL isExistedDb = [fileManager fileExistsAtPath:mDbPath];
 
-    if (sqlite3_open([dbPath UTF8String], &mHandle) != 0) {
+    if (sqlite3_open([mDbPath UTF8String], &mHandle) != 0) {
         // ouch!
         // re-create database
-        [fileManager removeItemAtPath:dbPath error:NULL];
-        sqlite3_open([dbPath UTF8String], &mHandle);
+        [fileManager removeItemAtPath:mDbPath error:NULL];
+        sqlite3_open([mDbPath UTF8String], &mHandle);
 
         isExistedDb = NO;
     }
@@ -129,7 +126,7 @@ static Database *sDatabase = nil;
 /**
    Execute SQL statement
 */
-- (void)exec:(NSString *)sql
+- (BOOL)exec:(NSString *)sql
 {
     //ASSERT(mHandle != 0);
 
@@ -137,7 +134,9 @@ static Database *sDatabase = nil;
     int result = sqlite3_exec(mHandle, [sql UTF8String], NULL, NULL, NULL);
     if (result != SQLITE_OK) {
         //LOG(@"sqlite3: %s", sqlite3_errmsg(mHandle));
+        return NO;
     }
+    return YES;
 }
 
 /**
@@ -156,7 +155,6 @@ static Database *sDatabase = nil;
     }
 
     dbstmt *dbs = [[dbstmt alloc] initWithStmt:stmt];
-    [dbs autorelease];
     //dbs.handle = self.handle;
     return dbs;
 }
@@ -216,6 +214,29 @@ static Database *sDatabase = nil;
     return dbPath;
 }
 
+/**
+   Modification hook
+*/
+- (void)setModified
+{
+    mIsDirty = YES;
+}
+
+/**
+   Update modification date of database
+*/
+- (void)updateModificationDate
+{
+    if (mIsDirty) {
+        mIsDirty = NO;
+
+        NSFileManager *m = [NSFileManager defaultManager];
+        NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithDictionary:[m attributesOfItemAtPath:mDbPath error:nil]];
+        [dict setObject:[NSDate new] forKey:NSFileModificationDate];
+        [m setAttributes:dict ofItemAtPath:mDbPath error:nil];
+    }
+}
+
 #pragma mark -
 #pragma mark Utilities
 
@@ -233,9 +254,7 @@ static Database *sDatabase = nil;
         [dateFormatter setDateFormat: @"yyyyMMddHHmmss"];
 
         // Avoid trivial bug for 'AM/PM' handling for some locales.
-        NSLocale *loc = [[NSLocale alloc] initWithLocaleIdentifier:@"US"];
-        [dateFormatter setLocale:loc];
-        [loc release];
+        [dateFormatter setLocale:[[NSLocale alloc] initWithLocaleIdentifier:@"US"]];
     }
     return dateFormatter;
 }

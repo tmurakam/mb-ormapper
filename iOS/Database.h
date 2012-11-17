@@ -36,6 +36,9 @@
 */
 @interface Database : NSObject {
     sqlite3 *mHandle; ///< Database handle
+
+    BOOL mIsDirty;
+    NSString *mDbPath; ///< Current database file path
 }
 
 @property(nonatomic,readonly) sqlite3 *handle;
@@ -50,7 +53,7 @@
 - (id)init;
 - (void)dealloc;
 
-- (void)exec:(NSString *)sql;
+- (BOOL)exec:(NSString *)sql;
 - (dbstmt*)prepare:(NSString *)sql;
 - (int)lastInsertRowId;
 
@@ -60,6 +63,9 @@
 
 - (NSString *)dbPath:(NSString *)dbname;
 - (BOOL)open:(NSString *)dbname;
+
+- (void)setModified;
+- (void)updateModificationDate;
 
 // utilities
 - (NSDateFormatter *)dateFormatter;

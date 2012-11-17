@@ -46,7 +46,6 @@
     if (mStmt) {
         sqlite3_finalize(mStmt);
     }
-    [super dealloc];
 }
 
 /**

@@ -167,4 +167,12 @@
     // must be override
 }
 
+/**
+   Quote SQL string
+*/
+- (NSString *)quoteSqlString:(NSString *)string
+{
+    return [NSString stringWithFormat:@"'%@'", [string stringByReplacingOccurrencesOfString:@"'" withString:@"''"]];
+}
+
 @end

@@ -54,6 +54,8 @@
 
 + (NSString *)tableName;
 
+- (NSString *)quoteSqlString:(NSString *)string;
+
 @end
 
 
