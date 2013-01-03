@@ -1,9 +1,5 @@
 //
 //  sampleAppDelegate.m
-//  sample
-//
-//  Created by 村上 卓弥 on 10/05/08.
-//  Copyright __MyCompanyName__ 2010. All rights reserved.
 //
 
 #import "sampleAppDelegate.h"
@@ -29,10 +25,11 @@
     
     //[Person delete_all];
     
+    // add test data
     NSMutableArray *persons = [Person find_all];
     if ([persons count] == 0) {
         // add test data
-        Person *person = [[Person alloc] init];
+        Person *person = [Person new];
         person.name = @"John Doe";
         person.age = 26;
         person.sex = 0;
