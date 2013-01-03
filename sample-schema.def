@@ -1,4 +1,4 @@
-# output dir
+# output dir (Android only)
 OUTDIR = src
 
 # Package name (Android only)
