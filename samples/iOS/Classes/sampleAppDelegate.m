@@ -32,7 +32,7 @@
     NSMutableArray *persons = [Person find_all];
     if ([persons count] == 0) {
         // add test data
-        Person *person = [[[Person alloc] init] autorelease];
+        Person *person = [[Person alloc] init];
         person.name = @"John Doe";
         person.age = 26;
         person.sex = 0;
@@ -53,11 +53,6 @@
 #pragma mark -
 #pragma mark Memory management
 
-- (void)dealloc {
-    [navigationController release];
-    [window release];
-    [super dealloc];
-}
 
 
 @end
