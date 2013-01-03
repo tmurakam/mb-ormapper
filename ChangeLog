@@ -1,6 +1,7 @@
 2013/01/03 : Takuya Murakami <tmurakam@tmurakam.org>
 
 	* README 翻訳
+	* iOS 版 sample 修正 (ARC対応など)
 
 2012/11/17 : Takuya Murakami <tmurakam@tmurakam.org>
 
