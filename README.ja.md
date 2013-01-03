@@ -32,21 +32,26 @@ Android の場合:
 使用方法 : iOS の場合
 ---------------------
 
-最初に以下のようにしてデータベースのインスタンスを生成し、シングルトン
-として登録します。そして open を呼び出してデータベースの作成、ロードを
-行い、migrate を呼び出してテーブルの作成・マイグレーションを行います。
+最初に以下のようにしてデータベースのシングルトンインスタンスを取得
+します。そして open を呼び出してデータベースの作成とオープンを行います。
 
-    Database *db = [Database new];
-    [Database setInstance:db];
-
+    Database *db = [Database instance];
     [db open:@"MyDatabase.db"];
-    [db migrate];
+
+次に、各モデルの migrate を呼び出し、テーブルの作成・マイグレーション
+を行います。以下はここではモデルクラスが Person の場合の例です。
+
+    [Person migrate];
 
 テーブルの読み込みにはファインダメソッド群 (find) を使います。
 これらのメソッドはモデルの NSMutableArray 配列を返します。
 
-特定の ID を持つレコードを読み出したい場合は find(int pid)
+    NSMutableArray *people = [Person find_all];
+
+特定の ID を持つレコードを読み出したい場合は find:(int)pid
 メソッドを使ってください。
+
+    Person *person = [Person find:1];
 
 レコードの作成、保存を行う場合は、モデルのインスタンスを
 生成し、save メソッドを呼ぶだけです。

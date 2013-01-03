@@ -32,21 +32,24 @@ Also you need to add source files in 'iOS' or 'Android' directory.
 How to use : for iOS
 --------------------
 
-At first, generate database instance and register as a singleton.
+At first, get singleton instance of database and open database.
 
-    Database *db = [Database new];
-    [Database setInstance:db];
-
-Then call 'open' to create and load a database, call 'migrate'
-to create and migrate tables.
-
+    Database *db = [Database instance];
     [db open:@"MyDatabase.db"];
-    [db migrate];
+
+Then call 'migrate' method of a model class to create and
+migrate tables. For example, model class name is Person:
+
+    [Person migrate];
 
 To load data use 'finder' methods. These methods returns
 NSMutableArray array of a model entities.
 
-To load specified record, use 'find(int pid)' method.
+    NSMutableArray *people = [Person find_all];
+
+To load specified record, use find:(int)pid method.
+
+    Person *person = [Person find:1];
 
 To save a record, just call 'save' method of the model.
 
