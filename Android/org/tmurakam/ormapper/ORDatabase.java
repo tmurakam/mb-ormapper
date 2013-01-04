@@ -54,8 +54,6 @@ public class ORDatabase extends SQLiteOpenHelper {
 
     private static SimpleDateFormat sDateFormat;
     
-    private static SimpleDateFormat sOlderDateFormat;
-
     private static Date sWorkDate;
 
     private SQLiteDatabase mDb;
@@ -63,9 +61,6 @@ public class ORDatabase extends SQLiteOpenHelper {
     static {
         sDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
         sDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-
-        sOlderDateFormat = new SimpleDateFormat("yyyyMMddHHmm");
-        sOlderDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
     /**
@@ -163,12 +158,7 @@ public class ORDatabase extends SQLiteOpenHelper {
         try {
             return sDateFormat.parse(d).getTime();
         } catch (ParseException ex) {
-            // 秒を含まないフォーマット(古い iPhone 版 DB フォーマット)で再度試みる
-            try {
-                return sOlderDateFormat.parse(d).getTime();
-            } catch (ParseException ex2) {
-                return 0; // 1970/1/1 0:00:00 GMT
-            }
+            return 0; // 1970/1/1 0:00:00 GMT
         }
     }
 
