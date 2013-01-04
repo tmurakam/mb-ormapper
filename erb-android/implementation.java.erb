@@ -70,38 +70,80 @@ public class <%= cdef.baseClassName %> extends ORRecord {
      * @return record
      */
     public static <%= cdef.className %> find(int pid) {
-        return where("key = ?;", Integer.toString(pid)).first();
+        return query().where("key = ?;", Integer.toString(pid)).first();
     }
 
 <%  # find_by finders -%>
 <%  cdef.members.each do |m| -%>
 
     public static <%= cdef.className %> find_by_<%= m.fieldName %>(<%= getJavaType(m.type) %> key) {
-        return where("<%= m.fieldName %> = ?", <%= getToString(m.type, "key") %>).first();
+        return query().where("<%= m.fieldName %> = ?", <%= getToString(m.type, "key") %>).first();
     }
 <% end -%>
 
     /**
      * get ORQuery
      */
-    public static ORQuery<<%= cdef.className %>> orquery() {
+    public static ORQuery<<%= cdef.className %>> query() {
         return new ORQuery<<%= cdef.className %>>(<%= cdef.className %>.class, tableName);
     }
 
+    /* shortcuts to ORQuery functions */
+
     /**
-     * shortcuts to ORQuery functions
+     * Execute query and returns all elements
+     * @return elements
      */
     public static List<<%= cdef.className %>> all() {
-        return orquery().all();
+        return query().all();
     }
+
+    /**
+     * Execute query and get first element
+     * @return first element
+     */
     public static <%= cdef.className %> first() {
-        return orquery().first();
+        return query().first();
     }
+
+    /**
+     * Set 'WHERE' conditions
+     * @param cond conditions
+     * @param params parameters for each placeholders
+     * @return this
+     * @note You can set only 1 where condition.
+     */
     public static ORQuery<<%= cdef.className %>> where(String cond, String... params) {
-        return orquery().where(cond, params);
+        return query().where(cond, params);
     }
+
+    /**
+     * Set 'WHERE' conditions
+     * @param column column name
+     * @param param parameter
+     * @return this
+     * @note You can set only 1 where condition.
+     */
+    public static ORQuery<<%= cdef.className %>> where_eq(String column, String param) {
+        return query().where_eq(column, param);
+    }
+
+    /**
+     * set 'ORDER BY' parameter
+     * @param order ORDER BY parameter string
+     * @return this
+     */
     public static ORQuery<<%= cdef.className %>> order(String order) {
-        return orquery().order(order);
+        return query().order(order);
+    }
+
+    /**
+     * set 'LIMIT' parameter 
+     * @param limit parameter
+     * @return this
+     */
+    public static ORQuery<<%= cdef.className %>> limit(int limit) {
+        return query().limit(limit);
     }
 
     /* load row columns */
@@ -229,7 +271,7 @@ public class <%= cdef.baseClassName %> extends ORRecord {
         }
         wr.write(");\n");
 
-        List<<%= cdef.className %>> ary = all();
+        List<<%= cdef.className %>> ary = query().all();
         for (<%= cdef.className %> e : ary) {
             e.getInsertSql(wr);
             wr.write("\n");

@@ -64,7 +64,8 @@ public class ORQuery<T extends ORRecord> {
      * Set 'WHERE' conditions
      * @param cond conditions
      * @param params parameters for each placeholders
-     * @return
+     * @return this
+     * @note You can set only 1 where condition.
      */
     public ORQuery<T> where(String cond, String... params) {
         mWhere = cond;
@@ -73,9 +74,22 @@ public class ORQuery<T extends ORRecord> {
     }
     
     /**
+     * Set 'WHERE' conditions
+     * @param column column name
+     * @param param parameter
+     * @return this
+     * @note You can set only 1 where condition.
+     */
+    public ORQuery<T> where_eq(String column, String param) {
+        mWhere = column + " = ?";
+        mWhereParams = new String[] { param };
+        return this;
+    }
+    
+    /**
      * set 'ORDER BY' parameter
      * @param order ORDER BY parameter string
-     * @return
+     * @return this
      */
     public ORQuery<T> order(String order) {
         mOrder = order;
@@ -85,13 +99,13 @@ public class ORQuery<T extends ORRecord> {
     /**
      * set 'LIMIT' parameter 
      * @param limit parameter
-     * @return
+     * @return this
      */
     public ORQuery<T> limit(int limit) {
         mLimit = limit;
         return this;
     }
-    
+
     /**
      * Execute query and returns all elements
      * @return elements
