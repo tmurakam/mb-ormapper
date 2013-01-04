@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
-#-*-  Mode:ruby; c-basic-offset:4; tab-width:8; indent-tabs-mode:nil -*-
+#-*-  Mode:ruby; c-basic-offset:2; tab-width:8; indent-tabs-mode:nil -*-
 =begin
   O/R Mapper library for Android
 
-  Copyright (c) 2010-2012, Takuya Murakami. All rights reserved.
+  Copyright (c) 2010-2013, Takuya Murakami. All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are
@@ -39,7 +39,7 @@ $LOAD_PATH.push(ORMDIR)
 require "orschema.rb"
 require 'erb'
 
-VER = "1.1"
+VER = "1.2"
 
 def getJavaType(type)
   case type
