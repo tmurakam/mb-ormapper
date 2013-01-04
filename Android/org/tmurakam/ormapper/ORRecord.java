@@ -26,14 +26,17 @@
 
 package org.tmurakam.ormapper;
 
+import org.tmurakam.cashflow.models.Asset;
+
 import android.database.sqlite.SQLiteDatabase;
 import android.database.Cursor;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public abstract class ORRecord {
+public abstract class ORRecord<T> {
     public int pid; // primary key
 
     protected boolean isInserted;
@@ -118,7 +121,28 @@ public abstract class ORRecord {
      * Update record
      */
     public abstract void update();
+    
+    /**
+     * Basic Query
+     */
+    protected static Cursor query(String tableName, String cond, String... params) {
+        StringBuilder sql = new StringBuilder("SELECT * FROM ");
+        sql.append(tableName);
+        if (cond != null) {
+            sql.append(" ");
+            sql.append(cond);
+        }
+        SQLiteDatabase db = ORDatabase.getDB();
+        Cursor cursor = db.rawQuery(sql.toString(), params);
+        return cursor;
+    }
 
+    /**
+     * Load row columns from cursor
+     * @param cursor
+     */
+    public abstract void _loadRow(Cursor cursor);
+    
     /**
      * Quote SQL string
      */

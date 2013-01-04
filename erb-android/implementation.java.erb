@@ -5,6 +5,7 @@ package <%= vers["PKGNAME"] %>;
 
 import org.tmurakam.ormapper.ORDatabase;
 import org.tmurakam.ormapper.ORRecord;
+import org.tmurakam.ormapper.ORQuery;
 
 import android.content.ContentValues;
 import android.database.*;
@@ -68,7 +69,8 @@ public class <%= cdef.baseClassName %> extends ORRecord {
      * @return array of all record
      */
     public static List<<%= cdef.className %>> find() {
-        return find(null);
+        return all();
+        //return find(null);
     }
 
     /**
@@ -77,75 +79,44 @@ public class <%= cdef.baseClassName %> extends ORRecord {
      * @return record
      */
     public static <%= cdef.className %> find(int pid) {
-        return findFirst("WHERE key = ?;", Integer.toString(pid));
+        return where("key = ?;", Integer.toString(pid)).first();
+        //return findFirst("WHERE key = ?;", Integer.toString(pid));
     }
 
 <%  # find_by finders -%>
 <%  cdef.members.each do |m| -%>
 
     public static <%= cdef.className %> find_by_<%= m.fieldName %>(<%= getJavaType(m.type) %> key) {
-        return findFirst("WHERE <%= m.fieldName %> = ?;", <%= getToString(m.type, "key") %>);
+        return where("<%= m.fieldName %> = ?", <%= getToString(m.type, "key") %>).first();
+        //return findFirst("WHERE <%= m.fieldName %> = ?;", <%= getToString(m.type, "key") %>);
     }
 <% end -%>
 
     /**
-     * Get all records match the conditions
-     * @param cond Conditions (WHERE phrase and so on)
-     * @param params parameters
-     * @return array of records
+     * get ORQuery
      */
-    public static List<<%= cdef.className %>> find(String cond, String... params) {
-        String sql;
-        sql = "SELECT * FROM " + tableName;
-        if (cond != null) {
-            sql += " ";
-            sql += cond;
-        }
-        SQLiteDatabase db = ORDatabase.getDB();
-        Cursor cursor = db.rawQuery(sql, params);
-        cursor.moveToFirst();
-
-        ArrayList<<%= cdef.className %>> array = new ArrayList<<%= cdef.className %>>();
-
-        while (!cursor.isAfterLast()) {
-            <%= cdef.className %> e = new <%= cdef.className %>();
-            e._loadRow(cursor);
-            array.add(e);
-            cursor.moveToNext();
-        }
-        cursor.close();
-
-        return array;
+    public static ORQuery<<%= cdef.className %>> orquery() {
+        return new ORQuery<<%= cdef.className %>>(<%= cdef.className %>.class, tableName);
     }
 
     /**
-     * Get first record matches the conditions
-     * @param cond Conditions (WHERE phrase and so on)
-     * @param params parameters
-     * @return record
+     * shortcuts to ORQuery functions
      */
-    public static <%= cdef.className %> findFirst(String cond, String... params) {
-        String sql;
-        sql = "SELECT * FROM " + tableName;
-        if (cond != null) {
-            sql += " ";
-            sql += cond;
-        }
-        SQLiteDatabase db = ORDatabase.getDB();
-        Cursor cursor = db.rawQuery(sql, params);
-        cursor.moveToFirst();
-
-        <%= cdef.className %> e = null;
-        if (!cursor.isAfterLast()) {
-            e = new <%= cdef.className %>();
-            e._loadRow(cursor);
-        }
-        cursor.close();
-
-        return e;
+    public static List<<%= cdef.className %>> all() {
+        return orquery().all();
+    }
+    public static <%= cdef.className %> first() {
+        return orquery().first();
+    }
+    public static ORQuery<<%= cdef.className %>> where(String cond, String... params) {
+        return orquery().where(cond, params);
+    }
+    public static ORQuery<<%= cdef.className %>> order(String order) {
+        return orquery().order(order);
     }
 
-    protected void _loadRow(Cursor cursor) {
+    /* load row columns */
+    public void _loadRow(Cursor cursor) {
         this.pid = cursor.getInt(0);
 
 <% 
