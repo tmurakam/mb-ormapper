@@ -65,22 +65,12 @@ public class <%= cdef.baseClassName %> extends ORRecord {
     // Read operations
 
     /**
-     * Get all records
-     * @return array of all record
-     */
-    public static List<<%= cdef.className %>> find() {
-        return all();
-        //return find(null);
-    }
-
-    /**
      * Get the record matches the id
      * @param pid Primary key of the record
      * @return record
      */
     public static <%= cdef.className %> find(int pid) {
         return where("key = ?;", Integer.toString(pid)).first();
-        //return findFirst("WHERE key = ?;", Integer.toString(pid));
     }
 
 <%  # find_by finders -%>
@@ -88,7 +78,6 @@ public class <%= cdef.baseClassName %> extends ORRecord {
 
     public static <%= cdef.className %> find_by_<%= m.fieldName %>(<%= getJavaType(m.type) %> key) {
         return where("<%= m.fieldName %> = ?", <%= getToString(m.type, "key") %>).first();
-        //return findFirst("WHERE <%= m.fieldName %> = ?;", <%= getToString(m.type, "key") %>);
     }
 <% end -%>
 
@@ -240,7 +229,7 @@ public class <%= cdef.baseClassName %> extends ORRecord {
         }
         wr.write(");\n");
 
-        List<<%= cdef.className %>> ary = find();
+        List<<%= cdef.className %>> ary = all();
         for (<%= cdef.className %> e : ary) {
             e.getInsertSql(wr);
             wr.write("\n");

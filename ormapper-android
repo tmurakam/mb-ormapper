@@ -39,7 +39,7 @@ $LOAD_PATH.push(ORMDIR)
 require "orschema.rb"
 require 'erb'
 
-VER = "1.2"
+VER = "1.3"
 
 def getJavaType(type)
   case type

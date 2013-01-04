@@ -26,17 +26,13 @@
 
 package org.tmurakam.ormapper;
 
-import org.tmurakam.cashflow.models.Asset;
-
 import android.database.sqlite.SQLiteDatabase;
 import android.database.Cursor;
 
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
-public abstract class ORRecord<T> {
+public abstract class ORRecord {
     public int pid; // primary key
 
     protected boolean isInserted;
