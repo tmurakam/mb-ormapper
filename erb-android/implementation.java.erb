@@ -68,7 +68,7 @@ public class <%= cdef.baseClassName %> extends ORRecord {
      * @return array of all record
      */
     public static List<<%= cdef.className %>> find() {
-        return find(null, null);
+        return find(null);
     }
 
     /**
@@ -77,27 +77,16 @@ public class <%= cdef.baseClassName %> extends ORRecord {
      * @return record
      */
     public static <%= cdef.className %> find(int pid) {
-        String[] param = { Integer.toString(pid) };
-        return findFirst("WHERE key = ?;", param);
+        return findFirst("WHERE key = ?;", Integer.toString(pid));
     }
 
 <%  # find_by finders -%>
 <%  cdef.members.each do |m| -%>
 
     public static <%= cdef.className %> find_by_<%= m.fieldName %>(<%= getJavaType(m.type) %> key) {
-        String[] param = { <%= getToString(m.type, "key") %> };
-        return findFirst("WHERE <%= m.fieldName %> = ?;", param);
+        return findFirst("WHERE <%= m.fieldName %> = ?;", <%= getToString(m.type, "key") %>);
     }
 <% end -%>
-
-    /**
-     * Get all records matches the conditions
-     * @param cond Conditions (WHERE phrase and so on)
-     * @return array of records
-     */
-    public static List<<%= cdef.className %>> find(String cond) {
-        return find(cond, null);
-    }
 
     /**
      * Get all records match the conditions
@@ -105,7 +94,7 @@ public class <%= cdef.baseClassName %> extends ORRecord {
      * @param params parameters
      * @return array of records
      */
-    public static List<<%= cdef.className %>> find(String cond, String[] params) {
+    public static List<<%= cdef.className %>> find(String cond, String... params) {
         String sql;
         sql = "SELECT * FROM " + tableName;
         if (cond != null) {
@@ -135,7 +124,7 @@ public class <%= cdef.baseClassName %> extends ORRecord {
      * @param params parameters
      * @return record
      */
-    public static <%= cdef.className %> findFirst(String cond, String[] params) {
+    public static <%= cdef.className %> findFirst(String cond, String... params) {
         String sql;
         sql = "SELECT * FROM " + tableName;
         if (cond != null) {
