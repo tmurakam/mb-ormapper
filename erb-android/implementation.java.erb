@@ -16,9 +16,9 @@ import java.util.*;
 import java.io.*;
 
 public class <%= cdef.baseClassName %> extends ORRecord {
-    public final static String TAG = "<%= cdef.baseClassName %>";
+    private final static String TAG = "<%= cdef.baseClassName %>";
 
-    public final static String tableName = "<%= cdef.tableName %>";
+    private final static String TABLE_NAME = "<%= cdef.tableName %>";
 
     private final static String[] COLUMN_TYPES = {
 <% cdef.members.each do |m| -%>
@@ -54,7 +54,7 @@ public class <%= cdef.baseClassName %> extends ORRecord {
      * @return true - table was newly created, false - table already exists
      */
     public static boolean migrate() {
-        return migrate(tableName, COLUMN_TYPES);
+        return migrate(TABLE_NAME, COLUMN_TYPES);
     }
 
     // Constructor
@@ -85,7 +85,7 @@ public class <%= cdef.baseClassName %> extends ORRecord {
      * get ORQuery
      */
     public static ORQuery<<%= cdef.className %>> query() {
-        return new ORQuery<<%= cdef.className %>>(<%= cdef.className %>.class, tableName);
+        return new ORQuery<<%= cdef.className %>>(<%= cdef.className %>.class, TABLE_NAME);
     }
 
     /* shortcuts to ORQuery functions */
@@ -179,7 +179,7 @@ public class <%= cdef.baseClassName %> extends ORRecord {
         db.beginTransaction();
         try {
             // TODO: pid should be long?
-            this.pid = (int)db.insert(tableName, "key", getContentValues());
+            this.pid = (int)db.insert(TABLE_NAME, "key", getContentValues());
             isInserted = true;
             Log.d(TAG, "<%= cdef.tableName %>.insert : pid = " + pid);
 
@@ -200,7 +200,7 @@ public class <%= cdef.baseClassName %> extends ORRecord {
             String[] whereArgs = {
                 Long.toString(pid)
             };
-            int n = db.update(tableName, cv, "key = ?", whereArgs);
+            int n = db.update(TABLE_NAME, cv, "key = ?", whereArgs);
             Log.d(TAG, "<%= cdef.tableName %>.update : count = " + n);
             db.setTransactionSuccessful();
         } finally {
@@ -236,7 +236,7 @@ public class <%= cdef.baseClassName %> extends ORRecord {
         String[] whereArgs = {
             Long.toString(pid)
         };
-        int n = db.delete(tableName, "key = ?", whereArgs);
+        int n = db.delete(TABLE_NAME, "key = ?", whereArgs);
         Log.d(TAG, "<%= cdef.tableName %>.delete : n = " + n);
     }
 
@@ -250,7 +250,7 @@ public class <%= cdef.baseClassName %> extends ORRecord {
         if (cond == null) {
             cond = "";
         }
-        String sql = "DELETE FROM " + tableName + " " + cond;
+        String sql = "DELETE FROM " + TABLE_NAME + " " + cond;
         db.execSQL(sql);
     }
 
@@ -262,8 +262,8 @@ public class <%= cdef.baseClassName %> extends ORRecord {
      * get table sql
      */
     public static void getTableSql(Writer wr) throws IOException {
-        wr.write(String.format("DROP TABLE %s;\n", tableName));
-        wr.write(String.format("CREATE TABLE %s (key INTEGER PRIMARY KEY", tableName));
+        wr.write(String.format("DROP TABLE %s;\n", TABLE_NAME));
+        wr.write(String.format("CREATE TABLE %s (key INTEGER PRIMARY KEY", TABLE_NAME));
 
         for (int i = 0; i < COLUMN_TYPES.length / 2; i++) {
             wr.write(String.format(", %s %s", 
@@ -283,7 +283,7 @@ public class <%= cdef.baseClassName %> extends ORRecord {
      */
     public void getInsertSql(Writer wr) throws IOException {
         wr.write("INSERT INTO ");
-        wr.write(tableName);
+        wr.write(TABLE_NAME);
         wr.write(String.format(" VALUES(%d", pid));
 <% cdef.members.each do |m| -%>
         wr.write(",");
