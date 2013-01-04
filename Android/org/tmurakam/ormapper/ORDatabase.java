@@ -54,8 +54,6 @@ public class ORDatabase extends SQLiteOpenHelper {
 
     private static SimpleDateFormat sDateFormat;
     
-    private static Date sWorkDate;
-
     private SQLiteDatabase mDb;
     
     static {
@@ -146,12 +144,8 @@ public class ORDatabase extends SQLiteOpenHelper {
     /**
      * utilities
      */
-    public static String date2str(long d) {
-        if (sWorkDate == null) {
-            sWorkDate = new Date();
-        }
-        sWorkDate.setTime(d);
-        return sDateFormat.format(sWorkDate);
+    public static String date2str(long milliseconds) {
+        return sDateFormat.format(new Date(milliseconds));
     }
 
     public static long str2date(String d) {
