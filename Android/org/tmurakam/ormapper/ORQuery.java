@@ -45,6 +45,7 @@ public class ORQuery<T extends ORRecord> {
     private String[] mWhereParams;
     private String mOrder;
     private int mLimit = 0;
+    private int mOffset = 0;
 
     /**
      * Constructor
@@ -103,6 +104,16 @@ public class ORQuery<T extends ORRecord> {
      */
     public ORQuery<T> limit(int limit) {
         mLimit = limit;
+        return this;
+    }
+    
+    /**
+     * set 'OFFSET' parameter
+     * @param offset offset parameter
+     * @return this
+     */
+    public ORQuery<T> offset(int offset) {
+        mOffset = offset;
         return this;
     }
 
@@ -191,6 +202,10 @@ public class ORQuery<T extends ORRecord> {
         if (mLimit > 0) {
             sql.append(" LIMIT ");
             sql.append(mLimit);
+        }
+        if (mOffset > 0) {
+            sql.append(" OFFSET ");
+            sql.append(mOffset);
         }
         return sql.toString();
     }
