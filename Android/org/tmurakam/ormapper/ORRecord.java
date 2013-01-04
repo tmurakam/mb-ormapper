@@ -119,21 +119,6 @@ public abstract class ORRecord {
     public abstract void update();
     
     /**
-     * Basic Query
-     */
-    protected static Cursor query(String tableName, String cond, String... params) {
-        StringBuilder sql = new StringBuilder("SELECT * FROM ");
-        sql.append(tableName);
-        if (cond != null) {
-            sql.append(" ");
-            sql.append(cond);
-        }
-        SQLiteDatabase db = ORDatabase.getDB();
-        Cursor cursor = db.rawQuery(sql.toString(), params);
-        return cursor;
-    }
-
-    /**
      * Load row columns from cursor
      * @param cursor
      */

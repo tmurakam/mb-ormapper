@@ -8,6 +8,9 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
+/** 
+ * O/R mapper query object
+ */
 public class ORQuery<T extends ORRecord> {
     private final static String TAG = "ORQuery";
     
@@ -18,6 +21,11 @@ public class ORQuery<T extends ORRecord> {
     private String mOrder;
     private int mLimit = 0;
 
+    /**
+     * Constructor
+     * @param clazz  Class object
+     * @param tableName Table name
+     */
     public ORQuery(Class<T> clazz, String tableName) {
         try {
             mConstructor = clazz.getConstructor();
@@ -27,24 +35,44 @@ public class ORQuery<T extends ORRecord> {
         mTableName = tableName;
     }
     
+    /**
+     * Set 'WHERE' conditions
+     * @param cond conditions
+     * @param params parameters for each placeholders
+     * @return
+     */
     public ORQuery<T> where(String cond, String... params) {
         mWhere = cond;
         mWhereParams = params;
         return this;
     }
     
+    /**
+     * set 'ORDER BY' parameter
+     * @param order ORDER BY parameter string
+     * @return
+     */
     public ORQuery<T> order(String order) {
         mOrder = order;
         return this;
     }
     
+    /**
+     * set 'LIMIT' parameter 
+     * @param limit parameter
+     * @return
+     */
     public ORQuery<T> limit(int limit) {
         mLimit = limit;
         return this;
     }
     
+    /**
+     * Execute query and returns all elements
+     * @return elements
+     */
     public List<T> all() {
-        Cursor cursor = query();
+        Cursor cursor = execQuery();
         cursor.moveToFirst();
         
         ArrayList<T> array = new ArrayList<T>();
@@ -65,10 +93,14 @@ public class ORQuery<T extends ORRecord> {
         return array;
     }
     
+    /**
+     * Execute query and get first element
+     * @return first element
+     */
     public T first() {
         mLimit = 1;
         
-        Cursor cursor = query();
+        Cursor cursor = execQuery();
         cursor.moveToFirst();
 
         T entity = null;
@@ -85,7 +117,25 @@ public class ORQuery<T extends ORRecord> {
         return entity;
     }
     
-    private Cursor query() {
+    /**
+     * Execute query
+     * @return Cursor
+     */
+    private Cursor execQuery() {
+        String sql = getSql();
+
+        SQLiteDatabase db = ORDatabase.getDB();
+        Cursor cursor = db.rawQuery(sql.toString(), mWhereParams);
+
+        return cursor;
+    }
+
+    /**
+     * get SQL statement
+     * @return SQL statement
+     * @note placeholder('?') are not be expanded
+     */
+    public String getSql() {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT * FROM ");
         sql.append(mTableName);
@@ -103,10 +153,6 @@ public class ORQuery<T extends ORRecord> {
             sql.append(" LIMIT ");
             sql.append(mLimit);
         }
-        
-        SQLiteDatabase db = ORDatabase.getDB();
-        Cursor cursor = db.rawQuery(sql.toString(), mWhereParams);
-        //cursor.moveToFirst();
-        return cursor;
+        return sql.toString();
     }
 }
