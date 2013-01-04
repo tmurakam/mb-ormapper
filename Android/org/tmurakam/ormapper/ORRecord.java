@@ -2,7 +2,7 @@
 /*
   O/R Mapper library for Android
 
-  Copyright (c) 2010-2011, Takuya Murakami. All rights reserved.
+  Copyright (c) 2010-2013, Takuya Murakami. All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are
@@ -32,9 +32,14 @@ import android.database.Cursor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * O/R mapper record base class
+ */
 public abstract class ORRecord {
-    public int pid; // primary key
+    /** primary key */
+    public int pid;
 
+    /** inserted flag */
     protected boolean isInserted;
 
     /**
