@@ -1,3 +1,9 @@
+2013/01/05 : Takuya Murakami <tmurakam@tmurakam.org>
+
+	* ver 2.0
+	* schema syntax を変更。Ruby 言語内 DSLにした。
+	* relation 設定を追加
+
 2013/01/04 : Takuya Murakami <tmurakam@tmurakam.org>
 
 	* ver 1.3
