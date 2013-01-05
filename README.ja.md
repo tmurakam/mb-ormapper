@@ -66,8 +66,8 @@ TBD
 schema について
 ---------------
 
-schema の文法は Ruby 言語内 DSL になっています。
-以下にサンプルを示します。
+schema の文法は Ruby on Rails の migration に似た
+言語内 DSL になっています。以下にサンプルを示します。
 
     create_table :people, :class => :Person, :base_class => :PersonBase do |t|
       t.text :name
@@ -79,9 +79,13 @@ schema の文法は Ruby 言語内 DSL になっています。
     end
 
 テーブル/モデル定義は create_table で行います。
-上記の例では 'person' という名前の table が生成されます。
+上記の例では 'people' という名前の table が生成されます。
 また、:base_class に指定した名前でモデルクラスが生成されます。
 開発者は、これを :class に指定した名前のクラスで継承して使用します。
+
+生成されるファイル名は base_class のクラス名で決まります。
+上記の例では、iOS では PersonBase.h, PersonBase.m, Android の場合は
+PersonBase.java になります。
 
 なお、:base_class を省略すると、:class の指定と同一とみなされます。
 :class を省略した場合、テーブル名と同一とみなされます。

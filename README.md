@@ -61,37 +61,31 @@ TBD
 Schema definition
 -----------------
 
-Schema syntax is:
+Schema syntax is similar to RoR migration syntax.
+Sample:
 
-    model_name: class_name, base_class_name
-            column_name: type
-            ...
+    create_table :people, :class => :Person, :base_class => :PersonBase do |t|
+      t.text :name
+      t.integer :sex
+      t.integer :age
+      t.integer :group_id
 
-    model_name: class_name, base_class_name
-            column_name: type
-            ...
+      t.belongs_to :group, :class => :Group, :field_name => :group_id
+    end
 
-A base model class file name is decided with base_class_name.
+Use create_table to define table and model.
+With this example, table name is 'people' and base class name
+is 'PersonBase'. You must implement class 'Person' derived from
+PersonBase.
+
+A base model class file name is decided with base_class name.
 For iOS, file name will be 'base_class_name.h' and 'base_class_name.m'
 For Android, it will be 'base_class_name.java'
 
-You need to implement model class with 'class_name' name derived
-from base_class_name.
-Or you can use base class directly. In this case omit base_class_name
-like as:
-
-    model_name: base_class_name
-
-Also you can omit base_class_name. In this case class name is 
-same as model name
-
-    model_name
-
-Note: SQL table name is same as model name.
-(Not plural like as Ruby on Rails)
-
-'type' should be SQLite data type. Supporting types and
-corresponding types of Objective-C or Java are:
+All fields must be declared in the block.
+Use text, integer, real, date method to define a field.
+Supporting types and corresponding types of Objective-C or
+Java are:
 
     SQL type   Obj-C type    Java type
     -----------------------------------
@@ -103,9 +97,23 @@ corresponding types of Objective-C or Java are:
     *1: 14 characters string ("yyyyMMddHHmmss") internally
     *2: Elapsed time from 1970/1/1 0:00 UTC in milliseconds.
 
-Properties of model class is automatically generated based on
-'column_name'.
+Relationships
+-------------
 
+Relationships must be defined in the create_table block.
+For 1 to many relationship, use belongs_to, has_many method.
+
+For child table, use belongs_to with method name, parent 
+class name, and field name.
+
+    t.belongs_to :group, :class => :Group, :field_name => :group_id
+
+For parent table, use has_many with method name, child
+class name, and field name of child table.
+
+    t.has_many :people, :class => :Person, :field_name => :group_id
+
+Use has_one for 1 to 1 relationship.
 
 Table migration
 ---------------
