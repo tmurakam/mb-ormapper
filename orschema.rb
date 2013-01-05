@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 
 =begin
   O/R Mapper library for Android
@@ -34,139 +34,138 @@
 =end
 
 class MemberVar
-    attr_reader :type, :fieldName, :memberName
-    attr_reader :getter, :setter, :propName
+  attr_reader :type, :fieldName, :memberName
+  attr_reader :getter, :setter, :propName
 
-    def initialize(type, name, fieldName = nil)
-        @type = type
+  def initialize(type, name, fieldName = nil)
+    @type = type
 
-        @getter = camelCase(name)
-        @setter = "set" + CamelCase(name)
-        @propName = @getter
+    @getter = camelCase(name)
+    @setter = "set" + CamelCase(name)
+    @propName = @getter
 
-        @memberName = "m" + CamelCase(name)
+    @memberName = "m" + CamelCase(name)
 
-        if (fieldName != nil)
-            @fieldName = fieldName
-        else
-            @fieldName = name
-        end
-
+    if (fieldName != nil)
+      @fieldName = fieldName
+    else
+      @fieldName = name
     end
 
-    private
-    def camelCase(name)
-        name = name.gsub(/_./) { |x| x.gsub(/_/, "").upcase }
-        return name
-    end 
+  end
 
-    def CamelCase(name)
-        name = name.gsub(/^./) { |x| x.upcase }
-        name = name.gsub(/_./) { |x| x.gsub(/_/, "").upcase }
-        return name
-    end 
+  private
+  def camelCase(name)
+    name = name.gsub(/_./) { |x| x.gsub(/_/, "").upcase }
+    return name
+  end 
 
-    def dump
-        puts "  #{@type}: #{@fieldName} => #{@propertyName}"
-    end
+  def CamelCase(name)
+    name = name.gsub(/^./) { |x| x.upcase }
+    name = name.gsub(/_./) { |x| x.gsub(/_/, "").upcase }
+    return name
+  end 
+
+  def dump
+    puts "  #{@type}: #{@fieldName} => #{@propertyName}"
+  end
 end
 
 class ClassDef
-    attr_accessor :tableName, :baseClassName, :className, :members
+  attr_accessor :tableName, :baseClassName, :className, :members
 
-    def initialize
-        @tableName = nil             # table name
-        @baseClassName = nil           # base class name
-        @className = nil           # real class name
-        @members = Array.new    # members
-    end
+  def initialize
+    @tableName = nil             # table name
+    @baseClassName = nil           # base class name
+    @className = nil           # real class name
+    @members = Array.new    # members
+  end
 
-    def dump
-        puts "-- #{@name} --"
-        @members.each do |member|
-            member.dump
-        end
+  def dump
+    puts "-- #{@name} --"
+    @members.each do |member|
+      member.dump
     end
+  end
 end
 
 class Schema
-    attr_reader :defs
-    attr_reader :vers
+  attr_reader :defs
+  attr_reader :vers
 
-    def initialize
-        @defs = Array.new
-        @vers = Hash.new
-    end
+  def initialize
+    @defs = Array.new
+    @vers = Hash.new
+  end
 
-    def loadFromFile(filename)
-        open(filename) do |fh|
-            
-            classdef = nil
+  def loadFromFile(filename)
+    open(filename) do |fh|
+      
+      classdef = nil
 
-            fh.each do |line|
-                line.chop!
+      fh.each do |line|
+        line.chop!
 
-                # remove comment
-                line.gsub!(/#.*$/, "")
+        # remove comment
+        line.gsub!(/#.*$/, "")
 
-                if (line =~ /^\s*$/)
-                   # empty line
-                   next                   
+        if (line =~ /^\s*$/)
+          # empty line
+          next                   
 
-                elsif (line =~ /^(\S+)\s*=\s*(\S+)/)
-                    # variable def.
-                    name = $1
-                    value = $2
-                    @vers[name] = value
+        elsif (line =~ /^(\S+)\s*=\s*(\S+)/)
+          # variable def.
+          name = $1
+          value = $2
+          @vers[name] = value
 
-                elsif (line =~ /^\S/)
-                    # start class def
-                    tableName = baseClassName = className = nil
-                    if (line =~ /(.*)\s*:\s*(.*)\s*,\s*(.*)/)
-                        tableName = $1
-                        className = $2
-                        baseClassName = $3
-                    elsif (line =~ /(.*)\s*:\s*(.*)/)
-                        tableName = $1
-                        className = $2
-                        baseClassName = className
-                    else
-                        line =~ /^(\S+):?/
-                        tableName = $1
-                        className = name
-                        baseClassName = name
-                    end
+        elsif (line =~ /^\S/)
+          # start class def
+          tableName = baseClassName = className = nil
+          if (line =~ /(.*)\s*:\s*(.*)\s*,\s*(.*)/)
+            tableName = $1
+            className = $2
+            baseClassName = $3
+          elsif (line =~ /(.*)\s*:\s*(.*)/)
+            tableName = $1
+            className = $2
+            baseClassName = className
+          else
+            line =~ /^(\S+):?/
+            tableName = $1
+            className = name
+            baseClassName = name
+          end
 
-                    if (classdef != nil)
-                        @defs.push(classdef)
-                    end
-                    classdef = ClassDef.new
-                    classdef.tableName = tableName
-                    classdef.className = className
-                    classdef.baseClassName = baseClassName
+          if (classdef != nil)
+            @defs.push(classdef)
+          end
+          classdef = ClassDef.new
+          classdef.tableName = tableName
+          classdef.className = className
+          classdef.baseClassName = baseClassName
 
-                elsif (line =~ /\s+(\S+)\s*=>\s*(\S+)\s*:\s*(\S+)/)
-                    # fieldName => column: type
-                    member = MemberVar.new($3, $1, $2)
-                    classdef.members.push(member)
+        elsif (line =~ /\s+(\S+)\s*=>\s*(\S+)\s*:\s*(\S+)/)
+          # fieldName => column: type
+          member = MemberVar.new($3, $1, $2)
+          classdef.members.push(member)
 
-                elsif (line =~ /\s+(\S+)\s*:\s*(\S+)/)
-                    # column: type
-                    member = MemberVar.new($2, $1)
-                    classdef.members.push(member)
-                end
-            end
-            if (classdef != nil)
-                @defs.push(classdef)
-            end
+        elsif (line =~ /\s+(\S+)\s*:\s*(\S+)/)
+          # column: type
+          member = MemberVar.new($2, $1)
+          classdef.members.push(member)
         end
+      end
+      if (classdef != nil)
+        @defs.push(classdef)
+      end
     end
+  end
 
-    def dump
-        @defs.each do |classdef|
-            classdef.dump
-        end
+  def dump
+    @defs.each do |classdef|
+      classdef.dump
     end
+  end
 end
 
-        
