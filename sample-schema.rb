@@ -15,11 +15,11 @@ create_table :person, :class => :Person, :base_class => :PersonBase do |t|
   t.date :birth_date
   t.text :phone_number
 
-  t.belongs_to :group, :class => :Group, :foreign_key => :group_id
+  t.belongs_to :group, :class => :Group, :field_name => :group_id
 end
 
 create_table :group, :class => :Group do |t|
   t.text :name
 
-  t.has_many :people, :class => :Person, :foreign_key => :group_id
+  t.has_many :people, :class => :Person, :field_name => :group_id
 end

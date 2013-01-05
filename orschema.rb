@@ -93,13 +93,22 @@ class ClassDef
 
   # relations
 
-  def belongs_to(symbol, options = {})
+  def belongs_to(name, options = {})
+    m = MemberVar.new("INTEGER", name, options)
+    @members.push(m)
+
+    r = Relation.new(name, options)
+    @belongs_to.push(r)
   end
 
-  def has_many(symbol, options = {})
+  def has_many(name, options = {})
+    r = Relation.new(name, options)
+    @has_many.push(r)
   end
 
   def has_one(symbol, options = {})
+    r = Relation.new(name, options)
+    @has_one.push(r)
   end
 
   def dump
@@ -156,10 +165,19 @@ end
 class Relation
   attr_reader :name, :class_name, :field_name
 
-  def initialize(name, class_name, field_name)
-    @name = name
-    @class_name = class_name
-    @field_name = field_name
+  def initialize(name, options)
+    @name = name.to_s
+    if options[:class_name]
+      @class_name = options[:class_name].to_s
+    else
+      @class_name = @name
+    end
+
+    if options[:field_name]
+      @field_name = options[:field_name].to_s
+    else
+      @field_name = @name
+    end
   end
 end
              
