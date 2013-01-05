@@ -41,7 +41,7 @@ $LOAD_PATH.push(ORMDIR)
 
 require "orschema.rb"
 
-VER = "1.3"
+VER = "2.0"
 
 def getObjcType(type)
   case type

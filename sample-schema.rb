@@ -8,7 +8,7 @@ PKGNAME = "com.example.person"
 #PKEY = key
 
 # class definitions
-create_table :person, :class => :Person, :base_class => :PersonBase do |t|
+create_table :people, :class => :Person, :base_class => :PersonBase do |t|
   t.text :name
   t.integer :sex
   t.integer :age
