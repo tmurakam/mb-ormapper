@@ -96,11 +96,12 @@ class MemberVar
 end
 
 class Relation
-  attr_reader :name, :className
+  attr_reader :name, :class_name, :field_name
 
-  def initialize(name, className)
+  def initialize(name, class_name, field_name)
     @name = name
-    @className = className
+    @class_name = class_name
+    @field_name = field_name
   end
 end
                  
@@ -165,9 +166,9 @@ class Schema
           member = MemberVar.new($3, $1, $2)
           classdef.members.push(member)
           
-        elsif (line =~ /\s+(\S+)\s*:\s*(\S+)\s*(\S+)/)
-          # column: has_many/has_one/belongs_to class
-          has_many = Relation.new($1, $3)
+        elsif (line =~ /\s+(\S+)\s*:\s*(\S+)\s+(\S+)\s*,\s*(\S+)/)
+          # column: has_many/has_one/belongs_to class, field
+          has_many = Relation.new($1, $3, $4)
           case $2
           when "has_many"
             classdef.has_many.push(has_many)
@@ -175,6 +176,9 @@ class Schema
             classdef.has_one.push(has_many)
           when "belongs_to"
             classdef.belongs_to.push(has_many)
+          else
+            STDERR.puts "Invalid keyword: #{$2}"
+            exit 1
           end
 
         elsif (line =~ /\s+(\S+)\s*:\s*(\S+)/)
