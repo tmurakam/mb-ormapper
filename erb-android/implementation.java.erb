@@ -70,7 +70,7 @@ public class <%= cdef.base_class_name %> extends ORRecord {
      * @return record
      */
     public static <%= cdef.class_name %> find(int pid) {
-        return query().where("key = ?;", Integer.toString(pid)).first();
+        return query().where("<%= PKEY %> = ?;", Integer.toString(pid)).first();
     }
 
 <%  # find_by finders -%>
@@ -212,7 +212,7 @@ public class <%= cdef.base_class_name %> extends ORRecord {
         db.beginTransaction();
         try {
             // TODO: pid should be long?
-            this.pid = (int)db.insert(TABLE_NAME, "key", getContentValues());
+            this.pid = (int)db.insert(TABLE_NAME, "<%= PKEY %>", getContentValues());
             isInserted = true;
             Log.d(TAG, "<%= cdef.table_name %>.insert : pid = " + pid);
 
@@ -233,7 +233,7 @@ public class <%= cdef.base_class_name %> extends ORRecord {
             String[] whereArgs = {
                 Long.toString(pid)
             };
-            int n = db.update(TABLE_NAME, cv, "key = ?", whereArgs);
+            int n = db.update(TABLE_NAME, cv, "<%= PKEY %> = ?", whereArgs);
             Log.d(TAG, "<%= cdef.table_name %>.update : count = " + n);
             db.setTransactionSuccessful();
         } finally {
@@ -269,7 +269,7 @@ public class <%= cdef.base_class_name %> extends ORRecord {
         String[] whereArgs = {
             Long.toString(pid)
         };
-        int n = db.delete(TABLE_NAME, "key = ?", whereArgs);
+        int n = db.delete(TABLE_NAME, "<%= PKEY %> = ?", whereArgs);
         Log.d(TAG, "<%= cdef.table_name %>.delete : n = " + n);
     }
 
@@ -296,7 +296,7 @@ public class <%= cdef.base_class_name %> extends ORRecord {
      */
     public static void getTableSql(Writer wr) throws IOException {
         wr.write(String.format("DROP TABLE %s;\n", TABLE_NAME));
-        wr.write(String.format("CREATE TABLE %s (key INTEGER PRIMARY KEY", TABLE_NAME));
+        wr.write(String.format("CREATE TABLE %s (<%= PKEY %> INTEGER PRIMARY KEY", TABLE_NAME));
 
         for (int i = 0; i < COLUMN_TYPES.length / 2; i++) {
             wr.write(String.format(", %s %s", 

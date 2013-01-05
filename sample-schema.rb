@@ -4,8 +4,8 @@ OUTDIR = "src"
 # Package name (Android only)
 PKGNAME = "com.example.person"
 
-# Primary key name (iOS only)
-#PKEY = key
+# Primary key name
+#PKEY = "key"
 
 # class definitions
 create_table :people, :class => :Person, :base_class => :PersonBase do |t|
