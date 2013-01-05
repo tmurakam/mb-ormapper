@@ -3,14 +3,14 @@
 #import <UIKit/UIKit.h>
 #import "ORRecord.h"
 
-@class <%= cdef.className %>;
+@class <%= cdef.class_name %>;
 
-@interface <%= cdef.baseClassName %> : ORRecord {
+@interface <%= cdef.base_class_name %> : ORRecord {
 <%
   cdef.members.each do |m|
     type, mem = getObjcType(m.type)
 -%>
-    <%= type %> <%= m.memberName %>;
+    <%= type %> <%= m.member_name %>;
 <% end -%>
 }
 
@@ -18,7 +18,7 @@
   cdef.members.each do |m|
     type, mem = getObjcType(m.type)
 -%>
-@property(nonatomic,<%= mem %>) <%= type %> <%= m.propName %>;
+@property(nonatomic,<%= mem %>) <%= type %> <%= m.prop_name %>;
 <% end -%>
 
 + (BOOL)migrate;
@@ -31,20 +31,20 @@
 - (void)_update;
 
 // Read operations (Finder)
-+ (<%= cdef.className %> *)find:(int)pid;
++ (<%= cdef.class_name %> *)find:(int)pid;
 
 <%
   cdef.members.each do |m|
     type, mem = getObjcType(m.type)
 -%>
-+ (<%= cdef.className %> *)find_by_<%= m.fieldName %>:(<%= type %>)key cond:(NSString*)cond;
-+ (<%= cdef.className %> *)find_by_<%= m.fieldName %>:(<%= type %>)key;
++ (<%= cdef.class_name %> *)find_by_<%= m.field_name %>:(<%= type %>)key cond:(NSString*)cond;
++ (<%= cdef.class_name %> *)find_by_<%= m.field_name %>:(<%= type %>)key;
 <% end -%>
 
 + (NSMutableArray *)find_all:(NSString *)cond;
 
 + (dbstmt *)gen_stmt:(NSString *)cond;
-+ (<%= cdef.className %> *)find_first_stmt:(dbstmt *)stmt;
++ (<%= cdef.class_name %> *)find_first_stmt:(dbstmt *)stmt;
 + (NSMutableArray *)find_all_stmt:(dbstmt *)stmt;
 
 // Delete operations

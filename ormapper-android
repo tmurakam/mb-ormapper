@@ -93,49 +93,52 @@ end
 #
 # generate implementation
 #
-def generateImplementation(vers, cdef, fh)
+def generateImplementation(cdef, fh)
   erb = ERB.new(File.read(ORMDIR + "/erb-android/implementation.java.erb"), nil, '-')
   fh.puts erb.result(binding)
 end
 
 ##############################################################
 # start from here
-deffile = "schema.def"
+deffile = "schema.rb"
 if (ARGV.size == 1)
   deffile = ARGV[0]
 end
 
-schema = Schema.new
-schema.loadFromFile(deffile)
-#schema.dump
+unless File.exists? deffile
+  STDERR.puts "no schema file"
+  exit 1
+end
+
+# load schema
+require deffile
 
 # check vers
-if (!schema.vers.has_key?("PKGNAME"))
+unless defined? PKGNAME
   STDERR.puts "You must declare PKGNAME"
   exit 1
 end
 
 # primary key name
-if (!schema.vers.has_key?("PKEY"))
-  schema.vers["PKEY"] = "key"
+unless defined? PKEY
+  PKEY = "key"
 end
 
 # output dir
-outdir = "."
-if (schema.vers.has_key?("OUTDIR"))
-  outdir = schema.vers["OUTDIR"]
+unless defined? OUTDIR
+  OUTDIR = "."
 end
 
 # create output dir
-outdir = outdir + "/" + schema.vers["PKGNAME"].gsub(/\./, "/")
+outdir = OUTDIR + "/" + PKGNAME.gsub(/\./, "/")
 system "mkdir -p " + outdir
 
 # generate
-schema.defs.each do |cdef|
-  path = outdir + "/" + cdef.baseClassName + ".java"
+$class_defs.each do |cdef|
+  path = outdir + "/" + cdef.base_class_name + ".java"
 
   STDERR.puts "generate #{path}"
   fh = open(path, "w")
-  generateImplementation(schema.vers, cdef, fh)
+  generateImplementation(cdef, fh)
   fh.close
 end

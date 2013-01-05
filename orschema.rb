@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# -*- coding: utf-8 -*-
 
 =begin
   O/R Mapper library for Android
@@ -33,14 +34,33 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =end
 
+$class_defs = Array.new
+
+def create_table(table, options = {}, &block)
+  t = ClassDef.new(table, options)
+  block.call(t)
+  $class_defs.push t
+end
+
 class ClassDef
-  attr_accessor :tableName, :baseClassName, :className, :members
+  attr_accessor :table_name, :base_class_name, :class_name, :members
   attr_accessor :has_many, :has_one, :belongs_to
 
-  def initialize
-    @tableName = nil        # table name
-    @baseClassName = nil    # base class name
-    @className = nil        # real class name
+  def initialize(table, options = {})
+    @table_name = table.to_s
+
+    if options[:class]
+      @class_name = options[:class].to_s
+    else
+      @class_name = @table_name.to_s
+    end
+
+    if options[:base_class]
+      @base_class_name = options[:base_class].to_s
+    else
+      @base_class_name = @class_name
+    end
+
     @members = Array.new    # members
 
     # relations
@@ -49,8 +69,41 @@ class ClassDef
     @belongs_to = Array.new
   end
 
+  # attributes
+  def integer(name, options = {})
+    add_member("INTEGER", name, options)
+  end
+
+  def real(name, options = {})
+    add_member("REAL", name, options)
+  end
+
+  def text(name, options = {})
+    add_member("TEXT", name, options)
+  end
+
+  def date(name, options = {})
+    add_member("DATE", name, options)
+  end
+
+  def add_member(type, name, options)
+    m = MemberVar.new(type, name, options)
+    @members.push(m)
+  end
+
+  # relations
+
+  def belongs_to(symbol, options = {})
+  end
+
+  def has_many(symbol, options = {})
+  end
+
+  def has_one(symbol, options = {})
+  end
+
   def dump
-    puts "-- #{@name} --"
+    puts "-- table:#{@table_name}, class:#{@class_name}, base_class:#{@base_class_name} --"
     @members.each do |member|
       member.dump
     end
@@ -58,24 +111,33 @@ class ClassDef
 end
 
 class MemberVar
-  attr_reader :type, :fieldName, :memberName
-  attr_reader :getter, :setter, :propName
+  attr_reader :type # SQL型名
+  attr_reader :field_name # SQLフィールド名
+  attr_reader :member_name # メンバ変数名 (mCamelCase)
+  attr_reader :getter # ゲッタメソッド名 (camelCase)
+  attr_reader :setter # セッタメソッド名 (setCamelCase)
+  attr_reader :prop_name # プロパティ名 (getter と同じ)
 
-  def initialize(type, name, fieldName = nil)
-    @type = type
+  def initialize(type, name, options)
+    @type = type.to_s
+    name = name.to_s
 
     @getter = camelCase(name)
     @setter = "set" + CamelCase(name)
-    @propName = @getter
+    @prop_name = @getter
 
-    @memberName = "m" + CamelCase(name)
+    @member_name = "m" + CamelCase(name)
 
-    if (fieldName != nil)
-      @fieldName = fieldName
+    if options[:field_name]
+      @field_name = options[:field_name].to_s
     else
-      @fieldName = name
+      @field_name = name
     end
 
+  end
+
+  def dump
+    puts "  #{@type} #{@field_name} => #{@prop_name}"
   end
 
   private
@@ -89,10 +151,6 @@ class MemberVar
     name = name.gsub(/_./) { |x| x.gsub(/_/, "").upcase }
     return name
   end 
-
-  def dump
-    puts "  #{@type}: #{@fieldName} => #{@propertyName}"
-  end
 end
 
 class Relation
@@ -104,99 +162,4 @@ class Relation
     @field_name = field_name
   end
 end
-                 
-class Schema
-  attr_reader :defs
-  attr_reader :vers
-
-  def initialize
-    @defs = Array.new
-    @vers = Hash.new
-  end
-
-  def loadFromFile(filename)
-    open(filename) do |fh|
-      
-      classdef = nil
-
-      fh.each do |line|
-        line.chop!
-
-        # remove comment
-        line.gsub!(/#.*$/, "")
-
-        if (line =~ /^\s*$/)
-          # empty line
-          next                   
-
-        elsif (line =~ /^(\S+)\s*=\s*(\S+)/)
-          # variable def.
-          name = $1
-          value = $2
-          @vers[name] = value
-
-        elsif (line =~ /^\S/)
-          # start class def
-          tableName = baseClassName = className = nil
-          if (line =~ /(.*)\s*:\s*(.*)\s*,\s*(.*)/)
-            tableName = $1
-            className = $2
-            baseClassName = $3
-          elsif (line =~ /(.*)\s*:\s*(.*)/)
-            tableName = $1
-            className = $2
-            baseClassName = className
-          else
-            line =~ /^(\S+):?/
-            tableName = $1
-            className = name
-            baseClassName = name
-          end
-
-          if (classdef != nil)
-            @defs.push(classdef)
-          end
-          classdef = ClassDef.new
-          classdef.tableName = tableName
-          classdef.className = className
-          classdef.baseClassName = baseClassName
-
-        elsif (line =~ /\s+(\S+)\s*=>\s*(\S+)\s*:\s*(\S+)/)
-          # fieldName => column: type
-          member = MemberVar.new($3, $1, $2)
-          classdef.members.push(member)
-          
-        elsif (line =~ /\s+(\S+)\s*:\s*(\S+)\s+(\S+)\s*,\s*(\S+)/)
-          # column: has_many/has_one/belongs_to class, field
-          has_many = Relation.new($1, $3, $4)
-          case $2
-          when "has_many"
-            classdef.has_many.push(has_many)
-          when "has_one"
-            classdef.has_one.push(has_many)
-          when "belongs_to"
-            classdef.belongs_to.push(has_many)
-          else
-            STDERR.puts "Invalid keyword: #{$2}"
-            exit 1
-          end
-
-        elsif (line =~ /\s+(\S+)\s*:\s*(\S+)/)
-          # column: type
-          member = MemberVar.new($2, $1)
-          classdef.members.push(member)
-        end
-      end
-      if (classdef != nil)
-        @defs.push(classdef)
-      end
-    end
-  end
-
-  def dump
-    @defs.each do |classdef|
-      classdef.dump
-    end
-  end
-end
-
+             
