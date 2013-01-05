@@ -9,9 +9,13 @@ PKGNAME = com.example.person
 
 # class definition
 person: Person, PersonBase
-	name :TEXT
-     	sex :INTEGER
-        age :INTEGER
-        birth_date :DATE
-        phone_number :TEXT
+	name: TEXT
+     	sex: INTEGER
+        age: INTEGER
+        birth_date: DATE
+        phone_number: TEXT
+
+group: Group
+       name: TEXT
+
 

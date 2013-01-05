@@ -144,12 +144,14 @@ class Schema
                     classdef.tableName = tableName
                     classdef.className = className
                     classdef.baseClassName = baseClassName
-                elsif (line =~ /\s+(\S+)\s*=>\s*(\S+)\s*:(\S+)/)
-                    # property,column :type
+
+                elsif (line =~ /\s+(\S+)\s*=>\s*(\S+)\s*:\s*(\S+)/)
+                    # fieldName => column: type
                     member = MemberVar.new($3, $1, $2)
                     classdef.members.push(member)
-                elsif (line =~ /\s+(\S+)\s*:(\S+)/)
-                    # column :type
+
+                elsif (line =~ /\s+(\S+)\s*:\s*(\S+)/)
+                    # column: type
                     member = MemberVar.new($2, $1)
                     classdef.members.push(member)
                 end

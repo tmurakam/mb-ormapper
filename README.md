@@ -64,11 +64,11 @@ Schema definition
 Schema syntax is:
 
     model_name: class_name, base_class_name
-            type: column_name
+            column_name: type
             ...
 
     model_name: class_name, base_class_name
-            type: column_name
+            column_name: type
             ...
 
 A base model class file name is decided with base_class_name.
