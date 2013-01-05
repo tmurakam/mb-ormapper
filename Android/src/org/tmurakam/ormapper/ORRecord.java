@@ -52,10 +52,11 @@ public abstract class ORRecord {
     /**
      * Migrate database table
      * @param tableName Table name
+     * @param pkeyName primary key name
      * @param array Table schema ( column, type, column, type, ... ) 
      * @return true: table newly created, false: table exists
      */
-    static protected boolean migrate(String tableName, String[] array) {
+    static protected boolean migrate(String tableName, String pkeyName, String[] array) {
         SQLiteDatabase db = ORDatabase.getDB();
         boolean ret;
         String tablesql;
@@ -70,7 +71,7 @@ public abstract class ORRecord {
 
         // create table
         if (cursor.getCount() == 0) {
-            sql = "CREATE TABLE " + tableName + " ( key INTEGER PRIMARY KEY );";
+            sql = "CREATE TABLE " + tableName + " ( " + pkeyName + " INTEGER PRIMARY KEY );";
             db.execSQL(sql);
             tablesql = sql;
             ret = true;

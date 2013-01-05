@@ -19,6 +19,7 @@ public class <%= cdef.base_class_name %> extends ORRecord {
     private final static String TAG = "<%= cdef.base_class_name %>";
 
     private final static String TABLE_NAME = "<%= cdef.table_name %>";
+    private final static String PKEY_NAME = "<%= PKEY %>";
 
     private final static String[] COLUMN_TYPES = {
 <% cdef.members.each do |m| -%>
@@ -54,7 +55,7 @@ public class <%= cdef.base_class_name %> extends ORRecord {
      * @return true - table was newly created, false - table already exists
      */
     public static boolean migrate() {
-        return migrate(TABLE_NAME, COLUMN_TYPES);
+        return migrate(TABLE_NAME, PKEY_NAME, COLUMN_TYPES);
     }
 
     // Constructor
@@ -70,7 +71,7 @@ public class <%= cdef.base_class_name %> extends ORRecord {
      * @return record
      */
     public static <%= cdef.class_name %> find(int pid) {
-        return query().where("<%= PKEY %> = ?;", Integer.toString(pid)).first();
+        return query().where_eq(PKEY_NAME, Integer.toString(pid)).first();
     }
 
 <%  # find_by finders -%>
@@ -176,7 +177,7 @@ public class <%= cdef.base_class_name %> extends ORRecord {
   cdef.belongs_tos.each do |r|
 -%>
     public <%= r.class_name %> <%= r.name %>() {
-        return <%= r.class_name %>.where_eq("<%= PKEY %>", this.<%= r.field_getter_name %>)().first();
+        return <%= r.class_name %>.where_eq(PKEY_NAME, this.<%= r.field_getter_name %>)().first();
     }
 <%
   end
@@ -212,7 +213,7 @@ public class <%= cdef.base_class_name %> extends ORRecord {
         db.beginTransaction();
         try {
             // TODO: pid should be long?
-            this.pid = (int)db.insert(TABLE_NAME, "<%= PKEY %>", getContentValues());
+            this.pid = (int)db.insert(TABLE_NAME, PKEY_NAME, getContentValues());
             isInserted = true;
             Log.d(TAG, "<%= cdef.table_name %>.insert : pid = " + pid);
 
@@ -233,7 +234,7 @@ public class <%= cdef.base_class_name %> extends ORRecord {
             String[] whereArgs = {
                 Long.toString(pid)
             };
-            int n = db.update(TABLE_NAME, cv, "<%= PKEY %> = ?", whereArgs);
+            int n = db.update(TABLE_NAME, cv, PKEY_NAME + " = ?", whereArgs);
             Log.d(TAG, "<%= cdef.table_name %>.update : count = " + n);
             db.setTransactionSuccessful();
         } finally {
@@ -269,7 +270,7 @@ public class <%= cdef.base_class_name %> extends ORRecord {
         String[] whereArgs = {
             Long.toString(pid)
         };
-        int n = db.delete(TABLE_NAME, "<%= PKEY %> = ?", whereArgs);
+        int n = db.delete(TABLE_NAME, PKEY_NAME + " = ?", whereArgs);
         Log.d(TAG, "<%= cdef.table_name %>.delete : n = " + n);
     }
 
@@ -296,7 +297,7 @@ public class <%= cdef.base_class_name %> extends ORRecord {
      */
     public static void getTableSql(Writer wr) throws IOException {
         wr.write(String.format("DROP TABLE %s;\n", TABLE_NAME));
-        wr.write(String.format("CREATE TABLE %s (<%= PKEY %> INTEGER PRIMARY KEY", TABLE_NAME));
+        wr.write(String.format("CREATE TABLE %s (%s INTEGER PRIMARY KEY", TABLE_NAME, PKEY_NAME));
 
         for (int i = 0; i < COLUMN_TYPES.length / 2; i++) {
             wr.write(String.format(", %s %s", 
