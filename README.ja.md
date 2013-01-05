@@ -14,16 +14,16 @@ iOS と Android 両対応のアプリを書くときには、特に便利。
 モデルの生成手順
 ----------------
 
-データベース定義のサンプルが sample-schema.def にあります。
+データベース定義のサンプルが sample-schema.rb にあります。
 以下のようにすることでモデルを生成できます。
 
 iOS の場合:
 
-    $ ./ormapper-ios sample-schema.def
+    $ ./ormapper-ios sample-schema.rb
 
 Android の場合:
 
-    $ ./ormapper-android sample-schema.def
+    $ ./ormapper-android sample-schema.rb
 
 生成されたファイルとプロジェクトに追加してください。
 また、iOS/Android ディレクトリ内のファイルも適宜追加してください。

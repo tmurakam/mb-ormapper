@@ -14,16 +14,16 @@ Ruby is needed to execute the tool.
 How to create models
 --------------------
 
-A sample database schema is 'sample-schama.def'.
+A sample database schema is 'sample-schama.rb'.
 To generate model source code based on the schema,
 
 for iOS:
 
-    $ ./ormapper-ios sample-schema.def
+    $ ./ormapper-ios sample-schema.rb
 
 for Android:
 
-    $ ./ormapper-android sample-schema.def
+    $ ./ormapper-android sample-schema.rb
 
 Add generated files to your application project.
 Also you need to add source files in 'iOS' or 'Android' directory.
