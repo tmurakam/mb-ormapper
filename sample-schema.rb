@@ -14,6 +14,7 @@ create_table :person, :class => :Person, :base_class => :PersonBase do |t|
   t.integer :age
   t.date :birth_date
   t.text :phone_number
+  t.integer :group_id
 
   t.belongs_to :group, :class => :Group, :field_name => :group_id
 end

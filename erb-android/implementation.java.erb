@@ -169,6 +169,39 @@ public class <%= cdef.base_class_name %> extends ORRecord {
         isInserted = true;
     }
 
+    // Relations
+
+    // belongs_to
+<%
+  cdef.belongs_tos.each do |r|
+-%>
+    public <%= r.class_name %> <%= r.name %>() {
+        return <%= r.class_name %>.where_eq("<%= PKEY %>", this.<%= r.field_getter_name %>)().first();
+    }
+<%
+  end
+-%>        
+    // has_many
+<%
+  cdef.has_manys.each do |r|
+-%>
+    public List<<%= r.class_name %>> <%= r.name %>() {
+        return <%= r.class_name %>.where_eq("<%= r.field_name %>", this.pid)().all();
+    }
+<%
+  end
+-%>        
+    // has_one
+<%
+  cdef.has_ones.each do |r|
+-%>
+    public <%= r.class_name %> <%= r.name %>() {
+        return <%= r.class_name %>.where_eq("<%= r.field_name %>", this.pid)().first();
+    }
+<%
+  end
+-%>        
+
     // Create operations
 
     public void insert() {

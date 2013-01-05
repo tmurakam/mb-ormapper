@@ -44,7 +44,7 @@ end
 
 class ClassDef
   attr_accessor :table_name, :base_class_name, :class_name, :members
-  attr_accessor :has_many, :has_one, :belongs_to
+  attr_accessor :has_manys, :has_ones, :belongs_tos
 
   def initialize(table, options = {})
     @table_name = table.to_s
@@ -64,9 +64,9 @@ class ClassDef
     @members = Array.new    # members
 
     # relations
-    @has_many = Array.new 
-    @has_one = Array.new
-    @belongs_to = Array.new
+    @has_manys = Array.new 
+    @has_ones = Array.new
+    @belongs_tos = Array.new
   end
 
   # attributes
@@ -94,21 +94,18 @@ class ClassDef
   # relations
 
   def belongs_to(name, options = {})
-    m = MemberVar.new("INTEGER", name, options)
-    @members.push(m)
-
     r = Relation.new(name, options)
-    @belongs_to.push(r)
+    @belongs_tos.push(r)
   end
 
   def has_many(name, options = {})
     r = Relation.new(name, options)
-    @has_many.push(r)
+    @has_manys.push(r)
   end
 
   def has_one(symbol, options = {})
     r = Relation.new(name, options)
-    @has_one.push(r)
+    @has_ones.push(r)
   end
 
   def dump
@@ -148,18 +145,6 @@ class MemberVar
   def dump
     puts "  #{@type} #{@field_name} => #{@prop_name}"
   end
-
-  private
-  def camelCase(name)
-    name = name.gsub(/_./) { |x| x.gsub(/_/, "").upcase }
-    return name
-  end 
-
-  def CamelCase(name)
-    name = name.gsub(/^./) { |x| x.upcase }
-    name = name.gsub(/_./) { |x| x.gsub(/_/, "").upcase }
-    return name
-  end 
 end
 
 class Relation
@@ -167,8 +152,8 @@ class Relation
 
   def initialize(name, options)
     @name = name.to_s
-    if options[:class_name]
-      @class_name = options[:class_name].to_s
+    if options[:class]
+      @class_name = options[:class].to_s
     else
       @class_name = @name
     end
@@ -179,5 +164,21 @@ class Relation
       @field_name = @name
     end
   end
+
+  # for belongs_to
+  def field_getter_name
+    camelCase(@field_name)
+  end
 end
-             
+
+# utilities             
+def camelCase(name)
+  name = name.gsub(/_./) { |x| x.gsub(/_/, "").upcase }
+  return name
+end 
+
+def CamelCase(name)
+  name = name.gsub(/^./) { |x| x.upcase }
+  name = name.gsub(/_./) { |x| x.gsub(/_/, "").upcase }
+  return name
+end 
