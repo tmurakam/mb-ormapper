@@ -17,5 +17,4 @@ person: Person, PersonBase
 
 group: Group
        name: TEXT
-
-
+       people: has_many Person

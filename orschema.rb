@@ -33,6 +33,30 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =end
 
+class ClassDef
+  attr_accessor :tableName, :baseClassName, :className, :members
+  attr_accessor :has_many, :has_one, :belongs_to
+
+  def initialize
+    @tableName = nil        # table name
+    @baseClassName = nil    # base class name
+    @className = nil        # real class name
+    @members = Array.new    # members
+
+    # relations
+    @has_many = Array.new 
+    @has_one = Array.new
+    @belongs_to = Array.new
+  end
+
+  def dump
+    puts "-- #{@name} --"
+    @members.each do |member|
+      member.dump
+    end
+  end
+end
+
 class MemberVar
   attr_reader :type, :fieldName, :memberName
   attr_reader :getter, :setter, :propName
@@ -71,24 +95,15 @@ class MemberVar
   end
 end
 
-class ClassDef
-  attr_accessor :tableName, :baseClassName, :className, :members
+class Relation
+  attr_reader :name, :className
 
-  def initialize
-    @tableName = nil             # table name
-    @baseClassName = nil           # base class name
-    @className = nil           # real class name
-    @members = Array.new    # members
-  end
-
-  def dump
-    puts "-- #{@name} --"
-    @members.each do |member|
-      member.dump
-    end
+  def initialize(name, className)
+    @name = name
+    @className = className
   end
 end
-
+                 
 class Schema
   attr_reader :defs
   attr_reader :vers
@@ -149,6 +164,18 @@ class Schema
           # fieldName => column: type
           member = MemberVar.new($3, $1, $2)
           classdef.members.push(member)
+          
+        elsif (line =~ /\s+(\S+)\s*:\s*(\S+)\s*(\S+)/)
+          # column: has_many/has_one/belongs_to class
+          has_many = Relation.new($1, $3)
+          case $2
+          when "has_many"
+            classdef.has_many.push(has_many)
+          when "has_one"
+            classdef.has_one.push(has_many)
+          when "belongs_to"
+            classdef.belongs_to.push(has_many)
+          end
 
         elsif (line =~ /\s+(\S+)\s*:\s*(\S+)/)
           # column: type
