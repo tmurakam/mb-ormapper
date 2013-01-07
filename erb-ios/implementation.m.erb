@@ -25,7 +25,7 @@
 {
     NSArray *columnTypes = @[
 <% cdef.members.each do |m| -%>
-        @"<%= m.field_name %>", @"<%= m.type %>",
+        @"<%= m.field_name %>", @"<%= getSqlType(m.type) %>",
 <% end -%>
         ];
 

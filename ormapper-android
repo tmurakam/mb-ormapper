@@ -41,16 +41,27 @@ require 'erb'
 
 VER = "2.0"
 
+def getSqlType(type)
+  case type
+  when "LONG"
+    "INTEGER"
+  else
+    type
+  end
+end
+
 def getJavaType(type)
   case type
   when "INTEGER"
-    return "int";
+    "int"
+  when "LONG"
+    "long"
   when "REAL"
-    return "double";
+    "double"
   when "TEXT"
-    return "String";
+    "String"
   when "DATE"
-    return "long";
+    "long"
   else
     puts "#{type} is not supported."
     exit 1
@@ -60,13 +71,15 @@ end
 def getMethodType(type)
   case type
   when "INTEGER"
-    return "Int"
+    "Int"
+  when "LONG"
+    "Long"
   when "REAL"
-    return "Double"
+    "Double"
   when "TEXT"
-    return "String"
+    "String"
   when "DATE"
-    return "Date"
+    "Date"
   else
     puts "#{type} not supported"
     exit 1
@@ -75,10 +88,8 @@ end
 
 def getToString(type, var)
   case type
-  when "INTEGER"
-    return "Integer.toString(#{var})"
-  when "REAL"
-    return "Double.toString(#{var})"
+  when "INTEGER", "LONG", "REAL"
+    return "String.valueOf(#{var})"
   when "TEXT"
     return var
   when "DATE"
@@ -88,7 +99,6 @@ def getToString(type, var)
     exit 1
   end
 end
-
 
 #
 # generate implementation

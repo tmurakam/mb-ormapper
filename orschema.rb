@@ -74,6 +74,10 @@ class ClassDef
     add_member("INTEGER", name, options)
   end
 
+  def long(name, options = {})
+    add_member("LONG", name, options)
+  end
+
   def real(name, options = {})
     add_member("REAL", name, options)
   end
