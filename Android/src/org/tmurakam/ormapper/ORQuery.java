@@ -77,7 +77,7 @@ public class ORQuery<T extends ORRecord> {
     /**
      * Set 'WHERE' conditions
      * @param column column name
-     * @param param parameter
+     * @param param parameter (string)
      * @return this
      * @note You can set only 1 where condition.
      */
@@ -85,6 +85,17 @@ public class ORQuery<T extends ORRecord> {
         mWhere = column + " = ?";
         mWhereParams = new String[] { param };
         return this;
+    }
+
+    /**
+     * Set 'WHERE' conditions
+     * @param column column name
+     * @param param parameter (integer)
+     * @return this
+     * @note You can set only 1 where condition.
+     */
+    public ORQuery<T> where_eq(String column, int param) {
+        return where_eq(column, Integer.toString(param));
     }
     
     /**

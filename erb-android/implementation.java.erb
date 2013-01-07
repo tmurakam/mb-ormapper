@@ -177,7 +177,7 @@ public class <%= cdef.base_class_name %> extends ORRecord {
   cdef.belongs_tos.each do |r|
 -%>
     public <%= r.class_name %> <%= r.name %>() {
-        return <%= r.class_name %>.where_eq(PKEY_NAME, this.<%= r.field_getter_name %>)().first();
+        return <%= r.class_name %>.query().where_eq(PKEY_NAME, this.<%= r.field_getter_name %>()).first();
     }
 <%
   end
@@ -187,7 +187,7 @@ public class <%= cdef.base_class_name %> extends ORRecord {
   cdef.has_manys.each do |r|
 -%>
     public List<<%= r.class_name %>> <%= r.name %>() {
-        return <%= r.class_name %>.where_eq("<%= r.field_name %>", this.pid)().all();
+        return <%= r.class_name %>.query().where_eq("<%= r.field_name %>", this.pid).all();
     }
 <%
   end
@@ -197,7 +197,7 @@ public class <%= cdef.base_class_name %> extends ORRecord {
   cdef.has_ones.each do |r|
 -%>
     public <%= r.class_name %> <%= r.name %>() {
-        return <%= r.class_name %>.where_eq("<%= r.field_name %>", this.pid)().first();
+        return <%= r.class_name %>.where_eq("<%= r.field_name %>", this.pid).first();
     }
 <%
   end
