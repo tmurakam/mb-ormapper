@@ -83,16 +83,17 @@ For iOS, file name will be 'base_class_name.h' and 'base_class_name.m'
 For Android, it will be 'base_class_name.java'
 
 All fields must be declared in the block.
-Use text, integer, real, date method to define a field.
-Supporting types and corresponding types of Objective-C or
+Use text, integer, long, real, date method to define a field.
+Supporting types and corresponding types of SQLite, Objective-C and
 Java are:
 
-    SQL type   Obj-C type    Java type
-    -----------------------------------
-    INTEGER    int           int
-    REAL       double        double
-    TEXT       NSString *    String
-    DATE (*1)  NSDate *      long (*2)
+    type       SQL type   Obj-C type    Java type
+    ----------------------------------------------
+    integer    INTEGER    int           int
+    long       INTEGER    long          long
+    real       REAL       double        double
+    text       TEXT       NSString *    String
+    date       DATE (*1)  NSDate *      long (*2)
 
     *1: 14 characters string ("yyyyMMddHHmmss") internally
     *2: Elapsed time from 1970/1/1 0:00 UTC in milliseconds.

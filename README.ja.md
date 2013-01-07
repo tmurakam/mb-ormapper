@@ -91,18 +91,18 @@ PersonBase.java になります。
 :class を省略した場合、テーブル名と同一とみなされます。
 
 テーブル内のフィールドはブロック内に定義します。
-メソッド text, integer, real, date を使用して、フィールドを定義します。
-メソッド名を大文字にしたものが SQLite のデータ型に対応します。
+メソッド text, integer, long, real, date を使用して、フィールドを定義します。
 
-今のところサポートしている型、およびこれに対応する Objective-C、
-および Java の型は以下の通りです。
+今のところサポートしている型、およびこれに対応する SQLite, 
+Objective-C、および Java の型は以下の通りです。
 
-    SQL type   Obj-C type    Java type
-    -----------------------------------
-    INTEGER    int           int
-    REAL       double        double
-    TEXT       NSString *    String
-    DATE (*1)  NSDate *      long (*2)
+    type       SQL type   Obj-C type    Java type
+    ----------------------------------------------
+    integer    INTEGER    int           int
+    long       INTEGER    long          long
+    real       REAL       double        double
+    text       TEXT       NSString *    String
+    date       DATE (*1)  NSDate *      long (*2)
 
     *1: 内部的には14桁の文字列("yyyyMMddHHmmss") となる
     *2: 1970/1/1 0:00 UTC からの経過ミリ秒数
