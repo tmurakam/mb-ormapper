@@ -2,6 +2,7 @@
 
 	* long 型に対応
 	* relation バグ修正
+	* Android 用ライブラリプロジェクトを追加
 
 2013/01/05 : Takuya Murakami <tmurakam@tmurakam.org>
 
