@@ -2,7 +2,7 @@
 /*
   O/R Mapper library for iOS
 
-  Copyright (c) 2010-2012, Takuya Murakami. All rights reserved.
+  Copyright (c) 2010-2013, Takuya Murakami. All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are
@@ -32,6 +32,11 @@
 #define UNASSIGNED_PID -1
 
 @synthesize pid = mPid;
+
+- (void)_loadRow:(dbstmt *)stmt
+{
+    // you must override this
+}
 
 /** Constructor */ 
 - (id)init
