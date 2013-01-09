@@ -43,6 +43,15 @@ require "orschema.rb"
 
 VER = "2.0"
 
+def getSqlType(type)
+  case type
+  when "LONG"
+    "INTEGER"
+  else
+    type
+  end
+end
+
 def getObjcType(type)
   case type
   when "INTEGER"
@@ -111,7 +120,7 @@ end
 
 ##############################################################
 # start from here
-deffile = "schema.rb"
+deffile = "./schema.rb"
 if (ARGV.size == 1)
   deffile = ARGV[0]
 end
