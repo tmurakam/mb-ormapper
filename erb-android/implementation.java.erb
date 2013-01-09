@@ -282,18 +282,17 @@ public class <%= cdef.base_class_name %> extends ORRecord {
 
     /**
      * Delete records
-     * @param cond Conditions
+     * @param where where clause
+     * @param whereArgs where arguments
      */
-    public static void delete(String cond) {
-        SQLiteDatabase db = ORDatabase.getDB();
-
-        if (cond == null) {
-            cond = "";
-        }
-        String sql = "DELETE FROM " + TABLE_NAME + " " + cond;
-        db.execSQL(sql);
+     public static void delete(String where, String... whereArgs) {
+         SQLiteDatabase db = ORDatabase.getDB();
+         int n = db.delete(TABLE_NAME, where, whereArgs);
     }
 
+    /**
+     * Delete all record
+     */
     public static void delete_all() {
         delete(null);
     }
