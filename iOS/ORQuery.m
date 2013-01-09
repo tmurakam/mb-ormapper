@@ -2,6 +2,7 @@
 
 #import "Database.h"
 #import "ORRecord.h"
+#import "ORQuery.h"
 
 @interface ORQuery()
 {
@@ -18,12 +19,12 @@
 
 @implementation ORQuery
 
-+ (ORQuery *)get:(Class)class tableName:(NSString *)tableName
++ (ORQuery *)getWithClass:(Class)class tableName:(NSString *)tableName
 {
-    return [[ORQuery alloc] initWithTableName:tableName];
+    return [[ORQuery alloc] initWithClass:class tableName:tableName];
 }
 
-- (id)init:(Class)class tableName:(NSSTring *)tableName
+- (id)initWithClass:(Class)class tableName:(NSString *)tableName
 {
     self = [super init];
     if (self != nil) {
@@ -40,7 +41,7 @@
  * @return this
  * @note You can set only 1 where condition.
  */
-- (ORQuery *)where:(NSString *)where args:(NSArray *)args
+- (ORQuery *)where:(NSString *)where arguments:(NSArray *)args
 {
     mWhere = where;
     mWhereParams = args;
@@ -101,40 +102,17 @@
 - (NSMutableArray *)all
 {
     NSMutableArray *array = [NSMutableArray new];
-    NSMutableString *sql = [NSMutableString new];
-
-    [sql appendFormat:@"SELECT FROM %@", mTableName];
-
-    // Where 節
-    if (mWhere != nil) {
-        [sql appendString:@" WHERE "];
-        [sql appendString:mWhere];
-    }
-
-    // Order
-    if (mOrder != nil) {
-        [sql appendString:@" ORDER BY "];
-        [sql appendString:mOrder];
-    }
-
-    // Offset
-    if (mOffset > 0) {
-        [sql appendFormat:@" OFFSET %d", mOffset];
-    }
-    // Limit
-    if (mLimit > 0) {
-        [sql appendFormat:@" LIMIT %d", mLimit];
-    }
+    NSMutableString *sql = [self getSql];
 
     // bind arguments
     dbstmt *stmt = [[Database instance] prepare:sql];
     
-    for (int i = 0; i < [mWhereParam count]; i++) {
-        [stmt bindString:i val:(NSString *)[mWhereParam objectAtIndex:n]];
+    for (int i = 0; i < [mWhereParams count]; i++) {
+        [stmt bindString:i val:(NSString *)mWhereParams[i]];
     }
 
     while ([stmt step] == SQLITE_ROW) {
-        id e = [mTargetClass new];
+        ORRecord *e = [mTargetClass new];
         [e _loadRow:stmt];
         [array addObject:e];
     }
@@ -156,47 +134,41 @@
     return [ary objectAtIndex:0];
 }
 
+/**
+ * get SQL statement
+ * @return SQL statement
+ * @note placeholder('?') are not be expanded
+ */
+- (NSMutableString *)getSql
+{
+    NSMutableString *sql = [NSMutableString new];
     
-    /**
-     * Execute query
-     * @return Cursor
-     */
-    private Cursor execQuery() {
-        String sql = getSql();
-
-        SQLiteDatabase db = ORDatabase.getDB();
-        Cursor cursor = db.rawQuery(sql.toString(), mWhereParams);
-
-        return cursor;
+    [sql appendFormat:@"SELECT * FROM %@", mTableName];
+    
+    // Where 節
+    if (mWhere != nil) {
+        [sql appendString:@" WHERE "];
+        [sql appendString:mWhere];
     }
-
-    /**
-     * get SQL statement
-     * @return SQL statement
-     * @note placeholder('?') are not be expanded
-     */
-    public String getSql() {
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT * FROM ");
-        sql.append(mTableName);
-        
-        // where conditions
-        if (mWhere != null) {
-            sql.append(" WHERE ");
-            sql.append(mWhere);
-        }
-        if (mOrder != null) {
-            sql.append(" ORDER BY ");
-            sql.append(mOrder);
-        }
-        if (mLimit > 0) {
-            sql.append(" LIMIT ");
-            sql.append(mLimit);
-        }
-        if (mOffset > 0) {
-            sql.append(" OFFSET ");
-            sql.append(mOffset);
-        }
-        return sql.toString();
+    
+    // Order
+    if (mOrder != nil) {
+        [sql appendString:@" ORDER BY "];
+        [sql appendString:mOrder];
     }
+    
+    // Limit
+    if (mLimit > 0) {
+        [sql appendFormat:@" LIMIT %d", mLimit];
+    }
+    
+    // Offset
+    if (mOffset > 0) {
+        [sql appendFormat:@" OFFSET %d", mOffset];
+    }
+    
+    return sql;
 }
+
+@end
+

@@ -10,9 +10,11 @@
 {
 }
 
-+ (ORQuery *)get_with_table:(NSString *)tableName;
++ (ORQuery *)getWithClass:(Class)class tableName:(NSString *)tableName;
 
-- (ORQuery *)where:(NSString *)cond arguments:(NSString *)args, ...;
+- (id)initWithClass:(Class)class tableName:(NSString *)tableName;
+
+- (ORQuery *)where:(NSString *)where arguments:(NSArray *)args;
 - (ORQuery *)order:(NSString *)order;
 - (ORQuery *)limit:(int)limit;
 - (ORQuery *)offset:(int)limit;
