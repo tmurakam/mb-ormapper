@@ -1,3 +1,7 @@
+2013/01/09 : Takuya Murakami <tmurakam@tmurakam.org>
+
+	* iOS版バグ修正 : コンパイル通らない問題
+
 2013/01/07 : Takuya Murakami <tmurakam@tmurakam.org>
 
 	* long 型に対応
