@@ -134,6 +134,10 @@ public abstract class ORRecord {
      * Quote SQL string
      */
     protected String quoteSqlString(String s) {
-        return "'" + s.replaceAll("'", "''") + "'";
+        if (s == null) {
+            return "null";
+        } else {
+            return "'" + s.replaceAll("'", "''") + "'";
+        }
     }
 }
