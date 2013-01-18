@@ -177,7 +177,11 @@
 */
 - (NSString *)quoteSqlString:(NSString *)string
 {
-    return [NSString stringWithFormat:@"'%@'", [string stringByReplacingOccurrencesOfString:@"'" withString:@"''"]];
+    if (string == nil) {
+        return @"null";
+    } else {
+        return [NSString stringWithFormat:@"'%@'", [string stringByReplacingOccurrencesOfString:@"'" withString:@"''"]];
+    }
 }
 
 @end
