@@ -7,14 +7,7 @@
 
 @class <%= cdef.class_name %>;
 
-@interface <%= cdef.base_class_name %> : ORRecord {
-<%
-  cdef.members.each do |m|
-    type, mem = getObjcType(m.type)
--%>
-    <%= type %> <%= m.member_name %>;
-<% end -%>
-}
+@interface <%= cdef.base_class_name %> : ORRecord
 
 <%
   cdef.members.each do |m|
@@ -26,11 +19,6 @@
 + (BOOL)migrate;
 
 // CRUD (Create/Read/Update/Delete) operations
-
-// Create/update operations
-// Note: You should use 'save' method
-- (void)_insert;
-- (void)_update;
 
 // Read operations (Finder)
 + (<%= cdef.class_name %> *)find:(int)pid;
@@ -57,9 +45,5 @@
 // Dump SQL
 + (void)getTableSql:(NSMutableString *)s;
 - (void)getInsertSql:(NSMutableString *)s;
-
-// internal functions
-+ (NSString *)tableName;
-- (void)_loadRow:(dbstmt *)stmt;
 
 @end

@@ -5,6 +5,22 @@
 #import "Database.h"
 #import "<%= cdef.base_class_name %>.h"
 
+@interface <%= cdef.base_class_name %> ()
+{
+<%
+  cdef.members.each do |m|
+    type, mem = getObjcType(m.type)
+-%>
+    <%= type %> <%= m.member_name %>;
+<% end -%>
+}
+
+- (void)_insert;
+- (void)_update;
++ (NSString *)tableName;
+- (void)_loadRow:(dbstmt *)stmt;
+@end
+
 @implementation <%= cdef.base_class_name %>
 
 <% cdef.members.each do |m| -%>
