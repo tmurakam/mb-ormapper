@@ -61,7 +61,36 @@ Android の場合:
 
 使用方法 : Android の場合
 -------------------------
-TBD
+
+最初に以下のようにしてデータベースの初期化・作成を行います。
+
+    ORDatabase.initialize(this, "MyDatabase.db");
+
+次に、各モデルの migrate を呼び出し、テーブルの作成・マイグレーション
+を行います。以下はここではモデルクラスが Person の場合の例です。
+
+    Person.migrate();
+
+テーブルの読み込みにはファインダメソッド群 (find) を使います。
+これらのメソッドはモデルの NSMutableArray 配列を返します。
+
+    List<Person> people = Person.find_all();
+
+特定の ID を持つレコードを読み出したい場合は find(int pid)
+メソッドを使ってください。
+
+    Person person = Person.find(1);
+
+Rails の ActiveRelation ぽいクエリも可能です。
+
+    List<Person> people = Person.where("age > ?", 20).order("name DESC").all();
+
+    Person person = Person.where("name = ?", name).first();
+
+レコードの作成、保存を行う場合は、モデルのインスタンスを
+生成し、save メソッドを呼ぶだけです。
+
+レコードの削除は delete で行います。
 
 schema について
 ---------------
@@ -143,6 +172,7 @@ schema にフィールドを追加した場合、migrate メソッドを呼び�
 ------------------
 
 libs 以下のファイルは BSD ライセンスに準じます。
+詳細は LICENSE ファイルを見て下さい。
 
 本ジェネレータで生成されたソースコードについては、ライセンス条件
 は一切つきません (Public Domain とお考えください)
