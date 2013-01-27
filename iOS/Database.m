@@ -261,7 +261,7 @@ static Database *sDatabase = nil;
 {
     static NSDateFormatter *dateFormatter = nil;
     if (dateFormatter == nil) {
-        dateFormatter = [[NSDateFormatter alloc] init];
+        dateFormatter = [NSDateFormatter new];
         [dateFormatter setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
         [dateFormatter setDateFormat: @"yyyyMMddHHmmss"];
 
