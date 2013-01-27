@@ -172,7 +172,7 @@
     NSMutableArray *array = [NSMutableArray new];
 
     while ([stmt step] == SQLITE_ROW) {
-        <%= cdef.base_class_name %> *e = [[[self class] alloc] init];
+        <%= cdef.base_class_name %> *e = [[self class] new];
         [e _loadRow:stmt];
         [array addObject:e];
     }
