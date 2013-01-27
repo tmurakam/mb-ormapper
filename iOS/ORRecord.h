@@ -31,13 +31,6 @@
    O/R Record base class
  */
 @interface ORRecord : NSObject
-{
-    /** Primary ID (primary key) */
-    int mPid;
-
-    /** new entry or not */
-    BOOL mIsNew;
-}
 
 @property(nonatomic,assign) int pid;
 
@@ -47,15 +40,10 @@
 + (id)find:(int)id;
 
 - (void)save;
-- (void)_insert;
-- (void)_update;
 - (void)delete;
 + (void)delete_all;
 
-- (void)_loadRow:(dbstmt *)stmt;
-
 + (NSString *)tableName;
-
 - (NSString *)quoteSqlString:(NSString *)string;
 
 @end

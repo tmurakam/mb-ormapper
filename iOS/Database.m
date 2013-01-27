@@ -26,6 +26,18 @@
 
 #import "Database.h"
 
+@interface Database () {
+    sqlite3 *mHandle; ///< Database handle
+
+    BOOL mIsDirty;
+    NSString *mDbPath; ///< Current database file path
+}
+
++ (Database*)_instance;
++ (void)_setInstance:(Database*)db;
+
+@end
+
 @implementation Database
 
 @synthesize handle;

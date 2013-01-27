@@ -34,19 +34,11 @@
 /**
    Wrapper class of sqlite3 database (base class)
 */
-@interface Database : NSObject {
-    sqlite3 *mHandle; ///< Database handle
-
-    BOOL mIsDirty;
-    NSString *mDbPath; ///< Current database file path
-}
+@interface Database : NSObject
 
 @property(nonatomic,readonly) sqlite3 *handle;
 
 + (Database*)instance;
-
-+ (Database*)_instance;
-+ (void)_setInstance:(Database*)db;
 
 + (void)shutdown;
 

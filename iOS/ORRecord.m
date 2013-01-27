@@ -27,6 +27,19 @@
 #import "Database.h"
 #import "ORRecord.h"
 
+@interface ORRecord () {
+    /** Primary ID (primary key) */
+    int mPid;
+
+    /** new entry or not */
+    BOOL mIsNew;
+}
+
+- (void)_insert;
+- (void)_update;
+- (void)_loadRow:(dbstmt *)stmt;
+@end
+
 @implementation ORRecord
 
 #define UNASSIGNED_PID -1

@@ -26,6 +26,12 @@
 
 #import "Database.h"
 
+@interface dbstmt () {
+    sqlite3_stmt *mStmt;	///< sqlite3_stmt handle.
+    Database *mDb; ///< Database class handle
+}
+@end
+
 @implementation dbstmt
 
 /**

@@ -34,10 +34,7 @@
 /**
    Wrapper class of sqlite3_stmt
 */
-@interface dbstmt : NSObject {
-    sqlite3_stmt *mStmt;	///< sqlite3_stmt handle.
-    Database *mDb; ///< Database class handle
-}
+@interface dbstmt : NSObject
 
 - (id)initWithStmt:(sqlite3_stmt *)st;
 - (int)step;
