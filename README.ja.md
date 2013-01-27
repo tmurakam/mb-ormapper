@@ -72,20 +72,20 @@ Android の場合:
     Person.migrate();
 
 テーブルの読み込みにはファインダメソッド群 (find) を使います。
-これらのメソッドはモデルの NSMutableArray 配列を返します。
+これらのメソッドはモデルの List を返します。
 
     List<Person> people = Person.find_all();
+
+Rails3 の ActiveRelation ぽいクエリも可能です。
+
+    List<Person> people = Person.where("age > ?", 20).order("name DESC").all();
+
+    Person person = Person.where("name = ?", name).first();
 
 特定の ID を持つレコードを読み出したい場合は find(int pid)
 メソッドを使ってください。
 
     Person person = Person.find(1);
-
-Rails の ActiveRelation ぽいクエリも可能です。
-
-    List<Person> people = Person.where("age > ?", 20).order("name DESC").all();
-
-    Person person = Person.where("name = ?", name).first();
 
 レコードの作成、保存を行う場合は、モデルのインスタンスを
 生成し、save メソッドを呼ぶだけです。
@@ -110,7 +110,8 @@ schema の文法は Ruby on Rails の migration に似た
 テーブル/モデル定義は create_table で行います。
 上記の例では 'people' という名前の table が生成されます。
 また、:base_class に指定した名前でモデルクラスが生成されます。
-開発者は、これを :class に指定した名前のクラスで継承して使用します。
+このモデルクラスを直接使っても良いですが、普通は継承して処理を
+加えたいはずです。継承するクラス名を :class に指定してください。
 
 生成されるファイル名は base_class のクラス名で決まります。
 上記の例では、iOS では PersonBase.h, PersonBase.m, Android の場合は
