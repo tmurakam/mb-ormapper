@@ -90,7 +90,7 @@ public class ORDatabase extends SQLiteOpenHelper {
      * 
      * すでにインスタンスがある場合はこれを返す
      */
-    public static SQLiteDatabase getDB() {
+    public static synchronized SQLiteDatabase getDB() {
         assert(mApplicationContext != null);
         assert(mDatabaseName != null);
         if (sInstance == null) {
@@ -104,7 +104,7 @@ public class ORDatabase extends SQLiteOpenHelper {
      * 
      * シングルトンインスタンスは解放される
      */
-    public static void closeDB() {
+    public static synchronized void closeDB() {
         if (sInstance != null) {
             sInstance.close();
             sInstance = null;
@@ -146,12 +146,16 @@ public class ORDatabase extends SQLiteOpenHelper {
      * utilities
      */
     public static String date2str(long milliseconds) {
-        return sDateFormat.format(new Date(milliseconds));
+        synchronized(sDateFormat) {
+            return sDateFormat.format(new Date(milliseconds));
+        }
     }
 
     public static long str2date(String d) {
         try {
-            return sDateFormat.parse(d).getTime();
+            synchronized(sDateFormat) {
+                return sDateFormat.parse(d).getTime();
+            }
         } catch (ParseException ex) {
             return 0; // 1970/1/1 0:00:00 GMT
         }
