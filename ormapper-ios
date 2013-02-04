@@ -1,7 +1,8 @@
 #!/usr/bin/env ruby
 #-*-  Mode:ruby; c-basic-offset:2; tab-width:8; indent-tabs-mode:nil -*-
 =begin
-  O/R Mapper library for iOS
+  mb-ormapper : O/R Mapper library for iOS/Android
+  https://github.com/tmurakam/mb-ormapper
 
   Copyright (c) 2010-2013, Takuya Murakami. All rights reserved.
 
@@ -33,7 +34,7 @@ $LOAD_PATH.push(ORMDIR)
 
 require "orschema.rb"
 
-VER = "2.0"
+VER = "2.1"
 
 def getSqlType(type)
   case type
