@@ -1,3 +1,8 @@
+2013/02/05 : Takuya Murakami <tmurakam@tmurakam.org>
+
+	* バグ修正
+	* Android 版ライブラリ修正 (synchronized)
+
 2013/01/28 : Takuya Murakami <tmurakam@tmurakam.org>
 
 	* リファクタリング
