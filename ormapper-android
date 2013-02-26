@@ -101,6 +101,14 @@ def generateImplementation(cdef, fh)
   fh.puts erb.result(binding)
 end
 
+#
+# generate utils file
+#
+def generateUtils(fh)
+  erb = ERB.new(File.read(ORMDIR + "/erb-android/ORUtils.java.erb"), nil, '-')
+  fh.puts erb.result(binding)
+end
+
 ##############################################################
 # start from here
 deffile = "schema.rb"
@@ -136,7 +144,7 @@ end
 outdir = OUTDIR + "/" + PKGNAME.gsub(/\./, "/")
 system "mkdir -p " + outdir
 
-# generate
+# generate each model files
 $class_defs.each do |cdef|
   path = outdir + "/" + cdef.base_class_name + ".java"
 
@@ -145,3 +153,10 @@ $class_defs.each do |cdef|
   generateImplementation(cdef, fh)
   fh.close
 end
+
+# generate utils files
+path = outdir + "/ORUtils.java"
+STDERR.puts "generate #{path}"
+fh = open(path, "w")
+generateUtils(fh)
+fh.close
