@@ -108,8 +108,8 @@ if (ARGV.size == 1)
   deffile = ARGV[0]
 end
 
-unless File.exists? deffile
-  STDERR.puts "no schema file"
+unless File.exist? deffile
+  STDERR.puts "no schema file : #{deffile}"
   exit 1
 end
 
