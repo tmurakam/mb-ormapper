@@ -106,7 +106,7 @@ def generateHeader(cdef, fh)
 end
 
 # generate implementation
-def generateImplementation(cdef, fh, vers)
+def generateImplementation(cdef, fh)
   erb = ERB.new(File.read(ORMDIR + "/erb-ios/implementation.m.erb"), nil, '-')
   fh.puts erb.result(binding)
 end
