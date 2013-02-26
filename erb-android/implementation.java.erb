@@ -270,25 +270,29 @@ public class <%= cdef.base_class_name %> extends ORRecord {
 
     /**
      * Delete this record
+     * @return number of rows deleted.
      */
-    public void delete() {
+    public int delete() {
         SQLiteDatabase db = ORDatabase.getDB();
 
         String[] whereArgs = {
             Long.toString(pid)
         };
         int n = db.delete(TABLE_NAME, PKEY_NAME + " = ?", whereArgs);
-        Log.d(TAG, "<%= cdef.table_name %>.delete : n = " + n);
+        //Log.d(TAG, "<%= cdef.table_name %>.delete : n = " + n);
+        return n;
     }
 
     /**
      * Delete records
      * @param where where clause
      * @param whereArgs where arguments
+     * @return number of rows deleted.
      */
-     public static void delete(String where, String... whereArgs) {
+     public static int delete(String where, String... whereArgs) {
          SQLiteDatabase db = ORDatabase.getDB();
          int n = db.delete(TABLE_NAME, where, whereArgs);
+         reutrn n;
     }
 
     /**
