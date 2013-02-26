@@ -292,7 +292,7 @@ public class <%= cdef.base_class_name %> extends ORRecord {
      public static int delete(String where, String... whereArgs) {
          SQLiteDatabase db = ORDatabase.getDB();
          int n = db.delete(TABLE_NAME, where, whereArgs);
-         reutrn n;
+         return n;
     }
 
     /**
