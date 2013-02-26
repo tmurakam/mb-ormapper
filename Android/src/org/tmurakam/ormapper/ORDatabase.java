@@ -73,7 +73,12 @@ public class ORDatabase extends SQLiteOpenHelper {
     }
     
     public static void initialize(Context context) {
-        mApplicationContext = context.getApplicationContext();
+        Context c = context.getApplicationContext();
+        if (c != mApplicationContext) {
+            // re-init
+            mApplicationContext = c;
+            sInstance = null;
+        }
     }
 
     /**
