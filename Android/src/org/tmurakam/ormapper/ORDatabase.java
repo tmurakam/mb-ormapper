@@ -39,10 +39,19 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.*;
 
+/**
+ * ORMデータベースヘルパ。
+ * <p>
+ * SQLiteOpenHelper を継承している。
+ * {@link #initialize} で初期化を行い、{@link #getDB}で
+ * SQLiteDatabase のシングルトンインスタンスを取得する。
+ * <p>
+ * スキーマバージョンを管理したい場合は、本クラスを継承し、
+ * {@link #getSchemaVerion} および {@link #onUpgrade} を
+ * オーバライドすること。
+ */
 public class ORDatabase extends SQLiteOpenHelper {
     private static final String TAG = "ORMapper";
-
-    private static final int VERSION = 1;
 
     /** アプリケーションコンテキスト */
     private static Context mApplicationContext;
@@ -60,6 +69,14 @@ public class ORDatabase extends SQLiteOpenHelper {
     static {
         sDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
         sDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+    }
+
+    /**
+     * データベースバージョン(schema version)を取得する。
+     * @return スキーマバージョン
+     */
+    protected int getSchemaVersion() {
+        return 1;
     }
 
     /**
@@ -118,7 +135,7 @@ public class ORDatabase extends SQLiteOpenHelper {
     // --- Internal methods
 
     private ORDatabase(Context context, String databaseName) {
-        super(context.getApplicationContext(), databaseName, null, VERSION);
+        super(context.getApplicationContext(), databaseName, null, getSchemaVersion());
     }
 
     private SQLiteDatabase _getDB() {
