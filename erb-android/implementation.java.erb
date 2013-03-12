@@ -19,8 +19,8 @@ import java.io.*;
 public class <%= cdef.base_class_name %> extends ORRecord {
     private final static String TAG = "<%= cdef.base_class_name %>";
 
-    private final static String TABLE_NAME = "<%= cdef.table_name %>";
-    private final static String PKEY_NAME = "<%= PKEY %>";
+    protected final static String TABLE_NAME = "<%= cdef.table_name %>";
+    protected final static String PKEY_NAME = "<%= PKEY %>";
 
     public static class Field {
 <% cdef.members.each do |m| -%>
@@ -28,7 +28,7 @@ public class <%= cdef.base_class_name %> extends ORRecord {
 <% end -%>
     };
 
-    private final static String[] COLUMN_TYPES = {
+    protected final static String[] COLUMN_TYPES = {
 <% cdef.members.each do |m| -%>
         "<%= m.field_name %>", "<%= getSqlType(m.type) %>",
 <% end -%>
@@ -249,7 +249,7 @@ public class <%= cdef.base_class_name %> extends ORRecord {
         }
     }
 
-    private ContentValues getContentValues() {
+    protected ContentValues getContentValues() {
         ContentValues cv = new ContentValues();
 
 <%
