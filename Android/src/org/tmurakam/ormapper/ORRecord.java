@@ -104,7 +104,7 @@ public abstract class ORRecord {
     /**
      * Save record
      */
-    final public void save() {
+    public void save() {
         if (isInserted) {
             update();
         } else {
