@@ -103,7 +103,7 @@ public class ORDatabase extends SQLiteOpenHelper {
         if (c != mApplicationContext) {
             // re-init
             mApplicationContext = c;
-            sInstance = null;
+            closeDB();
         }
     }
 
