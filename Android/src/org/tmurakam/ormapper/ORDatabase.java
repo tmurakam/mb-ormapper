@@ -96,6 +96,7 @@ public class ORDatabase extends SQLiteOpenHelper {
 
     /**
      * 初期化。getDB() 前に呼び出されている必要がある。
+     * ただし、すでに初期化が行われている場合は何もしない。
      * @param context コンテキスト
      */
     public static void initialize(Context context) {
