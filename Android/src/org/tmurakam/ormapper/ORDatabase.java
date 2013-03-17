@@ -49,17 +49,10 @@ import java.text.*;
 public class ORDatabase extends SQLiteOpenHelper {
     private static final String TAG = ORDatabase.class.getSimpleName();
 
+    protected static ORDatabaseFactory sFactory = new ORDatabaseFactory();
+
     /** アプリケーションコンテキスト */
     protected static Context sApplicationContext;
-
-    /** データベース名 */
-    protected static String sDatabaseName;
-
-    /** データベースヘルパインスタンス */
-    protected static ORDatabase sInstance;
-
-    /** データベーススキーマバージョン */
-    protected static int sSchemaVersion = 1;
 
     protected static SimpleDateFormat sDateFormat;
 
@@ -73,14 +66,21 @@ public class ORDatabase extends SQLiteOpenHelper {
 
     /**
      * 初期化。getDB() 前に呼び出されている必要がある。
-     * @param context コンテキスト
-     * @param databaseName データベース名
-     * @param schemaVersion スキーマバージョン
+     * @param context           コンテキスト
+     * @param databaseName      データベース名 (null時は無指定)
+     * @param schemaVersion     スキーマバージョン
+     * @param factory           ORDatabaseファクトリ (null時はデフォルト)
      */
-    public static void initialize(Context context, String databaseName, int schemaVersion) {
+    public static void initialize(Context context, String databaseName, int schemaVersion, ORDatabaseFactory factory) {
+        if (factory != null) {
+            sFactory = factory;
+        }
         sApplicationContext = context.getApplicationContext();
-        sSchemaVersion = schemaVersion;
-        setDatabaseName(databaseName);
+        sFactory.initialize(context, databaseName, schemaVersion);
+    }
+
+    public static void initialize(Context context, String databaseName, int schemaVersion) {
+        initialize(context, databaseName, schemaVersion, null);
     }
 
     /**
@@ -91,7 +91,7 @@ public class ORDatabase extends SQLiteOpenHelper {
      * @param databaseName データベース名 (null時は無指定)
      */
     public static void initialize(Context context, String databaseName) {
-        initialize(context, databaseName, 1);
+        initialize(context, databaseName, 1, null);
     }
 
     /**
@@ -109,27 +109,13 @@ public class ORDatabase extends SQLiteOpenHelper {
     }
 
     /**
-     * データベース名を指定する
-     * @param databaseName  データベース名
-     */
-    public static void setDatabaseName(String databaseName) {
-        if (databaseName != null) {
-            sDatabaseName = databaseName;
-        }
-    }
-
-    /**
      * データベースをオープンして SQLiteDatabase ハンドルを返す。
      * 
      * すでにインスタンスがある場合はこれを返す。
      */
     public static synchronized SQLiteDatabase getDB() {
-        assert(sApplicationContext != null);
-        assert(sDatabaseName != null);
-        if (sInstance == null) {
-            sInstance = new ORDatabase(sApplicationContext, sDatabaseName, sSchemaVersion);
-        }
-        return sInstance._getDB();
+        ORDatabase helper = sFactory.getInstance();
+        return helper._getDB();
     }
 
     /**
@@ -138,10 +124,7 @@ public class ORDatabase extends SQLiteOpenHelper {
      * シングルトンインスタンスは解放される。
      */
     public static synchronized void closeDB() {
-        if (sInstance != null) {
-            sInstance.close();
-            sInstance = null;
-        }
+        sFactory.close();
     }
 
     public static void sync() {
