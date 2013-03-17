@@ -47,24 +47,17 @@ import java.text.*;
  * SQLiteDatabase のシングルトンインスタンスを取得する。
  */
 public class ORDatabase extends SQLiteOpenHelper {
-    private static final String TAG = "ORMapper";
+    private static final String TAG = ORDatabase.class.getSimpleName();
+
+    protected static ORDatabaseFactory sFactory = new ORDatabaseFactory();
 
     /** アプリケーションコンテキスト */
-    private static Context mApplicationContext;
+    protected static Context sApplicationContext;
 
-    /** データベース名 */
-    private static String mDatabaseName;
-
-    /** データベースヘルパインスタンス */
-    private static ORDatabase sInstance;
-
-    /** データベーススキーマバージョン */
-    private static int sSchemaVersion = 1;
-
-    private static SimpleDateFormat sDateFormat;
+    protected static SimpleDateFormat sDateFormat;
 
     /** SQLiteDatabase インスタンス */
-    private SQLiteDatabase mDb;
+    protected SQLiteDatabase mDb;
 
     static {
         sDateFormat = new SimpleDateFormat("yyyyMMddHHmmss", Locale.US);
@@ -73,25 +66,26 @@ public class ORDatabase extends SQLiteOpenHelper {
 
     /**
      * 初期化。getDB() 前に呼び出されている必要がある。
-     * @param context コンテキスト
-     * @param databaseName データベース名
-     * @param schemaVersion スキーマバージョン
+     * @param context           コンテキスト
+     * @param databaseName      データベース名 (null時は無指定)
+     * @param factory           ORDatabaseファクトリ (null時はデフォルト)
      */
-    public static void initialize(Context context, String databaseName, int schemaVersion) {
-        mApplicationContext = context.getApplicationContext();
-        sSchemaVersion = schemaVersion;
-        setDatabaseName(databaseName);
+    public static void initialize(Context context, String databaseName, ORDatabaseFactory factory) {
+        if (factory != null) {
+            sFactory = factory;
+        }
+        sApplicationContext = context.getApplicationContext();
+        sFactory.initialize(context, databaseName);
     }
 
     /**
      * 初期化。getDB() 前に呼び出されている必要がある。
      * <p>
-     * スキーマバージョンは 1 が指定される。
      * @param context コンテキスト
      * @param databaseName データベース名 (null時は無指定)
      */
     public static void initialize(Context context, String databaseName) {
-        initialize(context, databaseName, 1);
+        initialize(context, databaseName, null);
     }
 
     /**
@@ -101,20 +95,10 @@ public class ORDatabase extends SQLiteOpenHelper {
      */
     public static void initialize(Context context) {
         Context c = context.getApplicationContext();
-        if (c != mApplicationContext) {
+        if (c != sApplicationContext) {
             // re-init
-            mApplicationContext = c;
+            sApplicationContext = c;
             closeDB();
-        }
-    }
-
-    /**
-     * データベース名を指定する
-     * @param databaseName  データベース名
-     */
-    public static void setDatabaseName(String databaseName) {
-        if (databaseName != null) {
-            mDatabaseName = databaseName;
         }
     }
 
@@ -124,12 +108,8 @@ public class ORDatabase extends SQLiteOpenHelper {
      * すでにインスタンスがある場合はこれを返す。
      */
     public static synchronized SQLiteDatabase getDB() {
-        assert(mApplicationContext != null);
-        assert(mDatabaseName != null);
-        if (sInstance == null) {
-            sInstance = new ORDatabase(mApplicationContext, mDatabaseName, sSchemaVersion);
-        }
-        return sInstance._getDB();
+        ORDatabase helper = sFactory.getInstance();
+        return helper._getDB();
     }
 
     /**
@@ -138,10 +118,7 @@ public class ORDatabase extends SQLiteOpenHelper {
      * シングルトンインスタンスは解放される。
      */
     public static synchronized void closeDB() {
-        if (sInstance != null) {
-            sInstance.close();
-            sInstance = null;
-        }
+        sFactory.close();
     }
 
     public static void sync() {
@@ -150,17 +127,29 @@ public class ORDatabase extends SQLiteOpenHelper {
 
     // --- Internal methods
 
-    private ORDatabase(Context context, String databaseName, int schemaVersion) {
+    /**
+     * コンストラクタ
+     * @param context
+     * @param databaseName
+     */
+    protected ORDatabase(Context context, String databaseName, int schemaVersion) {
         super(context.getApplicationContext(), databaseName, null, schemaVersion);
     }
 
-    private SQLiteDatabase _getDB() {
+    /**
+     * SQLiteDatabase インスタンスを取得する。
+     * @return
+     */
+    protected SQLiteDatabase _getDB() {
         if (mDb == null) {
             mDb = getWritableDatabase();
         }
         return mDb;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void close() {
         if (mDb != null) {
@@ -169,9 +158,17 @@ public class ORDatabase extends SQLiteOpenHelper {
         super.close();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void onCreate(SQLiteDatabase db) {
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
     }
 
@@ -201,7 +198,7 @@ public class ORDatabase extends SQLiteOpenHelper {
      */
     public static boolean installSqlFromResource(int sqlResourceId) {
         // open SQL raw resource
-        InputStream in = mApplicationContext.getResources().openRawResource(sqlResourceId);
+        InputStream in = sApplicationContext.getResources().openRawResource(sqlResourceId);
         BufferedReader b = new BufferedReader(new InputStreamReader(in));
 
         // execute each sql
