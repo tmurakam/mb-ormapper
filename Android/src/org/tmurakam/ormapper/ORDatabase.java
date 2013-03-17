@@ -50,10 +50,10 @@ public class ORDatabase extends SQLiteOpenHelper {
     private static final String TAG = "ORMapper";
 
     /** アプリケーションコンテキスト */
-    private static Context mApplicationContext;
+    private static Context sApplicationContext;
 
     /** データベース名 */
-    private static String mDatabaseName;
+    private static String sDatabaseName;
 
     /** データベースヘルパインスタンス */
     private static ORDatabase sInstance;
@@ -78,7 +78,7 @@ public class ORDatabase extends SQLiteOpenHelper {
      * @param schemaVersion スキーマバージョン
      */
     public static void initialize(Context context, String databaseName, int schemaVersion) {
-        mApplicationContext = context.getApplicationContext();
+        sApplicationContext = context.getApplicationContext();
         sSchemaVersion = schemaVersion;
         setDatabaseName(databaseName);
     }
@@ -101,9 +101,9 @@ public class ORDatabase extends SQLiteOpenHelper {
      */
     public static void initialize(Context context) {
         Context c = context.getApplicationContext();
-        if (c != mApplicationContext) {
+        if (c != sApplicationContext) {
             // re-init
-            mApplicationContext = c;
+            sApplicationContext = c;
             closeDB();
         }
     }
@@ -114,7 +114,7 @@ public class ORDatabase extends SQLiteOpenHelper {
      */
     public static void setDatabaseName(String databaseName) {
         if (databaseName != null) {
-            mDatabaseName = databaseName;
+            sDatabaseName = databaseName;
         }
     }
 
@@ -124,10 +124,10 @@ public class ORDatabase extends SQLiteOpenHelper {
      * すでにインスタンスがある場合はこれを返す。
      */
     public static synchronized SQLiteDatabase getDB() {
-        assert(mApplicationContext != null);
-        assert(mDatabaseName != null);
+        assert(sApplicationContext != null);
+        assert(sDatabaseName != null);
         if (sInstance == null) {
-            sInstance = new ORDatabase(mApplicationContext, mDatabaseName, sSchemaVersion);
+            sInstance = new ORDatabase(sApplicationContext, sDatabaseName, sSchemaVersion);
         }
         return sInstance._getDB();
     }
@@ -201,7 +201,7 @@ public class ORDatabase extends SQLiteOpenHelper {
      */
     public static boolean installSqlFromResource(int sqlResourceId) {
         // open SQL raw resource
-        InputStream in = mApplicationContext.getResources().openRawResource(sqlResourceId);
+        InputStream in = sApplicationContext.getResources().openRawResource(sqlResourceId);
         BufferedReader b = new BufferedReader(new InputStreamReader(in));
 
         // execute each sql
