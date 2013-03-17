@@ -68,30 +68,24 @@ public class ORDatabase extends SQLiteOpenHelper {
      * 初期化。getDB() 前に呼び出されている必要がある。
      * @param context           コンテキスト
      * @param databaseName      データベース名 (null時は無指定)
-     * @param schemaVersion     スキーマバージョン
      * @param factory           ORDatabaseファクトリ (null時はデフォルト)
      */
-    public static void initialize(Context context, String databaseName, int schemaVersion, ORDatabaseFactory factory) {
+    public static void initialize(Context context, String databaseName, ORDatabaseFactory factory) {
         if (factory != null) {
             sFactory = factory;
         }
         sApplicationContext = context.getApplicationContext();
-        sFactory.initialize(context, databaseName, schemaVersion);
-    }
-
-    public static void initialize(Context context, String databaseName, int schemaVersion) {
-        initialize(context, databaseName, schemaVersion, null);
+        sFactory.initialize(context, databaseName);
     }
 
     /**
      * 初期化。getDB() 前に呼び出されている必要がある。
      * <p>
-     * スキーマバージョンは 1 が指定される。
      * @param context コンテキスト
      * @param databaseName データベース名 (null時は無指定)
      */
     public static void initialize(Context context, String databaseName) {
-        initialize(context, databaseName, 1, null);
+        initialize(context, databaseName, null);
     }
 
     /**
@@ -137,7 +131,6 @@ public class ORDatabase extends SQLiteOpenHelper {
      * コンストラクタ
      * @param context
      * @param databaseName
-     * @param schemaVersion
      */
     protected ORDatabase(Context context, String databaseName, int schemaVersion) {
         super(context.getApplicationContext(), databaseName, null, schemaVersion);

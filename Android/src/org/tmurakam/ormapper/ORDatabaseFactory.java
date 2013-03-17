@@ -31,7 +31,7 @@ import android.content.Context;
 
 /**
  * ORDatabase ファクトリ。
- * ORDatabase のサブクラスを使用する場合は、本ファクトリを継承して {@link #getInstance}
+ * ORDatabase のサブクラスを使用する場合は、本ファクトリを継承して {@link #create}
  * をオーバライドし、ORDatabase にファクトリをセットする。
  */
 public class ORDatabaseFactory {
@@ -43,9 +43,6 @@ public class ORDatabaseFactory {
     /** データベース名 */
     protected String mDatabaseName;
 
-    /** データベーススキーマバージョン */
-    protected int mSchemaVersion = 1;
-
     /** データベースヘルパインスタンス */
     protected ORDatabase mInstance;
 
@@ -53,11 +50,9 @@ public class ORDatabaseFactory {
      * 初期化。getDB() 前に呼び出されている必要がある。
      * @param context           コンテキスト
      * @param databaseName      データベース名 (null時は無指定)
-     * @param schemaVersion     スキーマバージョン
      */
-    public void initialize(Context context, String databaseName, int schemaVersion) {
+    public void initialize(Context context, String databaseName) {
         mApplicationContext = context.getApplicationContext();
-        mSchemaVersion = schemaVersion;
         setDatabaseName(databaseName);
     }
 
@@ -79,9 +74,16 @@ public class ORDatabaseFactory {
         assert(mDatabaseName != null);
         
         if (mInstance == null) {
-            mInstance = new ORDatabase(mApplicationContext, mDatabaseName, mSchemaVersion);
+            mInstance = create();
         }
         return mInstance;
+    }
+    
+    /**
+     * インスタンス生成
+     */
+    protected ORDatabase create() {
+        return new ORDatabase(mApplicationContext, mDatabaseName, 1);
     }
     
     /**
