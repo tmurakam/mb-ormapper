@@ -47,24 +47,24 @@ import java.text.*;
  * SQLiteDatabase のシングルトンインスタンスを取得する。
  */
 public class ORDatabase extends SQLiteOpenHelper {
-    private static final String TAG = "ORMapper";
+    private static final String TAG = ORDatabase.class.getSimpleName();
 
     /** アプリケーションコンテキスト */
-    private static Context sApplicationContext;
+    protected static Context sApplicationContext;
 
     /** データベース名 */
-    private static String sDatabaseName;
+    protected static String sDatabaseName;
 
     /** データベースヘルパインスタンス */
-    private static ORDatabase sInstance;
+    protected static ORDatabase sInstance;
 
     /** データベーススキーマバージョン */
-    private static int sSchemaVersion = 1;
+    protected static int sSchemaVersion = 1;
 
-    private static SimpleDateFormat sDateFormat;
+    protected static SimpleDateFormat sDateFormat;
 
     /** SQLiteDatabase インスタンス */
-    private SQLiteDatabase mDb;
+    protected SQLiteDatabase mDb;
 
     static {
         sDateFormat = new SimpleDateFormat("yyyyMMddHHmmss", Locale.US);
@@ -150,17 +150,30 @@ public class ORDatabase extends SQLiteOpenHelper {
 
     // --- Internal methods
 
-    private ORDatabase(Context context, String databaseName, int schemaVersion) {
+    /**
+     * コンストラクタ
+     * @param context
+     * @param databaseName
+     * @param schemaVersion
+     */
+    protected ORDatabase(Context context, String databaseName, int schemaVersion) {
         super(context.getApplicationContext(), databaseName, null, schemaVersion);
     }
 
-    private SQLiteDatabase _getDB() {
+    /**
+     * SQLiteDatabase インスタンスを取得する。
+     * @return
+     */
+    protected SQLiteDatabase _getDB() {
         if (mDb == null) {
             mDb = getWritableDatabase();
         }
         return mDb;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void close() {
         if (mDb != null) {
@@ -169,9 +182,17 @@ public class ORDatabase extends SQLiteOpenHelper {
         super.close();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void onCreate(SQLiteDatabase db) {
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
     }
 
