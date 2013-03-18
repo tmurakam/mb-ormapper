@@ -70,7 +70,7 @@ public class ORDatabase extends SQLiteOpenHelper {
      * @param databaseName      データベース名 (null時は無指定)
      * @param factory           ORDatabaseファクトリ (null時はデフォルト)
      */
-    public static void initialize(Context context, String databaseName, ORDatabaseFactory factory) {
+    public static synchronized void initialize(Context context, String databaseName, ORDatabaseFactory factory) {
         if (factory != null) {
             sFactory = factory;
         }
@@ -84,22 +84,22 @@ public class ORDatabase extends SQLiteOpenHelper {
      * @param context コンテキスト
      * @param databaseName データベース名 (null時は無指定)
      */
-    public static void initialize(Context context, String databaseName) {
+    public static synchronized void initialize(Context context, String databaseName) {
         initialize(context, databaseName, null);
     }
 
     /**
-     * 初期化。getDB() 前に呼び出されている必要がある。
-     * ただし、すでに初期化が行われている場合は何もしない。
+     * 再初期化。テスト用の API。
+     * 未初期化あるいはコンテキストが変更された場合のみ、初期化を実行する。
      * @param context コンテキスト
      */
-    public static void initialize(Context context) {
+    public static synchronized void _reinitialize(Context context, String databaseName) {
         Context c = context.getApplicationContext();
-        if (c != sApplicationContext) {
-            // re-init
-            sApplicationContext = c;
-            closeDB();
-        }
+        if (sApplicationContext == c) return; // do nothing
+
+        // re-init
+        sFactory.close();
+        initialize(context, databaseName, null);
     }
 
     /**
