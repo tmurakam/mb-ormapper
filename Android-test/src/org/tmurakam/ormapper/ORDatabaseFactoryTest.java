@@ -67,9 +67,9 @@ public class ORDatabaseFactoryTest extends AndroidTestCase {
      */
     public void testClose() {
         mFactory.initialize(mContext, "test.db");
-        ORDatabase db = mFactory.create();
+        ORDatabase db = mFactory.getInstance();
         assertNotNull(db);
-        assertSame(db, mFactory.mInstance);
+        assertSame(db, mFactory.mInstance); 
         
         mFactory.close();
         assertNull(mFactory.mInstance);
