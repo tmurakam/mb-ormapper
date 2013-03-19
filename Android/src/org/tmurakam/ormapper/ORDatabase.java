@@ -83,18 +83,12 @@ public class ORDatabase extends SQLiteOpenHelper {
     }
     
     /**
-     * 再初期化。テスト用の API。
-     * 未初期化あるいはコンテキストが変更された場合のみ、DBをクローズする。
-     * @param context コンテキスト
+     * シングルトンインスタンスを inject する (テスト用)
      */
-    public synchronized void _reinitialize(Context context) {
-        Context c = context.getApplicationContext();
-        if (mContext == c) return; // do nothing
-
-        mContext = c;
-        close();
+    public static void _injectInstance(ORDatabase ord) {
+        sInstance = ord;
     }
-
+    
     /**
      * データベースをオープンして SQLiteDatabase ハンドルを返す。
      */
@@ -118,12 +112,26 @@ public class ORDatabase extends SQLiteOpenHelper {
         closeDB();
     }
 
+    /**
+     * 再初期化。テスト用の API。
+     * 未初期化あるいはコンテキストが変更された場合のみ、DBをクローズする。
+     * @param context コンテキスト
+     */
+    public synchronized void _reinitialize(Context context) {
+        Context c = context.getApplicationContext();
+        if (mContext == c) return; // do nothing
+
+        mContext = c;
+        close();
+    }
+
     // --- Internal methods
 
     /**
      * コンストラクタ
      * @param context
      * @param databaseName
+     * @param schemaVersion
      */
     protected ORDatabase(Context context, String databaseName, int schemaVersion) {
         super(context.getApplicationContext(), databaseName, null, schemaVersion);
@@ -138,7 +146,7 @@ public class ORDatabase extends SQLiteOpenHelper {
      * SQLiteDatabase インスタンスを取得する。
      * @return
      */
-    protected SQLiteDatabase _getDB() {
+    protected synchronized SQLiteDatabase _getDB() {
         if (mDb == null) {
             mDb = getWritableDatabase();
         }
@@ -149,7 +157,7 @@ public class ORDatabase extends SQLiteOpenHelper {
      * {@inheritDoc}
      */
     @Override
-    public void close() {
+    public synchronized void close() {
         if (mDb != null) {
             mDb.close();
         }

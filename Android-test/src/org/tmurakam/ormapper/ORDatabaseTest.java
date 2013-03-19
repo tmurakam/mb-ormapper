@@ -29,6 +29,24 @@ public class ORDatabaseTest extends AndroidTestCase {
     }
     
     /**
+     * 初期化テスト
+     */
+    public void testInitialize() {
+        ORDatabase.closeDB(); // deinit
+        assertNull(ORDatabase.getInstance());
+
+        ORDatabase.initialize(getContext(), "test.db");
+        ORDatabase instance = ORDatabase.getInstance();
+        assertNotNull(instance);
+        mDb = ORDatabase.getDB();
+        assertTrue(mDb.getPath().endsWith("test.db"));
+        
+        // 再初期化されないこと
+        ORDatabase.initialize(getContext(), "test2.db");
+        assertSame(instance, ORDatabase.getInstance());
+    }
+    
+    /**
      * dump テスト
      */
     public void testDump() {
