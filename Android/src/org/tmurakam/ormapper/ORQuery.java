@@ -40,13 +40,13 @@ import java.util.List;
 public class ORQuery<T extends ORRecord> {
     private final static String TAG = "ORQuery";
     
-    private Constructor<T> mConstructor;
-    private String mTableName;
-    private String mWhere;
-    private String[] mWhereParams;
-    private String mOrder;
-    private int mLimit = 0;
-    private int mOffset = 0;
+    protected Constructor<T> mConstructor;
+    protected String mTableName;
+    protected String mWhere;
+    protected String[] mWhereParams;
+    protected String mOrder;
+    protected int mLimit = 0;
+    protected int mOffset = 0;
 
     /**
      * Constructor
@@ -134,7 +134,11 @@ public class ORQuery<T extends ORRecord> {
      * @return elements
      */
     public List<T> all() {
-        Cursor cursor = execQuery();
+        return all(ORDatabase.getDB());
+    }
+    
+    public List<T> all(SQLiteDatabase db) {
+        Cursor cursor = execQuery(db);
         cursor.moveToFirst();
         
         ArrayList<T> array = new ArrayList<T>();
@@ -160,9 +164,13 @@ public class ORQuery<T extends ORRecord> {
      * @return first element
      */
     public T first() {
+        return first(ORDatabase.getDB());
+    }
+    
+    public T first(SQLiteDatabase db) {
         mLimit = 1;
         
-        Cursor cursor = execQuery();
+        Cursor cursor = execQuery(db);
         cursor.moveToFirst();
 
         T entity = null;
@@ -183,10 +191,9 @@ public class ORQuery<T extends ORRecord> {
      * Execute query
      * @return Cursor
      */
-    private Cursor execQuery() {
+    protected Cursor execQuery(SQLiteDatabase db) {
         String sql = getSql();
 
-        SQLiteDatabase db = ORDatabase.getDB();
         Cursor cursor = db.rawQuery(sql.toString(), mWhereParams);
 
         return cursor;
