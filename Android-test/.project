@@ -3,7 +3,6 @@
 	<name>mb-ormapper-test</name>
 	<comment></comment>
 	<projects>
-		<project>mb-ormapper</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
