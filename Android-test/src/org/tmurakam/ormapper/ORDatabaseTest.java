@@ -5,6 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
+import java.io.File;
+
 public class ORDatabaseTest extends AndroidTestCase {
     private static final String TAG = "ORDatabaseTest";
     
@@ -15,16 +17,22 @@ public class ORDatabaseTest extends AndroidTestCase {
     public void setUp() throws Exception {
         super.setUp();
         mContext = getContext();
-        ORDatabase.closeDB();
         ORDatabase.initialize(mContext, "test.db");
         mDb = ORDatabase.getDB();
+    }
+    
+    @Override
+    public void tearDown() throws Exception {
+        String dbPath = ORDatabase.getDB().getPath();
+        ORDatabase.closeDB();
+        new File(dbPath).delete();
     }
     
     /**
      * dump テスト
      */
     public void testDump() {
-        mDb.execSQL("DROP TABLE test;");
+        //mDb.execSQL("DROP TABLE test;");
         mDb.execSQL("CREATE TABLE test (id INTEGER PRIMARY KEY, name TEXT);");
         mDb.execSQL("INSERT INTO test VALUES (1, 'test');");
         

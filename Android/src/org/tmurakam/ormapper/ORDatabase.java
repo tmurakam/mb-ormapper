@@ -50,67 +50,56 @@ import java.text.*;
 public class ORDatabase extends SQLiteOpenHelper {
     private static final String TAG = ORDatabase.class.getSimpleName();
 
-    protected static ORDatabaseFactory sFactory = new ORDatabaseFactory();
+    /** シングルトンインスタンス */
+    protected static ORDatabase sInstance;
 
     /** アプリケーションコンテキスト */
-    protected static Context sApplicationContext;
+    protected Context mContext;
+    
+    /** データベース名 */
+    protected String mDatabaseName;
 
-    protected static SimpleDateFormat sDateFormat;
+    protected SimpleDateFormat mDateFormat;
 
     /** SQLiteDatabase インスタンス */
     protected SQLiteDatabase mDb;
-
-    static {
-        sDateFormat = new SimpleDateFormat("yyyyMMddHHmmss", Locale.US);
-        sDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-    }
 
     /**
      * 初期化。getDB() 前に呼び出されている必要がある。
      * @param context           コンテキスト
      * @param databaseName      データベース名 (null時は無指定)
-     * @param factory           ORDatabaseファクトリ (null時はデフォルト)
-     */
-    public static synchronized void initialize(Context context, String databaseName, ORDatabaseFactory factory) {
-        if (factory != null) {
-            sFactory = factory;
-        }
-        sApplicationContext = context.getApplicationContext();
-        sFactory.initialize(context, databaseName);
-    }
-
-    /**
-     * 初期化。getDB() 前に呼び出されている必要がある。
-     * <p>
-     * @param context コンテキスト
-     * @param databaseName データベース名 (null時は無指定)
      */
     public static synchronized void initialize(Context context, String databaseName) {
-        initialize(context, databaseName, null);
+        if (sInstance == null) {
+            sInstance = new ORDatabase(context, databaseName, 1);
+        }
     }
 
     /**
+     * シングルトンインスタンスを取得する
+     */
+    public static ORDatabase getInstance() {
+        return sInstance;
+    }
+    
+    /**
      * 再初期化。テスト用の API。
-     * 未初期化あるいはコンテキストが変更された場合のみ、初期化を実行する。
+     * 未初期化あるいはコンテキストが変更された場合のみ、DBをクローズする。
      * @param context コンテキスト
      */
-    public static synchronized void _reinitialize(Context context, String databaseName) {
+    public synchronized void _reinitialize(Context context) {
         Context c = context.getApplicationContext();
-        if (sApplicationContext == c) return; // do nothing
+        if (mContext == c) return; // do nothing
 
-        // re-init
-        sFactory.close();
-        initialize(context, databaseName, null);
+        mContext = c;
+        close();
     }
 
     /**
      * データベースをオープンして SQLiteDatabase ハンドルを返す。
-     * 
-     * すでにインスタンスがある場合はこれを返す。
      */
     public static synchronized SQLiteDatabase getDB() {
-        ORDatabase helper = sFactory.getInstance();
-        return helper._getDB();
+        return sInstance._getDB();
     }
 
     /**
@@ -119,7 +108,10 @@ public class ORDatabase extends SQLiteOpenHelper {
      * シングルトンインスタンスは解放される。
      */
     public static synchronized void closeDB() {
-        sFactory.close();
+        if (sInstance != null) {
+            sInstance.close();
+            sInstance = null;
+        }
     }
 
     public static void sync() {
@@ -135,6 +127,11 @@ public class ORDatabase extends SQLiteOpenHelper {
      */
     protected ORDatabase(Context context, String databaseName, int schemaVersion) {
         super(context.getApplicationContext(), databaseName, null, schemaVersion);
+        mContext = context.getApplicationContext();
+        mDatabaseName = databaseName;
+
+        mDateFormat = new SimpleDateFormat("yyyyMMddHHmmss", Locale.US);
+        mDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
     /**
@@ -177,15 +174,23 @@ public class ORDatabase extends SQLiteOpenHelper {
      * utilities
      */
     public static String date2str(long milliseconds) {
-        synchronized(sDateFormat) {
-            return sDateFormat.format(new Date(milliseconds));
+        return sInstance._date2str(milliseconds);
+    }
+    
+    public String _date2str(long milliseconds) {
+        synchronized(mDateFormat) {
+            return mDateFormat.format(new Date(milliseconds));
         }
     }
 
     public static long str2date(String d) {
+        return sInstance._str2date(d);
+    }
+    
+    public long _str2date(String d) {
         try {
-            synchronized(sDateFormat) {
-                return sDateFormat.parse(d).getTime();
+            synchronized(mDateFormat) {
+                return mDateFormat.parse(d).getTime();
             }
         } catch (ParseException ex) {
             return 0; // 1970/1/1 0:00:00 GMT
@@ -197,9 +202,9 @@ public class ORDatabase extends SQLiteOpenHelper {
      * @param sqlResourceId Resource ID of raw SQL data.
      * @return
      */
-    public static boolean installSqlFromResource(int sqlResourceId) {
+    public boolean installSqlFromResource(int sqlResourceId) {
         // open SQL raw resource
-        InputStream in = sApplicationContext.getResources().openRawResource(sqlResourceId);
+        InputStream in = mContext.getResources().openRawResource(sqlResourceId);
         BufferedReader b = new BufferedReader(new InputStreamReader(in));
 
         // execute each sql
