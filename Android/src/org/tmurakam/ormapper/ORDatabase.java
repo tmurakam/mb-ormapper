@@ -222,13 +222,13 @@ public class ORDatabase extends SQLiteOpenHelper {
      * 全テーブルを dump する
      * @return SQL文
      */
-    public String dump() {
+    public static String dump(SQLiteDatabase db) {
         StringBuilder sb = new StringBuilder();
         Cursor cursor;
         ArrayList<String> tableNames = new ArrayList<String>();
 
         // テーブル名一覧取得
-        cursor = mDb.rawQuery("SELECT name, sql FROM sqlite_master WHERE type = 'table';", null);
+        cursor = db.rawQuery("SELECT name, sql FROM sqlite_master WHERE type = 'table';", null);
 ;
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -236,26 +236,28 @@ public class ORDatabase extends SQLiteOpenHelper {
             String sql = cursor.getString(1);
 
             tableNames.add(tableName);
-            sb.append("DROP TABLE " + tableName);
+            sb.append("DROP TABLE ");
+            sb.append(tableName);
+            sb.append(";\n");
             sb.append(sql);
-            sb.append("\n");
+            sb.append(";\n");
             cursor.moveToNext();
         }
         cursor.close();
 
         // 各テーブルの処理
         for (String tableName : tableNames) {
-            processTable(tableName, sb);
+            processTable(db, tableName, sb);
         }
 
         return sb.toString();
     }
     
-    protected void processTable(String tableName, StringBuilder sb) {
+    protected static void processTable(SQLiteDatabase db, String tableName, StringBuilder sb) {
         Cursor cursor;
 
         // カラム名取得
-        cursor = mDb.rawQuery("PRAGMA table_info('" + tableName + "');", null);
+        cursor = db.rawQuery("PRAGMA table_info('" + tableName + "');", null);
 
         ArrayList<String> columnNames = new ArrayList<String>();
         cursor.moveToFirst();
@@ -278,13 +280,14 @@ public class ORDatabase extends SQLiteOpenHelper {
             sql.append(")");
             isFirst = false;
         }
-        sql.append("');'");
+        sql.append("|| ')'");
         sql.append(" FROM " + tableName + ";\n");
 
-        cursor = mDb.rawQuery(sql.toString(), null);
+        cursor = db.rawQuery(sql.toString(), null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             sb.append(cursor.getString(0));
+            sb.append(";\n");
             cursor.moveToNext();
         }
         cursor.close();

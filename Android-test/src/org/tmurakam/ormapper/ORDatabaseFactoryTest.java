@@ -39,4 +39,39 @@ public class ORDatabaseFactoryTest extends AndroidTestCase {
         mFactory.setDatabaseName("test2.db");
         assertEquals("test2.db", mFactory.mDatabaseName);
     }
+    
+    /**
+     * setDatabaseName : null　は上書きしないこと 
+     */
+    public void testSetDatabaseNameNull() {
+        mFactory.initialize(mContext, "test.db");
+        mFactory.setDatabaseName(null);
+        assertEquals("test.db", mFactory.mDatabaseName);
+    }
+    
+    /**
+     * getInstance : 正常にインスタンス生成すること
+     */
+    public void testCreate() {
+        mFactory.initialize(mContext, "test.db");
+        ORDatabase db = mFactory.getInstance();
+        assertNotNull(db);
+        assertEquals("test.db", db.getDatabaseName());
+        
+        ORDatabase db2 = mFactory.getInstance();
+        assertSame(db2, db);
+    }
+    
+    /**
+     * close :正常にクローズすること
+     */
+    public void testClose() {
+        mFactory.initialize(mContext, "test.db");
+        ORDatabase db = mFactory.create();
+        assertNotNull(db);
+        assertSame(db, mFactory.mInstance);
+        
+        mFactory.close();
+        assertNull(mFactory.mInstance);
+    }
 }
