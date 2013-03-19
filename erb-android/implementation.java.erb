@@ -62,7 +62,16 @@ public class <%= cdef.base_class_name %> extends ORRecord {
      * @return true - table was newly created, false - table already exists
      */
     public static boolean migrate() {
-        return migrate(TABLE_NAME, PKEY_NAME, COLUMN_TYPES);
+        return migrate(ORDatabase.getDB());
+    }
+
+    /**
+     * Migrate database table
+     * @param db Database handle
+     * @return true - table was newly created, false - table already exists
+     */
+    public static boolean migrate(SQLiteDatabase db) {
+        return migrate(db, TABLE_NAME, PKEY_NAME, COLUMN_TYPES);
     }
 
     // Constructor
