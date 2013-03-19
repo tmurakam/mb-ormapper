@@ -28,6 +28,7 @@
 package org.tmurakam.ormapper;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -215,5 +216,77 @@ public class ORDatabase extends SQLiteOpenHelper {
             return false;
         }
         return true;
+    }
+    
+    /**
+     * 全テーブルを dump する
+     * @return SQL文
+     */
+    public String dump() {
+        StringBuilder sb = new StringBuilder();
+        Cursor cursor;
+        ArrayList<String> tableNames = new ArrayList<String>();
+
+        // テーブル名一覧取得
+        cursor = mDb.rawQuery("SELECT name, sql FROM sqlite_master WHERE type = 'table';", null);
+;
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            String tableName = cursor.getString(0);
+            String sql = cursor.getString(1);
+
+            tableNames.add(tableName);
+            sb.append("DROP TABLE " + tableName);
+            sb.append(sql);
+            sb.append("\n");
+            cursor.moveToNext();
+        }
+        cursor.close();
+
+        // 各テーブルの処理
+        for (String tableName : tableNames) {
+            processTable(tableName, sb);
+        }
+
+        return sb.toString();
+    }
+    
+    protected void processTable(String tableName, StringBuilder sb) {
+        Cursor cursor;
+
+        // カラム名取得
+        cursor = mDb.rawQuery("PRAGMA table_info('" + tableName + "');", null);
+
+        ArrayList<String> columnNames = new ArrayList<String>();
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            columnNames.add(cursor.getString(1));
+            cursor.moveToNext();
+        }
+        cursor.close();
+
+        // INSERT 文生成用の SELECT 文作成
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT 'INSERT INTO " + tableName + " VALUES('");
+        boolean isFirst = true;
+        for (String columnName : columnNames) {
+            if (!isFirst) {
+                sql.append("|| ','");
+            }
+            sql.append("||quote(");
+            sql.append(columnName);
+            sql.append(")");
+            isFirst = false;
+        }
+        sql.append("');'");
+        sql.append(" FROM " + tableName + ";\n");
+
+        cursor = mDb.rawQuery(sql.toString(), null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            sb.append(cursor.getString(0));
+            cursor.moveToNext();
+        }
+        cursor.close();
     }
 }
