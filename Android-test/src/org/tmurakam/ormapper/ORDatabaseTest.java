@@ -23,9 +23,11 @@ public class ORDatabaseTest extends AndroidTestCase {
     
     @Override
     public void tearDown() throws Exception {
-        String dbPath = ORDatabase.getDB().getPath();
-        ORDatabase.shutdown();
-        new File(dbPath).delete();
+        if (ORDatabase.getInstance() != null) {
+            String dbPath = ORDatabase.getDB().getPath();
+            ORDatabase.shutdown();
+            new File(dbPath).delete();
+        }
     }
     
     /**
@@ -44,6 +46,30 @@ public class ORDatabaseTest extends AndroidTestCase {
         // 再初期化されないこと
         ORDatabase.initialize(getContext(), "test2.db");
         assertSame(instance, ORDatabase.getInstance());
+    }
+    
+    /**
+     * sync テスト
+     */
+    public void testSync() {
+        ORDatabase.sync();
+        ORDatabase instance = ORDatabase.getInstance();
+        assertNotNull(instance);
+        assertNull(instance.mDb);
+    }
+    
+    /**
+     * shutdown テスト
+     */
+    public void testShutdown() {
+        ORDatabase instance = ORDatabase.getInstance();
+        assertNotNull(instance.mDb);
+        
+        ORDatabase.shutdown();
+        assertNull(ORDatabase.getInstance());
+        assertNull(instance.mDb);
+        
+        ORDatabase.shutdown(); // should never crash
     }
     
     /**

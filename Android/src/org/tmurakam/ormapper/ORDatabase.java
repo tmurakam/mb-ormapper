@@ -79,6 +79,9 @@ public class ORDatabase extends SQLiteOpenHelper {
      * シングルトンインスタンスを取得する
      */
     public static ORDatabase getInstance() {
+        if (sInstance == null) {
+            Log.w(TAG, "getInstance : not initialized");
+        }
         return sInstance;
     }
     
@@ -93,6 +96,9 @@ public class ORDatabase extends SQLiteOpenHelper {
      * データベースをオープンして SQLiteDatabase ハンドルを返す。
      */
     public static synchronized SQLiteDatabase getDB() {
+        if (sInstance == null) {
+            throw new IllegalStateException("not initialized");
+        }
         return sInstance._getDB();
     }
 
@@ -105,6 +111,8 @@ public class ORDatabase extends SQLiteOpenHelper {
         if (sInstance != null) {
             sInstance.close();
             sInstance = null;
+        } else {
+            Log.w(TAG, "shutdown : not initialized");
         }
     }
 
@@ -115,6 +123,8 @@ public class ORDatabase extends SQLiteOpenHelper {
     public static void sync() {
         if (sInstance != null) {
             sInstance.close();
+        } else {
+            Log.w(TAG, "sync : not initialized");
         }
     }
 
