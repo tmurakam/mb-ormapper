@@ -1,3 +1,9 @@
+2013/03/20 : Takuya Murakami <tmurakam@tmurakam.org>
+
+	* ver 2.2
+	* ORDatabaseFactory 削除
+	* ORDatabaes API 一部仕様変更、リファクタリング
+
 2013/03/17 : Takuya Murakami <tmurakam@tmurakam.org>
 
 	* ORDatabaseFactory 追加
