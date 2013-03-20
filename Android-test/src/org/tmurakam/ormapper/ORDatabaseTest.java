@@ -49,6 +49,24 @@ public class ORDatabaseTest extends AndroidTestCase {
     }
     
     /**
+     * getDB テスト
+     */
+    public void testGetDB() {
+        SQLiteDatabase db = ORDatabase.getDB();
+        assertTrue(db.getPath().endsWith("test.db"));
+    }
+
+    /**
+     * getDB : sync 後に再度インスタンスが生成されること。
+     */
+    public void testGetDBAfterSync() {
+        ORDatabase.sync();
+        
+        SQLiteDatabase db = ORDatabase.getDB();
+        assertTrue(db.getPath().endsWith("test.db"));
+    }
+
+    /**
      * sync テスト
      */
     public void testSync() {
