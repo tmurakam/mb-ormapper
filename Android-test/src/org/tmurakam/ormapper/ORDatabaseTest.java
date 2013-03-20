@@ -94,11 +94,11 @@ public class ORDatabaseTest extends AndroidTestCase {
      * dump テスト
      */
     public void testDump() {
-        //mDb.execSQL("DROP TABLE test;");
+        mDb.execSQL("DROP TABLE IF EXISTS test;");
         mDb.execSQL("CREATE TABLE test (id INTEGER PRIMARY KEY, name TEXT);");
         mDb.execSQL("INSERT INTO test VALUES (1, 'test');");
         
-        String dump = ORDatabase.dump(mDb);
+        String dump = ORDatabase.getInstance().dump();
         Log.d(TAG, "sql = " + dump);
     }
 }

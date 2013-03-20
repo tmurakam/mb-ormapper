@@ -252,10 +252,10 @@ public class ORDatabase extends SQLiteOpenHelper {
      * 全テーブルを dump する
      * @return SQL文
      */
-    public static String dump(SQLiteDatabase db) {
+    public String dump() {
+        SQLiteDatabase db = _getDB();
         StringBuilder sb = new StringBuilder();
         Cursor cursor;
-        ArrayList<String> tableNames = new ArrayList<String>();
 
         // テーブル名一覧取得
         cursor = db.rawQuery("SELECT name, sql FROM sqlite_master WHERE type = 'table';", null);
@@ -265,25 +265,25 @@ public class ORDatabase extends SQLiteOpenHelper {
             String tableName = cursor.getString(0);
             String sql = cursor.getString(1);
 
-            tableNames.add(tableName);
-            sb.append("DROP TABLE ");
-            sb.append(tableName);
-            sb.append(";\n");
-            sb.append(sql);
-            sb.append(";\n");
+            if (!tableName.equals("android_metadata")) {
+                sb.append("DROP TABLE IF EXISTS ");
+                sb.append(tableName);
+                sb.append(";\n");
+                sb.append(sql);
+                sb.append(";\n");
+            
+                // 各テーブルの処理
+                dumpTable(db, tableName, sb);
+            }
+
             cursor.moveToNext();
         }
         cursor.close();
 
-        // 各テーブルの処理
-        for (String tableName : tableNames) {
-            processTable(db, tableName, sb);
-        }
-
         return sb.toString();
     }
     
-    protected static void processTable(SQLiteDatabase db, String tableName, StringBuilder sb) {
+    protected void dumpTable(SQLiteDatabase db, String tableName, StringBuilder sb) {
         Cursor cursor;
 
         // カラム名取得
