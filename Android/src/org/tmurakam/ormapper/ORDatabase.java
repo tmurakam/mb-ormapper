@@ -97,19 +97,25 @@ public class ORDatabase extends SQLiteOpenHelper {
     }
 
     /**
-     * 開いているデータベースを閉じる。
+     * 開いているデータベースをシャットダウンし、初期化前状態に戻す。
      * 
-     * シングルトンインスタンスは解放される。
+     * SQLiteDatabase, ORDatabase はともに解放される。
      */
-    public static synchronized void closeDB() {
+    public static synchronized void shutdown() {
         if (sInstance != null) {
             sInstance.close();
             sInstance = null;
         }
     }
 
+    /**
+     * 開いているデータベースを閉じる。
+     * 次回 getDB() を呼び出すと、再度データベースが開かれる。
+     */
     public static void sync() {
-        closeDB();
+        if (sInstance != null) {
+            sInstance.close();
+        }
     }
 
     /**
@@ -160,6 +166,7 @@ public class ORDatabase extends SQLiteOpenHelper {
     public synchronized void close() {
         if (mDb != null) {
             mDb.close();
+            mDb = null;
         }
         super.close();
     }

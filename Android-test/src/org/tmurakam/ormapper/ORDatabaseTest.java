@@ -24,7 +24,7 @@ public class ORDatabaseTest extends AndroidTestCase {
     @Override
     public void tearDown() throws Exception {
         String dbPath = ORDatabase.getDB().getPath();
-        ORDatabase.closeDB();
+        ORDatabase.shutdown();
         new File(dbPath).delete();
     }
     
@@ -32,7 +32,7 @@ public class ORDatabaseTest extends AndroidTestCase {
      * 初期化テスト
      */
     public void testInitialize() {
-        ORDatabase.closeDB(); // deinit
+        ORDatabase.shutdown();
         assertNull(ORDatabase.getInstance());
 
         ORDatabase.initialize(getContext(), "test.db");
