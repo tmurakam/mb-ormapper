@@ -28,6 +28,7 @@
 package org.tmurakam.ormapper;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -49,80 +50,95 @@ import java.text.*;
 public class ORDatabase extends SQLiteOpenHelper {
     private static final String TAG = ORDatabase.class.getSimpleName();
 
-    protected static ORDatabaseFactory sFactory = new ORDatabaseFactory();
+    /** シングルトンインスタンス */
+    protected static ORDatabase sInstance;
 
     /** アプリケーションコンテキスト */
-    protected static Context sApplicationContext;
+    protected Context mContext;
+    
+    /** データベース名 */
+    protected String mDatabaseName;
 
-    protected static SimpleDateFormat sDateFormat;
+    protected SimpleDateFormat mDateFormat;
 
     /** SQLiteDatabase インスタンス */
     protected SQLiteDatabase mDb;
-
-    static {
-        sDateFormat = new SimpleDateFormat("yyyyMMddHHmmss", Locale.US);
-        sDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-    }
 
     /**
      * 初期化。getDB() 前に呼び出されている必要がある。
      * @param context           コンテキスト
      * @param databaseName      データベース名 (null時は無指定)
-     * @param factory           ORDatabaseファクトリ (null時はデフォルト)
      */
-    public static void initialize(Context context, String databaseName, ORDatabaseFactory factory) {
-        if (factory != null) {
-            sFactory = factory;
-        }
-        sApplicationContext = context.getApplicationContext();
-        sFactory.initialize(context, databaseName);
-    }
-
-    /**
-     * 初期化。getDB() 前に呼び出されている必要がある。
-     * <p>
-     * @param context コンテキスト
-     * @param databaseName データベース名 (null時は無指定)
-     */
-    public static void initialize(Context context, String databaseName) {
-        initialize(context, databaseName, null);
-    }
-
-    /**
-     * 初期化。getDB() 前に呼び出されている必要がある。
-     * ただし、すでに初期化が行われている場合は何もしない。
-     * @param context コンテキスト
-     */
-    public static void initialize(Context context) {
-        Context c = context.getApplicationContext();
-        if (c != sApplicationContext) {
-            // re-init
-            sApplicationContext = c;
-            closeDB();
+    public static synchronized void initialize(Context context, String databaseName) {
+        if (sInstance == null) {
+            sInstance = new ORDatabase(context, databaseName, 1);
         }
     }
 
+    /**
+     * シングルトンインスタンスを取得する
+     */
+    public static ORDatabase getInstance() {
+        if (sInstance == null) {
+            Log.w(TAG, "getInstance : not initialized");
+        }
+        return sInstance;
+    }
+    
+    /**
+     * シングルトンインスタンスを inject する (テスト用)
+     */
+    public static void _injectInstance(ORDatabase ord) {
+        sInstance = ord;
+    }
+    
     /**
      * データベースをオープンして SQLiteDatabase ハンドルを返す。
-     * 
-     * すでにインスタンスがある場合はこれを返す。
      */
     public static synchronized SQLiteDatabase getDB() {
-        ORDatabase helper = sFactory.getInstance();
-        return helper._getDB();
+        if (sInstance == null) {
+            throw new IllegalStateException("not initialized");
+        }
+        return sInstance._getDB();
+    }
+
+    /**
+     * 開いているデータベースをシャットダウンし、初期化前状態に戻す。
+     * 
+     * SQLiteDatabase, ORDatabase はともに解放される。
+     */
+    public static synchronized void shutdown() {
+        if (sInstance != null) {
+            sInstance.close();
+            sInstance = null;
+        } else {
+            Log.w(TAG, "shutdown : not initialized");
+        }
     }
 
     /**
      * 開いているデータベースを閉じる。
-     * 
-     * シングルトンインスタンスは解放される。
+     * 次回 getDB() を呼び出すと、再度データベースが開かれる。
      */
-    public static synchronized void closeDB() {
-        sFactory.close();
+    public static void sync() {
+        if (sInstance != null) {
+            sInstance.close();
+        } else {
+            Log.w(TAG, "sync : not initialized");
+        }
     }
 
-    public static void sync() {
-        closeDB();
+    /**
+     * 再初期化。テスト用の API。
+     * 未初期化あるいはコンテキストが変更された場合のみ、DBをクローズする。
+     * @param context コンテキスト
+     */
+    public synchronized void _reinitialize(Context context) {
+        Context c = context.getApplicationContext();
+        if (mContext == c) return; // do nothing
+
+        mContext = c;
+        close();
     }
 
     // --- Internal methods
@@ -131,16 +147,22 @@ public class ORDatabase extends SQLiteOpenHelper {
      * コンストラクタ
      * @param context
      * @param databaseName
+     * @param schemaVersion
      */
     protected ORDatabase(Context context, String databaseName, int schemaVersion) {
         super(context.getApplicationContext(), databaseName, null, schemaVersion);
+        mContext = context.getApplicationContext();
+        mDatabaseName = databaseName;
+
+        mDateFormat = new SimpleDateFormat("yyyyMMddHHmmss", Locale.US);
+        mDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
     /**
      * SQLiteDatabase インスタンスを取得する。
      * @return
      */
-    protected SQLiteDatabase _getDB() {
+    protected synchronized SQLiteDatabase _getDB() {
         if (mDb == null) {
             mDb = getWritableDatabase();
         }
@@ -151,9 +173,10 @@ public class ORDatabase extends SQLiteOpenHelper {
      * {@inheritDoc}
      */
     @Override
-    public void close() {
+    public synchronized void close() {
         if (mDb != null) {
             mDb.close();
+            mDb = null;
         }
         super.close();
     }
@@ -176,15 +199,23 @@ public class ORDatabase extends SQLiteOpenHelper {
      * utilities
      */
     public static String date2str(long milliseconds) {
-        synchronized(sDateFormat) {
-            return sDateFormat.format(new Date(milliseconds));
+        return sInstance._date2str(milliseconds);
+    }
+    
+    public String _date2str(long milliseconds) {
+        synchronized(mDateFormat) {
+            return mDateFormat.format(new Date(milliseconds));
         }
     }
 
     public static long str2date(String d) {
+        return sInstance._str2date(d);
+    }
+    
+    public long _str2date(String d) {
         try {
-            synchronized(sDateFormat) {
-                return sDateFormat.parse(d).getTime();
+            synchronized(mDateFormat) {
+                return mDateFormat.parse(d).getTime();
             }
         } catch (ParseException ex) {
             return 0; // 1970/1/1 0:00:00 GMT
@@ -196,9 +227,9 @@ public class ORDatabase extends SQLiteOpenHelper {
      * @param sqlResourceId Resource ID of raw SQL data.
      * @return
      */
-    public static boolean installSqlFromResource(int sqlResourceId) {
+    public boolean installSqlFromResource(int sqlResourceId) {
         // open SQL raw resource
-        InputStream in = sApplicationContext.getResources().openRawResource(sqlResourceId);
+        InputStream in = mContext.getResources().openRawResource(sqlResourceId);
         BufferedReader b = new BufferedReader(new InputStreamReader(in));
 
         // execute each sql
@@ -215,5 +246,80 @@ public class ORDatabase extends SQLiteOpenHelper {
             return false;
         }
         return true;
+    }
+    
+    /**
+     * 全テーブルを dump する
+     * @return SQL文
+     */
+    public String dump() {
+        SQLiteDatabase db = _getDB();
+        StringBuilder sb = new StringBuilder();
+        Cursor cursor;
+
+        // テーブル名一覧取得
+        cursor = db.rawQuery("SELECT name, sql FROM sqlite_master WHERE type = 'table';", null);
+;
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            String tableName = cursor.getString(0);
+            String sql = cursor.getString(1);
+
+            if (!tableName.equals("android_metadata")) {
+                sb.append("DROP TABLE IF EXISTS ");
+                sb.append(tableName);
+                sb.append(";\n");
+                sb.append(sql);
+                sb.append(";\n");
+            
+                // 各テーブルの処理
+                dumpTable(db, tableName, sb);
+            }
+
+            cursor.moveToNext();
+        }
+        cursor.close();
+
+        return sb.toString();
+    }
+    
+    protected void dumpTable(SQLiteDatabase db, String tableName, StringBuilder sb) {
+        Cursor cursor;
+
+        // カラム名取得
+        cursor = db.rawQuery("PRAGMA table_info('" + tableName + "');", null);
+
+        ArrayList<String> columnNames = new ArrayList<String>();
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            columnNames.add(cursor.getString(1));
+            cursor.moveToNext();
+        }
+        cursor.close();
+
+        // INSERT 文生成用の SELECT 文作成
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT 'INSERT INTO " + tableName + " VALUES('");
+        boolean isFirst = true;
+        for (String columnName : columnNames) {
+            if (!isFirst) {
+                sql.append("|| ','");
+            }
+            sql.append("||quote(");
+            sql.append(columnName);
+            sql.append(")");
+            isFirst = false;
+        }
+        sql.append("|| ')'");
+        sql.append(" FROM " + tableName + ";\n");
+
+        cursor = db.rawQuery(sql.toString(), null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            sb.append(cursor.getString(0));
+            sb.append(";\n");
+            cursor.moveToNext();
+        }
+        cursor.close();
     }
 }

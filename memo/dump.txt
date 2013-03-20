@@ -1,0 +1,19 @@
+SQLite dump
+
+1) SELECT name, sql FROM sqlite_master WHERE type = 'table';
+
+これでテーブル名と、CREATE TABLE 用の sql 文が得られる。
+
+2) PRAGMA table_info('table_name');
+
+2カラム目に、該当テーブルのカラム名が取得できる。
+
+3) select * FROM table_name;
+
+全行について、データを取り出し、逐次 INSERT INTO 文を生成する。
+これは以下の SQL 文で一発でできる。ここではカラム名を a, b,
+テーブル名を table_name とした場合の例。
+
+SELECT 'INSERT INTO table_name VALUES(' || quote(a) || ',' || quote(b) || ');' from table_name;
+
+

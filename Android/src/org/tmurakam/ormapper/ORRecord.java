@@ -51,14 +51,26 @@ public abstract class ORRecord {
     }
 
     /**
-     * Migrate database table
+     * Migrate database table (backward compat)
      * @param tableName Table name
      * @param pkeyName primary key name
      * @param array Table schema ( column, type, column, type, ... ) 
      * @return true: table newly created, false: table exists
      */
+    @Deprecated
     static protected boolean migrate(String tableName, String pkeyName, String[] array) {
-        SQLiteDatabase db = ORDatabase.getDB();
+        return migrate(ORDatabase.getDB(), tableName, pkeyName, array);
+    }
+    
+    /**
+     * Migrate database table
+     * @param db database handle
+     * @param tableName Table name
+     * @param pkeyName primary key name
+     * @param array Table schema ( column, type, column, type, ... ) 
+     * @return true: table newly created, false: table exists
+     */
+    static protected boolean migrate(SQLiteDatabase db, String tableName, String pkeyName, String[] array) {
         boolean ret;
         String tablesql;
 

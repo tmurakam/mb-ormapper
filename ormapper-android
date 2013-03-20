@@ -32,7 +32,7 @@ $LOAD_PATH.push(ORMDIR)
 require "orschema.rb"
 require 'erb'
 
-VER = "2.1"
+VER = "2.2"
 
 def getSqlType(type)
   case type
