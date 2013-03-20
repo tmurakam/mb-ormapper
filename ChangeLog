@@ -3,6 +3,7 @@
 	* ver 2.2
 	* ORDatabaseFactory 削除
 	* ORDatabaes API 一部仕様変更、リファクタリング
+	* Android 単体テスト追加
 
 2013/03/17 : Takuya Murakami <tmurakam@tmurakam.org>
 
