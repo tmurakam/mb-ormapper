@@ -1,9 +1,8 @@
 // -*-  Mode:ObjC; c-basic-offset:4; tab-width:8; indent-tabs-mode:nil -*-
 /*
-  mb-ormapper : O/R Mapper library for iOS/Android
-  https://github.com/tmurakam/mb-ormapper
+  O/R Mapper library for iOS
 
-  Copyright (c) 2010-2013, Takuya Murakami. All rights reserved.
+  Copyright (c) 2010-2011, Takuya Murakami. All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are
@@ -27,9 +26,10 @@
 
 #import "Database.h"
 
-@interface dbstmt () {
-    sqlite3_stmt *mStmt;	///< sqlite3_stmt handle.
-    Database *mDb; ///< Database class handle
+@interface dbstmt()
+{
+    sqlite3_stmt *_stmt;	///< sqlite3_stmt handle.
+    Database *_db; ///< Database class handle
 }
 @end
 
@@ -42,16 +42,16 @@
 {
     self = [super init];
     if (self != nil) {
-        mStmt = stmt;
-        mDb = [Database instance];
+        _stmt = stmt;
+        _db = [Database instance];
     }
     return self;
 }
 
 - (void)dealloc
 {
-    if (mStmt) {
-        sqlite3_finalize(mStmt);
+    if (_stmt) {
+        sqlite3_finalize(_stmt);
     }
 }
 
@@ -60,9 +60,9 @@
 */
 - (int)step
 {
-    int ret = sqlite3_step(mStmt);
+    int ret = sqlite3_step(_stmt);
     if (ret != SQLITE_OK && ret != SQLITE_ROW && ret != SQLITE_DONE) {
-        NSLog(@"sqlite3_step error:%d (%s)", ret, sqlite3_errmsg(mDb.handle));
+        NSLog(@"sqlite3_step error:%d (%s)", ret, sqlite3_errmsg(_db.handle));
     }
     return ret;
 }
@@ -72,7 +72,7 @@
 */
 - (void)reset
 {
-    sqlite3_reset(mStmt);
+    sqlite3_reset(_stmt);
 }
 
 /**
@@ -80,7 +80,7 @@
 */
 - (void)bindInt:(int)idx val:(int)val
 {
-    sqlite3_bind_int(mStmt, idx+1, val);
+    sqlite3_bind_int(_stmt, idx+1, val);
 }
 
 /**
@@ -88,7 +88,7 @@
 */
 - (void)bindDouble:(int)idx val:(double)val
 {
-    sqlite3_bind_double(mStmt, idx+1, val);
+    sqlite3_bind_double(_stmt, idx+1, val);
 }
 
 /**
@@ -96,7 +96,7 @@
 */
 - (void)bindCString:(int)idx val:(const char *)val
 {
-    sqlite3_bind_text(mStmt, idx+1, val, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(_stmt, idx+1, val, -1, SQLITE_TRANSIENT);
 }
 
 /**
@@ -104,7 +104,7 @@
 */
 - (void)bindString:(int)idx val:(NSString*)val
 {
-    sqlite3_bind_text(mStmt, idx+1, [val UTF8String], -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(_stmt, idx+1, [val UTF8String], -1, SQLITE_TRANSIENT);
 }
 
 /**
@@ -115,8 +115,8 @@
     NSString *str;
     
     if (date != NULL) {
-        str = [mDb stringFromDate:date];
-        sqlite3_bind_text(mStmt, idx+1, [str UTF8String], -1, SQLITE_TRANSIENT);
+        str = [_db stringFromDate:date];
+        sqlite3_bind_text(_stmt, idx+1, [str UTF8String], -1, SQLITE_TRANSIENT);
     }
 }
 
@@ -125,7 +125,7 @@
 */
 - (int)colInt:(int)idx
 {
-    return sqlite3_column_int(mStmt, idx);
+    return sqlite3_column_int(_stmt, idx);
 }
 
 /**
@@ -133,7 +133,7 @@
 */
 - (double)colDouble:(int)idx
 {
-    return sqlite3_column_double(mStmt, idx);
+    return sqlite3_column_double(_stmt, idx);
 }
 
 /**
@@ -141,7 +141,7 @@
 */
 - (const char *)colCString:(int)idx
 {
-    const char *s = (const char*)sqlite3_column_text(mStmt, idx);
+    const char *s = (const char*)sqlite3_column_text(_stmt, idx);
     return s;
 }
 
@@ -150,7 +150,7 @@
 */
 - (NSString*)colString:(int)idx
 {
-    const char *s = (const char*)sqlite3_column_text(mStmt, idx);
+    const char *s = (const char*)sqlite3_column_text(_stmt, idx);
     if (!s) {
         return @"";
     }
@@ -166,7 +166,7 @@
     NSDate *date = nil;
     NSString *ds = [self colString:idx];
     if (ds && [ds length] > 0) {
-        date = [mDb dateFromString:ds];
+        date = [_db dateFromString:ds];
     }
     return date;
 }

@@ -247,7 +247,7 @@
       i += 1
     end
 -%>
-    [stmt bindInt:<%= i %> val:mPid];
+    [stmt bindInt:<%= i %> val:self.pid];
 
     [stmt step];
     //[db commitTransaction];
@@ -265,7 +265,7 @@
     Database *db = [Database instance];
 
     dbstmt *stmt = [db prepare:@"DELETE FROM <%= cdef.table_name %> WHERE <%= PKEY %> = ?;"];
-    [stmt bindInt:0 val:mPid];
+    [stmt bindInt:0 val:self.pid];
     [stmt step];
 
     [[Database instance] setModified];
@@ -317,7 +317,7 @@
  */
 - (void)getInsertSql:(NSMutableString *)s
 {
-    [s appendFormat:@"INSERT INTO <%= cdef.table_name %> VALUES(%d", mPid];
+    [s appendFormat:@"INSERT INTO <%= cdef.table_name %> VALUES(%d", self.pid];
 <% cdef.members.each do |m| -%>
     [s appendString:@","];
     [s appendString:[self quoteSqlString:<%= getToString(m.type, m.member_name) %>]];
