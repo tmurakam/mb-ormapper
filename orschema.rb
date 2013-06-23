@@ -129,7 +129,11 @@ class MemberVar
     @setter = "set" + CamelCase(name)
     @prop_name = @getter
 
-    @member_name = "m" + CamelCase(name)
+    if IS_IOS
+      @member_name = "_" + camelCase(name)
+    else
+      @member_name = "m" + CamelCase(name)
+    end
 
     if options[:field_name]
       @field_name = options[:field_name].to_s

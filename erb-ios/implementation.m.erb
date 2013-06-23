@@ -15,10 +15,6 @@
 
 @implementation <%= cdef.base_class_name %>
 
-<% cdef.members.each do |m| -%>
-@synthesize <%= m.prop_name %> = <%= m.member_name %>;
-<% end -%>
-
 - (id)init
 {
     self = [super init];
