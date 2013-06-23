@@ -1,7 +1,6 @@
 // -*-  Mode:ObjC; c-basic-offset:4; tab-width:8; indent-tabs-mode:nil -*-
 /*
-  mb-ormapper : O/R Mapper library for iOS/Android
-  https://github.com/tmurakam/mb-ormapper
+  O/R Mapper library for iOS
 
   Copyright (c) 2010-2013, Takuya Murakami. All rights reserved.
 
@@ -40,6 +39,9 @@
 @property(nonatomic,readonly) sqlite3 *handle;
 
 + (Database*)instance;
+
++ (Database*)_instance;
++ (void)_setInstance:(Database*)db;
 
 + (void)shutdown;
 

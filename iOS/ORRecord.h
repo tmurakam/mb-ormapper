@@ -1,7 +1,6 @@
 // -*-  Mode:ObjC; c-basic-offset:4; tab-width:8; indent-tabs-mode:nil -*-
 /*
-  mb-ormapper : O/R Mapper library for iOS/Android
-  https://github.com/tmurakam/mb-ormapper
+  O/R Mapper library for iOS
 
   Copyright (c) 2010-2013, Takuya Murakami. All rights reserved.
 
@@ -45,7 +44,13 @@
 + (void)delete_all;
 
 + (NSString *)tableName;
+
 - (NSString *)quoteSqlString:(NSString *)string;
+
+// called only from inherited classes
+- (void)_insert;
+- (void)_update;
+- (void)_loadRow:(dbstmt *)stmt;
 
 @end
 

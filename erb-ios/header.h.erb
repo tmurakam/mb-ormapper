@@ -7,14 +7,7 @@
 
 @class <%= cdef.class_name %>;
 
-@interface <%= cdef.base_class_name %> : ORRecord {
-<%
-  cdef.members.each do |m|
-    type, mem = getObjcType(m.type)
--%>
-    <%= type %> <%= m.member_name %>;
-<% end -%>
-}
+@interface <%= cdef.base_class_name %> : ORRecord
 
 <%
   cdef.members.each do |m|

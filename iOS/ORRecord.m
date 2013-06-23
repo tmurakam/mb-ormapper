@@ -1,7 +1,6 @@
 // -*-  Mode:ObjC; c-basic-offset:4; tab-width:8; indent-tabs-mode:nil -*-
 /*
-  mb-ormapper : O/R Mapper library for iOS/Android
-  https://github.com/tmurakam/mb-ormapper
+  O/R Mapper library for iOS
 
   Copyright (c) 2010-2013, Takuya Murakami. All rights reserved.
 
@@ -28,24 +27,9 @@
 #import "Database.h"
 #import "ORRecord.h"
 
-@interface ORRecord () {
-    /** Primary ID (primary key) */
-    int mPid;
-
-    /** new entry or not */
-    BOOL mIsNew;
-}
-
-- (void)_insert;
-- (void)_update;
-- (void)_loadRow:(dbstmt *)stmt;
-@end
-
 @implementation ORRecord
 
 #define UNASSIGNED_PID -1
-
-@synthesize pid = mPid;
 
 - (void)_loadRow:(dbstmt *)stmt
 {
@@ -57,7 +41,7 @@
 {
     self = [super init];
     if (self != nil) {
-        mPid = UNASSIGNED_PID;
+        _pid = UNASSIGNED_PID;
     }
     return self;
 }
@@ -148,7 +132,7 @@
 */
 - (void)save
 {
-    if (mPid == UNASSIGNED_PID) {
+    if (_pid == UNASSIGNED_PID) {
         [self _insert];
     } else {
         [self _update];

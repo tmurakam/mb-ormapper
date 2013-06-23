@@ -1,7 +1,6 @@
 // -*-  Mode:ObjC; c-basic-offset:4; tab-width:8; indent-tabs-mode:nil -*-
 /*
-  mb-ormapper : O/R Mapper library for iOS/Android
-  https://github.com/tmurakam/mb-ormapper
+  O/R Mapper library for iOS
 
   Copyright (c) 2010-2013, Takuya Murakami. All rights reserved.
 
@@ -27,21 +26,13 @@
 
 #import "Database.h"
 
-@interface Database () {
-    sqlite3 *mHandle; ///< Database handle
-
-    BOOL mIsDirty;
-    NSString *mDbPath; ///< Current database file path
+@interface Database() {
+    BOOL _isDirty;
+    NSString *_dbPath; ///< Current database file path
 }
-
-+ (Database*)_instance;
-+ (void)_setInstance:(Database*)db;
-
 @end
 
 @implementation Database
-
-@synthesize handle;
 
 /** Singleton */
 static Database *sDatabase = nil;
@@ -88,8 +79,8 @@ static Database *sDatabase = nil;
 {
     self = [super init];
     if (self != nil) {
-        mHandle = nil;
-        mIsDirty = false;
+        _handle = nil;
+        _isDirty = false;
     }
     return self;
 }
@@ -105,8 +96,8 @@ static Database *sDatabase = nil;
         NSLog(@"WARNING: database instance was released, but it didn't match the singleton");
     }
 
-    if (mHandle != nil) {
-        sqlite3_close(mHandle);
+    if (_handle != nil) {
+        sqlite3_close(_handle);
     }
 }
 
@@ -120,14 +111,14 @@ static Database *sDatabase = nil;
     NSFileManager *fileManager = [NSFileManager defaultManager];
 
     // Load from DB
-    mDbPath = [self dbPath:dbname];
-    BOOL isExistedDb = [fileManager fileExistsAtPath:mDbPath];
+    _dbPath = [self dbPath:dbname];
+    BOOL isExistedDb = [fileManager fileExistsAtPath:_dbPath];
 
-    if (sqlite3_open([mDbPath UTF8String], &mHandle) != 0) {
+    if (sqlite3_open([_dbPath UTF8String], &_handle) != 0) {
         // ouch!
         // re-create database
-        [fileManager removeItemAtPath:mDbPath error:NULL];
-        sqlite3_open([mDbPath UTF8String], &mHandle);
+        [fileManager removeItemAtPath:_dbPath error:NULL];
+        sqlite3_open([_dbPath UTF8String], &_handle);
 
         isExistedDb = NO;
     }
@@ -144,7 +135,7 @@ static Database *sDatabase = nil;
     //ASSERT(mHandle != 0);
 
     //LOG(@"SQL: %s", sql);
-    int result = sqlite3_exec(mHandle, [sql UTF8String], NULL, NULL, NULL);
+    int result = sqlite3_exec(_handle, [sql UTF8String], NULL, NULL, NULL);
     if (result != SQLITE_OK) {
         //LOG(@"sqlite3: %s", sqlite3_errmsg(mHandle));
         return NO;
@@ -161,7 +152,7 @@ static Database *sDatabase = nil;
 - (dbstmt *)prepare:(NSString *)sql
 {
     sqlite3_stmt *stmt;
-    int result = sqlite3_prepare_v2(mHandle, [sql UTF8String], -1, &stmt, NULL);
+    int result = sqlite3_prepare_v2(_handle, [sql UTF8String], -1, &stmt, NULL);
     if (result != SQLITE_OK) {
         //LOG(@"sqlite3: %s", sqlite3_errmsg(mHandle));
         //ASSERT(0);
@@ -177,7 +168,7 @@ static Database *sDatabase = nil;
 */
 - (int)lastInsertRowId
 {
-    return sqlite3_last_insert_rowid(mHandle);
+    return sqlite3_last_insert_rowid(_handle);
 }
 
 /**
@@ -232,7 +223,7 @@ static Database *sDatabase = nil;
 */
 - (void)setModified
 {
-    mIsDirty = YES;
+    _isDirty = YES;
 }
 
 /**
@@ -240,13 +231,13 @@ static Database *sDatabase = nil;
 */
 - (void)updateModificationDate
 {
-    if (mIsDirty) {
-        mIsDirty = NO;
+    if (_isDirty) {
+        _isDirty = NO;
 
         NSFileManager *m = [NSFileManager defaultManager];
-        NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithDictionary:[m attributesOfItemAtPath:mDbPath error:nil]];
+        NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithDictionary:[m attributesOfItemAtPath:_dbPath error:nil]];
         dict[NSFileModificationDate] = [NSDate new];
-        [m setAttributes:dict ofItemAtPath:mDbPath error:nil];
+        [m setAttributes:dict ofItemAtPath:_dbPath error:nil];
     }
 }
 
@@ -262,7 +253,7 @@ static Database *sDatabase = nil;
 {
     static NSDateFormatter *dateFormatter = nil;
     if (dateFormatter == nil) {
-        dateFormatter = [NSDateFormatter new];
+        dateFormatter = [[NSDateFormatter alloc] init];
         [dateFormatter setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
         [dateFormatter setDateFormat: @"yyyyMMddHHmmss"];
 
