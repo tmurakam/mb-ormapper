@@ -135,7 +135,7 @@ static Database *sDatabase = nil;
     //ASSERT(mHandle != 0);
 
     //LOG(@"SQL: %s", sql);
-    int result = sqlite3_exec(_handle, [sql UTF8String], NULL, NULL, NULL);
+    NSInteger result = sqlite3_exec(_handle, [sql UTF8String], NULL, NULL, NULL);
     if (result != SQLITE_OK) {
         //LOG(@"sqlite3: %s", sqlite3_errmsg(mHandle));
         return NO;
@@ -152,7 +152,7 @@ static Database *sDatabase = nil;
 - (dbstmt *)prepare:(NSString *)sql
 {
     sqlite3_stmt *stmt;
-    int result = sqlite3_prepare_v2(_handle, [sql UTF8String], -1, &stmt, NULL);
+    NSInteger result = sqlite3_prepare_v2(_handle, [sql UTF8String], -1, &stmt, NULL);
     if (result != SQLITE_OK) {
         //LOG(@"sqlite3: %s", sqlite3_errmsg(mHandle));
         //ASSERT(0);
@@ -166,7 +166,7 @@ static Database *sDatabase = nil;
 /**
    Get last inserted row id
 */
-- (int)lastInsertRowId
+- (NSInteger)lastInsertRowId
 {
     return sqlite3_last_insert_rowid(_handle);
 }

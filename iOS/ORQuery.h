@@ -14,8 +14,8 @@
 
 - (ORQuery *)where:(NSString *)where arguments:(NSArray *)args;
 - (ORQuery *)order:(NSString *)order;
-- (ORQuery *)limit:(int)limit;
-- (ORQuery *)offset:(int)limit;
+- (ORQuery *)limit:(NSInteger)limit;
+- (ORQuery *)offset:(NSInteger)limit;
 
 - (NSMutableArray *)all;
 - (id)first;

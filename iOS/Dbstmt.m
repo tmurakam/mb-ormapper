@@ -58,9 +58,9 @@
 /**
    Execute step (sqlite3_step)
 */
-- (int)step
+- (NSInteger)step
 {
-    int ret = sqlite3_step(_stmt);
+    NSInteger ret = sqlite3_step(_stmt);
     if (ret != SQLITE_OK && ret != SQLITE_ROW && ret != SQLITE_DONE) {
         NSLog(@"sqlite3_step error:%d (%s)", ret, sqlite3_errmsg(_db.handle));
     }
@@ -78,7 +78,7 @@
 /**
    Bind integer value
 */
-- (void)bindInt:(int)idx val:(int)val
+- (void)bindInt:(NSInteger)idx val:(NSInteger)val
 {
     sqlite3_bind_int(_stmt, idx+1, val);
 }
@@ -86,7 +86,7 @@
 /**
    Bind double value
 */
-- (void)bindDouble:(int)idx val:(double)val
+- (void)bindDouble:(NSInteger)idx val:(double)val
 {
     sqlite3_bind_double(_stmt, idx+1, val);
 }
@@ -94,7 +94,7 @@
 /**
    Bind C-string value
 */
-- (void)bindCString:(int)idx val:(const char *)val
+- (void)bindCString:(NSInteger)idx val:(const char *)val
 {
     sqlite3_bind_text(_stmt, idx+1, val, -1, SQLITE_TRANSIENT);
 }
@@ -102,7 +102,7 @@
 /**
    Bind stringvalue
 */
-- (void)bindString:(int)idx val:(NSString*)val
+- (void)bindString:(NSInteger)idx val:(NSString*)val
 {
     sqlite3_bind_text(_stmt, idx+1, [val UTF8String], -1, SQLITE_TRANSIENT);
 }
@@ -110,7 +110,7 @@
 /**
    Bind date value
 */
-- (void)bindDate:(int)idx val:(NSDate*)date
+- (void)bindDate:(NSInteger)idx val:(NSDate*)date
 {
     NSString *str;
     
@@ -123,7 +123,7 @@
 /**
    Get integer value
 */
-- (int)colInt:(int)idx
+- (NSInteger)colInt:(NSInteger)idx
 {
     return sqlite3_column_int(_stmt, idx);
 }
@@ -131,7 +131,7 @@
 /**
    Get double value
 */
-- (double)colDouble:(int)idx
+- (double)colDouble:(NSInteger)idx
 {
     return sqlite3_column_double(_stmt, idx);
 }
@@ -139,7 +139,7 @@
 /**
    Get C-string value
 */
-- (const char *)colCString:(int)idx
+- (const char *)colCString:(NSInteger)idx
 {
     const char *s = (const char*)sqlite3_column_text(_stmt, idx);
     return s;
@@ -148,7 +148,7 @@
 /**
    Get stringvalue
 */
-- (NSString*)colString:(int)idx
+- (NSString*)colString:(NSInteger)idx
 {
     const char *s = (const char*)sqlite3_column_text(_stmt, idx);
     if (!s) {
@@ -161,7 +161,7 @@
 /**
    Get date value
 */
-- (NSDate*)colDate:(int)idx
+- (NSDate*)colDate:(NSInteger)idx
 {
     NSDate *date = nil;
     NSString *ds = [self colString:idx];

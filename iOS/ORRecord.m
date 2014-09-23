@@ -78,9 +78,9 @@
     }
 
     // add columns
-    int count = [array count] / 2;
+    NSInteger count = [array count] / 2;
 
-    for (int i = 0; i < count; i++) {
+    for (NSInteger i = 0; i < count; i++) {
         NSString *column = array[i * 2];
         NSString *type = array[i * 2 + 1];
 
@@ -122,7 +122,7 @@
    @param id Primary key of the record
    @return record
 */
-+ (id)find:(int)pid
++ (id)find:(NSInteger)pid
 {
     return nil;
 }

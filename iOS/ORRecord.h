@@ -32,12 +32,12 @@
  */
 @interface ORRecord : NSObject
 
-@property(nonatomic,assign) int pid;
+@property(nonatomic,assign) NSInteger pid;
 
 + (BOOL)migrate:(NSArray *)array primaryKey:(NSString*)key;
 + (NSMutableArray *)find_all;
 + (NSMutableArray *)find_all:(NSString *)cond;
-+ (id)find:(int)id;
++ (id)find:(NSInteger)id;
 
 - (void)save;
 - (void)delete;

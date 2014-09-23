@@ -1,3 +1,7 @@
+2014/09/23 : Takuya Murakami <tmurakam@tmurakam.org>
+
+	* iOS: 64bit 対応、int を NSInteger に変更
+
 2013/06/23 : Takuya Murakami <tmurakam@tmurakam.org>
 
 	* iOS: メンバ変数名/synthesize 変更

@@ -37,18 +37,18 @@
 @interface dbstmt : NSObject
 
 - (id)initWithStmt:(sqlite3_stmt *)st;
-- (int)step;
+- (NSInteger)step;
 - (void)reset;
 
-- (void)bindInt:(int)idx val:(int)val;
-- (void)bindDouble:(int)idx val:(double)val;
-- (void)bindCString:(int)idx val:(const char *)val;
-- (void)bindString:(int)idx val:(NSString*)val;
-- (void)bindDate:(int)idx val:(NSDate*)date;
+- (void)bindInt:(NSInteger)idx val:(NSInteger)val;
+- (void)bindDouble:(NSInteger)idx val:(double)val;
+- (void)bindCString:(NSInteger)idx val:(const char *)val;
+- (void)bindString:(NSInteger)idx val:(NSString*)val;
+- (void)bindDate:(NSInteger)idx val:(NSDate*)date;
 
-- (int)colInt:(int)idx;
-- (double)colDouble:(int)idx;
-- (const char*)colCString:(int)idx;
-- (NSString*)colString:(int)idx;
-- (NSDate*)colDate:(int)idx;
+- (NSInteger)colInt:(NSInteger)idx;
+- (double)colDouble:(NSInteger)idx;
+- (const char*)colCString:(NSInteger)idx;
+- (NSString*)colString:(NSInteger)idx;
+- (NSDate*)colDate:(NSInteger)idx;
 @end
