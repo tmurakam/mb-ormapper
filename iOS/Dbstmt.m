@@ -60,11 +60,11 @@
 */
 - (NSInteger)step
 {
-    NSInteger ret = sqlite3_step(_stmt);
+    int ret = sqlite3_step(_stmt);
     if (ret != SQLITE_OK && ret != SQLITE_ROW && ret != SQLITE_DONE) {
         NSLog(@"sqlite3_step error:%d (%s)", ret, sqlite3_errmsg(_db.handle));
     }
-    return ret;
+    return (NSInteger)ret;
 }
 
 /**
@@ -80,7 +80,7 @@
 */
 - (void)bindInt:(NSInteger)idx val:(NSInteger)val
 {
-    sqlite3_bind_int(_stmt, idx+1, val);
+    sqlite3_bind_int(_stmt, (int)(idx+1), (int)val);
 }
 
 /**
@@ -88,7 +88,7 @@
 */
 - (void)bindDouble:(NSInteger)idx val:(double)val
 {
-    sqlite3_bind_double(_stmt, idx+1, val);
+    sqlite3_bind_double(_stmt, (int)(idx+1), val);
 }
 
 /**
@@ -96,7 +96,7 @@
 */
 - (void)bindCString:(NSInteger)idx val:(const char *)val
 {
-    sqlite3_bind_text(_stmt, idx+1, val, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(_stmt, (int)(idx+1), val, -1, SQLITE_TRANSIENT);
 }
 
 /**
@@ -104,7 +104,7 @@
 */
 - (void)bindString:(NSInteger)idx val:(NSString*)val
 {
-    sqlite3_bind_text(_stmt, idx+1, [val UTF8String], -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(_stmt, (int)(idx+1), [val UTF8String], -1, SQLITE_TRANSIENT);
 }
 
 /**
@@ -116,7 +116,7 @@
     
     if (date != NULL) {
         str = [_db stringFromDate:date];
-        sqlite3_bind_text(_stmt, idx+1, [str UTF8String], -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(_stmt, (int)(idx+1), [str UTF8String], -1, SQLITE_TRANSIENT);
     }
 }
 
@@ -125,7 +125,7 @@
 */
 - (NSInteger)colInt:(NSInteger)idx
 {
-    return sqlite3_column_int(_stmt, idx);
+    return sqlite3_column_int(_stmt, (int)idx);
 }
 
 /**
@@ -133,7 +133,7 @@
 */
 - (double)colDouble:(NSInteger)idx
 {
-    return sqlite3_column_double(_stmt, idx);
+    return sqlite3_column_double(_stmt, (int)idx);
 }
 
 /**
@@ -141,7 +141,7 @@
 */
 - (const char *)colCString:(NSInteger)idx
 {
-    const char *s = (const char*)sqlite3_column_text(_stmt, idx);
+    const char *s = (const char*)sqlite3_column_text(_stmt, (int)idx);
     return s;
 }
 
@@ -150,7 +150,7 @@
 */
 - (NSString*)colString:(NSInteger)idx
 {
-    const char *s = (const char*)sqlite3_column_text(_stmt, idx);
+    const char *s = (const char*)sqlite3_column_text(_stmt, (int)idx);
     if (!s) {
         return @"";
     }

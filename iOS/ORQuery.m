@@ -159,12 +159,12 @@
     
     // Limit
     if (_limit > 0) {
-        [sql appendFormat:@" LIMIT %d", _limit];
+        [sql appendFormat:@" LIMIT %ld", (long)_limit];
     }
     
     // Offset
     if (_offset > 0) {
-        [sql appendFormat:@" OFFSET %d", _offset];
+        [sql appendFormat:@" OFFSET %ld", (long)_offset];
     }
     
     return sql;
