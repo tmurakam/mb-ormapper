@@ -46,7 +46,7 @@
   @param pid Primary key of the record
   @return record
 */
-+ (<%= cdef.class_name %> *)find:(int)pid
++ (<%= cdef.class_name %> *)find:(NSInteger)pid
 {
     Database *db = [Database instance];
 
@@ -317,7 +317,7 @@
  */
 - (void)getInsertSql:(NSMutableString *)s
 {
-    [s appendFormat:@"INSERT INTO <%= cdef.table_name %> VALUES(%d", self.pid];
+    [s appendFormat:@"INSERT INTO <%= cdef.table_name %> VALUES(%ld", (long)self.pid];
 <% cdef.members.each do |m| -%>
     [s appendString:@","];
     [s appendString:[self quoteSqlString:<%= getToString(m.type, m.member_name) %>]];

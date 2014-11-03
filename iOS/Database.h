@@ -50,7 +50,7 @@
 
 - (BOOL)exec:(NSString *)sql;
 - (dbstmt*)prepare:(NSString *)sql;
-- (int)lastInsertRowId;
+- (NSInteger)lastInsertRowId;
 
 - (void)beginTransaction;
 - (void)commitTransaction;

@@ -49,7 +49,7 @@ end
 def getObjcType(type)
   case type
   when "INTEGER"
-    return "int", "assign"
+    return "NSInteger", "assign"
   when "LONG"
     return "long", "assign"
   when "REAL"
@@ -85,7 +85,7 @@ end
 def getToString(type, var)
   case type
   when "INTEGER"
-    return "[NSString stringWithFormat:@\"%d\", #{var}]"
+    return "[NSString stringWithFormat:@\"%ld\", (long)#{var}]"
   when "LONG"
     return "[NSString stringWithFormat:@\"%ld\", #{var}]"
   when "REAL"

@@ -12,8 +12,8 @@
     NSString *_where;
     NSArray *_whereParams;
     NSString *_order;
-    int _limit;
-    int _offset;
+    NSInteger _limit;
+    NSInteger _offset;
 }
 @end
 
@@ -78,7 +78,7 @@
  * @param limit parameter
  * @return this
  */
-- (ORQuery *)limit:(int)limit
+- (ORQuery *)limit:(NSInteger)limit
 {
     _limit = limit;
     return self;
@@ -89,7 +89,7 @@
  * @param offset offset parameter
  * @return this
  */
-- (ORQuery*)offset:(int)offset
+- (ORQuery*)offset:(NSInteger)offset
 {
     _offset = offset;
     return self;
@@ -107,7 +107,7 @@
     // bind arguments
     dbstmt *stmt = [[Database instance] prepare:sql];
     
-    for (int i = 0; i < [_whereParams count]; i++) {
+    for (NSInteger i = 0; i < [_whereParams count]; i++) {
         [stmt bindString:i val:(NSString *)_whereParams[i]];
     }
 
@@ -159,12 +159,12 @@
     
     // Limit
     if (_limit > 0) {
-        [sql appendFormat:@" LIMIT %d", _limit];
+        [sql appendFormat:@" LIMIT %ld", (long)_limit];
     }
     
     // Offset
     if (_offset > 0) {
-        [sql appendFormat:@" OFFSET %d", _offset];
+        [sql appendFormat:@" OFFSET %ld", (long)_offset];
     }
     
     return sql;
