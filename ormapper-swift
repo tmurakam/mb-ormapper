@@ -1,0 +1,135 @@
+#!/usr/bin/env ruby
+#-*-  Mode:ruby; c-basic-offset:2; tab-width:8; indent-tabs-mode:nil -*-
+=begin
+  mb-ormapper : O/R Mapper library for iOS/Android
+  https://github.com/tmurakam/mb-ormapper
+
+  Copyright (c) 2010-2015, Takuya Murakami. All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are
+  met:
+
+  1. Redistributions of source code must retain the above copyright notice,
+  this list of conditions and the following disclaimer. 
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+=end
+
+require 'fileutils'
+require 'erb'
+
+ORMDIR = File.expand_path(File.dirname($0))
+$LOAD_PATH.push(ORMDIR)
+
+IS_IOS = true
+require "orschema.rb"
+
+VER = "2.3"
+
+def getSqlType(type)
+  case type
+  when "LONG"
+    "INTEGER"
+  else
+    type
+  end
+end
+
+def getObjcType(type)
+  case type
+  when "INTEGER"
+    return "NSInteger", "assign"
+  when "LONG"
+    return "long", "assign"
+  when "REAL"
+    return "double", "assign"
+  when "TEXT"
+    return "NSString*", "strong"
+  when "DATE"
+    return "NSDate*", "strong"
+  else
+    puts "#{type} is not supported."
+    exit 1
+  end
+end
+
+def getMethodType(type)
+  case type
+  when "INTEGER"
+    return "Int"
+  when "LONG"
+    return "Long"
+  when "REAL"
+    return "Double"
+  when "TEXT"
+    return "String"
+  when "DATE"
+    return "Date"
+  else
+    puts "#{type} not supported"
+    exit 1
+  end
+end
+
+def getToString(type, var)
+  case type
+  when "INTEGER"
+    return "[NSString stringWithFormat:@\"%ld\", (long)#{var}]"
+  when "LONG"
+    return "[NSString stringWithFormat:@\"%ld\", #{var}]"
+  when "REAL"
+    return "[NSString stringWithFormat:@\"%f\", #{var}]"
+  when "TEXT"
+    return var
+  when "DATE"
+    return "[[Database instance] stringFromDate:#{var}]"
+  else
+    puts "#{type} not supported"
+    exit 1
+  end
+end
+
+# generate implementation
+def generateImplementation(cdef, fh)
+  erb = ERB.new(File.read(ORMDIR + "/erb-swift/implementation.swift.erb"), nil, '-')
+  fh.puts erb.result(binding)
+end
+
+##############################################################
+# start from here
+deffile = "./schema.rb"
+if (ARGV.size == 1)
+  deffile = ARGV[0]
+end
+
+unless File.exists? deffile
+  STDERR.puts "no schema file"
+  exit 1
+end
+
+# load schema
+require deffile
+
+# primary key name
+unless defined? PKEY
+  PKEY = "key"
+end
+
+# generate
+$class_defs.each do |cdef|
+  STDERR.puts "generate #{cdef.base_class_name}.swift"
+  fh = open(cdef.base_class_name + ".swift", "w")
+  generateImplementation(cdef, fh)
+  fh.close
+end
