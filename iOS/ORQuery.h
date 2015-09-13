@@ -3,6 +3,8 @@
 #import <UIKit/UIKit.h>
 #import "Database.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
    O/R query
  */
@@ -10,16 +12,17 @@
 
 + (ORQuery *)getWithClass:(Class)class tableName:(NSString *)tableName;
 
-- (id)initWithClass:(Class)class tableName:(NSString *)tableName;
+- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)initWithClass:(Class)class tableName:(NSString *)tableName NS_DESIGNATED_INITIALIZER;
 
 - (ORQuery *)where:(NSString *)where arguments:(NSArray *)args;
 - (ORQuery *)order:(NSString *)order;
 - (ORQuery *)limit:(NSInteger)limit;
 - (ORQuery *)offset:(NSInteger)limit;
 
-- (NSMutableArray *)all;
-- (id)first;
+@property (nonatomic, readonly, copy) NSMutableArray *all;
+@property (nonatomic, readonly, strong) id first;
 
 @end
 
-
+NS_ASSUME_NONNULL_END

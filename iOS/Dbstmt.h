@@ -31,13 +31,16 @@
 
 @class Database;
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
    Wrapper class of sqlite3_stmt
 */
 @interface dbstmt : NSObject
 
-- (id)initWithStmt:(sqlite3_stmt *)st;
-- (NSInteger)step;
+- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)initWithStmt:(sqlite3_stmt *)st NS_DESIGNATED_INITIALIZER;
+@property (nonatomic, readonly) NSInteger step;
 - (void)reset;
 
 - (void)bindInt:(NSInteger)idx val:(NSInteger)val;
@@ -48,7 +51,9 @@
 
 - (NSInteger)colInt:(NSInteger)idx;
 - (double)colDouble:(NSInteger)idx;
-- (const char*)colCString:(NSInteger)idx;
+- (const char*)colCString:(NSInteger)idx NS_RETURNS_INNER_POINTER;
 - (NSString*)colString:(NSInteger)idx;
 - (NSDate*)colDate:(NSInteger)idx;
 @end
+
+NS_ASSUME_NONNULL_END
