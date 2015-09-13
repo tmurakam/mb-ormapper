@@ -48,7 +48,7 @@ def getSqlType(type)
   end
 end
 
-def getObjcType(type)
+def getSwiftType(type)
   case type
   when "INTEGER"
     return "Int", "assign"

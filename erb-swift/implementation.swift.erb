@@ -8,7 +8,8 @@ class <%= cdef.base_class_name %> : ORRecord {
 
 <%
   cdef.members.each do |m|
-    type, mem = getObjcType(m.type)
+    type, mem = getSwiftType(m.type)
+    #type = type + "?" if mem == "strong"
 -%>
     var <%= m.prop_name %> : <%= type %>
 <% end -%>
@@ -49,7 +50,7 @@ class <%= cdef.base_class_name %> : ORRecord {
 
 <%
   cdef.members.each do |m|
-    type, mem = getObjcType(m.type)
+    type, mem = getSwiftType(m.type)
 -%>
     /**
       finder with <%= m.field_name %>
