@@ -129,7 +129,9 @@ class MemberVar
     @setter = "set" + CamelCase(name)
     @prop_name = @getter
 
-    if IS_IOS
+    if IS_SWIFT
+      @member_name = camelCase(name)
+    elsif IS_IOS
       @member_name = "_" + camelCase(name)
     else
       @member_name = "m" + CamelCase(name)

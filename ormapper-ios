@@ -32,6 +32,7 @@ require 'erb'
 ORMDIR = File.expand_path(File.dirname($0))
 $LOAD_PATH.push(ORMDIR)
 
+IS_SWIFT = false
 IS_IOS = true
 require "orschema.rb"
 

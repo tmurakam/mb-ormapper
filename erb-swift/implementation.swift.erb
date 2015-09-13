@@ -5,6 +5,14 @@
 import Foundation
 
 class <%= cdef.base_class_name %> : ORRecord {
+
+<%
+  cdef.members.each do |m|
+    type, mem = getObjcType(m.type)
+-%>
+    var <%= m.prop_name %> : <%= type %>
+<% end -%>
+
     override init() {
         super.init()
     }
@@ -13,7 +21,7 @@ class <%= cdef.base_class_name %> : ORRecord {
      @brief Migrate database table
      @return YES - table was newly created, NO - table already exists
      */
-    class funs migrate -> Bool {
+    class func migrate() -> Bool {
         let columnTypes: [String] = [
 <% cdef.members.each do |m| -%>
             "<%= m.field_name %>", "<%= getSqlType(m.type) %>",
@@ -30,7 +38,7 @@ class <%= cdef.base_class_name %> : ORRecord {
       @param pid Primary key of the record
       @return record
     */
-    class func find(Integer pid) -> <%= cdef.class_name %>? {
+    class func find(pid: Int) -> <%= cdef.class_name %>? {
         let db = Database.instance()
 
         let stmt = db.prepare("SELECT * FROM <%= cdef.table_name %> WHERE <%= PKEY %> = ?;")
@@ -51,13 +59,14 @@ class <%= cdef.base_class_name %> : ORRecord {
       @note If you specify WHERE conditions, you must start cond with "AND" keyword.
     */
     class func find_by_<%= m.field_name %>(key: <%= type %>, cond: String?) -> <%= cdef.class_name %>? {
+        let cond2 : String  
         if (cond == nil) {
-            cond = "WHERE <%= m.field_name %> = ? LIMIT 1"
+            cond2 = "WHERE <%= m.field_name %> = ? LIMIT 1"
         } else {
-            cond = NSString(format:"WHERE <%= m.field_name %> = ? %@ LIMIT 1", cond!)
+            cond2 = "WHERE <%= m.field_name %> = ? \(cond!) LIMIT 1"
         }
-        let stmt = gen_stmt(cond!)
-        stmt.bind<%= getMethodType(m.type) %>(0, key)
+        let stmt = gen_stmt(cond2)
+        stmt.bind<%= getMethodType(m.type) %>(0, val:key)
         return find_first_stmt(stmt)
     }
 
@@ -73,12 +82,13 @@ class <%= cdef.base_class_name %> : ORRecord {
       @return array of records
     */
     class func find_first(cond: String?) -> <%= cdef.class_name %>? {
+        let cond2: String
         if (cond == nil) {
-            cond = "LIMIT 1"
+            cond2 = "LIMIT 1"
         } else {
-            cond = cond + " LIMIT 1"
+            cond2 = cond! + " LIMIT 1"
         }
-        let stmt = gen_stmt(cond!)
+        let stmt = gen_stmt(cond2)
         return  find_first_stmt(stmt)
     }
 
@@ -87,7 +97,7 @@ class <%= cdef.base_class_name %> : ORRecord {
       @param cond Conditions (WHERE phrase and so on)
       @return array of records
     */
-    class func find_all(cond: String?) -> NSMutableArray {
+    class func find_all(cond: String?) -> [<%= cdef.base_class_name %>] {
         let stmt = gen_stmt(cond)
         return  find_all_stmt(stmt)
     }
@@ -115,9 +125,10 @@ class <%= cdef.base_class_name %> : ORRecord {
     */
     class func find_first_stmt(stmt: dbstmt) -> <%= cdef.class_name %>? {
         if (stmt.step() == SQLITE_ROW) {
-            let e = self.class().new()
+            // e = [[self class] new]
+            let e = <%= cdef.class_name %>()
             e._loadRow(stmt)
-            return (<%= cdef.class_name %> *)e;
+            return e
         }
         return nil;
     }
@@ -127,18 +138,19 @@ class <%= cdef.base_class_name %> : ORRecord {
       @param stmt Statement
       @return array of records
     */
-    class func find_all_stmt(stmt: dbstmt) -> <%= cdef.base_class_name %>[] {
-        var array = <%= cdef.base_class_name %>[]
+    class func find_all_stmt(stmt: dbstmt) -> [<%= cdef.base_class_name %>] {
+        var array : [<%= cdef.base_class_name %>] = []
 
         while (stmt.step() == SQLITE_ROW) {
-            let e = self.class().new()
+            //let e = self.class().new()
+            let e = <%= cdef.class_name %>()
             e._loadRow(stmt)
             array.append(e)
         }
         return array;
     }
 
-    func _loadRow(stmt: dbst) {
+    func _loadRow(stmt: dbstmt) {
         self.pid = stmt.colInt(0)
 <%
     i = 1
@@ -153,7 +165,7 @@ class <%= cdef.base_class_name %> : ORRecord {
 
     // MARK: - Create operations
 
-    func _insert() {
+    override func _insert() {
         super._insert()
 
         let db = Database.instance()
@@ -171,7 +183,7 @@ class <%= cdef.base_class_name %> : ORRecord {
     cdef.members.each do |m|
       method = "bind" + getMethodType(m.type)
 -%>
-        stmt.<%= method %>(<%= i %>, <%= m.member_name %>)
+        stmt.<%= method %>(<%= i %>, val:self.<%= m.member_name %>)
 <%    i += 1 -%>
 <%  end -%>
         stmt.step()
@@ -185,7 +197,7 @@ class <%= cdef.base_class_name %> : ORRecord {
 
     // MARK: - Update operations
 
-    func _update {
+    override func _update {
         super._update()
 
         let db = Database.instance()
@@ -198,23 +210,23 @@ class <%= cdef.base_class_name %> : ORRecord {
     if (isFirst)
       isFirst = false
 -%>
-        "<%= m.field_name %> = ?"
+        + "<%= m.field_name %> = ?"
 <%  else -%>
-        ",<%= m.field_name %> = ?"
+        + ",<%= m.field_name %> = ?"
 <%  end -%>
 <% end -%>
-        " WHERE <%= PKEY %> = ?;")
+        + " WHERE <%= PKEY %> = ?;")
 <% 
     i = 0
     cdef.members.each do |m|
       method = "bind" + getMethodType(m.type)
 -%>
-        stmt.<%= method %>(<%= i %>, <%= m.member_name %>)
+        stmt.<%= method %>(<%= i %>, val:self.<%= m.member_name %>)
 <%
       i += 1
     end
 -%>
-        stmt.bindInt(<%= i %>, self.pid)
+        stmt.bindInt(<%= i %>, val:self.pid)
 
         stmt.step()
         //db.commitTransaction()
@@ -227,7 +239,7 @@ class <%= cdef.base_class_name %> : ORRecord {
     /**
       Delete record
     */
-    func delete() {
+    override func delete() {
         let db = Database.instance()
 
         let stmt = db.prepare("DELETE FROM <%= cdef.table_name %> WHERE <%= PKEY %> = ?;")
@@ -252,7 +264,7 @@ class <%= cdef.base_class_name %> : ORRecord {
         db.setModified()
     }
 
-    class func delete_all {
+    override class func delete_all {
         <%= cdef.base_class_name %>.delete_cond(nil)
     }
 
@@ -289,7 +301,7 @@ class <%= cdef.base_class_name %> : ORRecord {
 
     // MARK: - Internal functions
 
-    class func tableName -> String {
+    override class func tableName -> String {
         return "<%= cdef.table_name %>"
     }
 }

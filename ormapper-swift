@@ -32,7 +32,9 @@ require 'erb'
 ORMDIR = File.expand_path(File.dirname($0))
 $LOAD_PATH.push(ORMDIR)
 
+IS_SWIFT = true
 IS_IOS = true
+
 require "orschema.rb"
 
 VER = "2.3"
@@ -49,15 +51,15 @@ end
 def getObjcType(type)
   case type
   when "INTEGER"
-    return "NSInteger", "assign"
+    return "Int", "assign"
   when "LONG"
-    return "long", "assign"
+    return "Int64", "assign"
   when "REAL"
-    return "double", "assign"
+    return "Double", "assign"
   when "TEXT"
     return "String", "strong"
   when "DATE"
-    return "NSDate*", "strong"
+    return "NSDate", "strong"
   else
     puts "#{type} is not supported."
     exit 1
