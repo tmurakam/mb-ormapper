@@ -112,7 +112,7 @@ class <%= cdef.base_class_name %> : ORRecord {
         if (cond == nil) {
             sql = "SELECT * FROM <%= cdef.table_name %>;"
         } else {
-            sql = NSString(format:"SELECT * FROM <%= cdef.table_name %> %@;", cond)
+            sql = "SELECT * FROM <%= cdef.table_name %> \(cond!);"
         }  
         let stmt = Database.instance().prepare(sql)
         return stmt
@@ -124,7 +124,7 @@ class <%= cdef.base_class_name %> : ORRecord {
       @return array of records
     */
     class func find_first_stmt(stmt: dbstmt) -> <%= cdef.class_name %>? {
-        if (stmt.step() == SQLITE_ROW) {
+        if (stmt.step() == numericCast(SQLITE_ROW)) {
             // e = [[self class] new]
             let e = <%= cdef.class_name %>()
             e._loadRow(stmt)
@@ -141,7 +141,7 @@ class <%= cdef.base_class_name %> : ORRecord {
     class func find_all_stmt(stmt: dbstmt) -> [<%= cdef.base_class_name %>] {
         var array : [<%= cdef.base_class_name %>] = []
 
-        while (stmt.step() == SQLITE_ROW) {
+        while (stmt.step() == numericCast(SQLITE_ROW)) {
             //let e = self.class().new()
             let e = <%= cdef.class_name %>()
             e._loadRow(stmt)
@@ -150,7 +150,7 @@ class <%= cdef.base_class_name %> : ORRecord {
         return array;
     }
 
-    func _loadRow(stmt: dbstmt) {
+    override func _loadRow(stmt: dbstmt) {
         self.pid = stmt.colInt(0)
 <%
     i = 1
@@ -188,7 +188,7 @@ class <%= cdef.base_class_name %> : ORRecord {
 <%  end -%>
         stmt.step()
 
-        self.pid = db.lastInsertRowId()
+        self.pid = db.lastInsertRowId
 
         //db.commitTransaction()
 
@@ -197,7 +197,7 @@ class <%= cdef.base_class_name %> : ORRecord {
 
     // MARK: - Update operations
 
-    override func _update {
+    override func _update() {
         super._update()
 
         let db = Database.instance()
@@ -243,7 +243,7 @@ class <%= cdef.base_class_name %> : ORRecord {
         let db = Database.instance()
 
         let stmt = db.prepare("DELETE FROM <%= cdef.table_name %> WHERE <%= PKEY %> = ?;")
-        stmt.bindInt(0, self.pid)
+        stmt.bindInt(0, val:self.pid)
         stmt.step()
 
         db.setModified()
@@ -255,16 +255,19 @@ class <%= cdef.base_class_name %> : ORRecord {
     class func delete_cond(cond: String?) {
         let db = Database.instance()
 
+        let cond2: String
         if (cond == nil) {
-            cond = ""
+            cond2 = ""
+        } else {
+            cond2 = cond!
         }
-        let sql = NSString(format:"DELETE FROM <%= cdef.table_name %> %@;", cond)
+        let sql = "DELETE FROM <%= cdef.table_name %> \(cond2);"
         db.exec(sql)
 
         db.setModified()
     }
 
-    override class func delete_all {
+    override class func delete_all() {
         <%= cdef.base_class_name %>.delete_cond(nil)
     }
 
@@ -281,7 +284,7 @@ class <%= cdef.base_class_name %> : ORRecord {
         s.appendString(");\n")
 
         let ary = find_all(nil)
-        for (e in ary) {
+        for e in ary {
             e.getInsertSql(s)
             s.appendString("\n")
         }
@@ -291,7 +294,7 @@ class <%= cdef.base_class_name %> : ORRecord {
      * get "INSERT" SQL
      */
     func getInsertSql(s: NSMutableString) {
-        s.appendFormat("INSERT INTO <%= cdef.table_name %> VALUES(%ld", (long)self.pid)
+        s.appendFormat("INSERT INTO <%= cdef.table_name %> VALUES(%ld", self.pid)
 <% cdef.members.each do |m| -%>
         s.appendString(",")
         s.appendString(quoteSqlString(<%= getToString(m.type, m.member_name) %>))
@@ -301,7 +304,7 @@ class <%= cdef.base_class_name %> : ORRecord {
 
     // MARK: - Internal functions
 
-    override class func tableName -> String {
+    override class func tableName() -> String {
         return "<%= cdef.table_name %>"
     }
 }
