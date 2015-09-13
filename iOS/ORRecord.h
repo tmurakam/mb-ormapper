@@ -36,10 +36,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property(nonatomic,assign) NSInteger pid;
 
-+ (BOOL)migrate:(NSArray *)array primaryKey:(NSString*)key;
-+ (NSMutableArray *)find_all;
-+ (NSMutableArray *)find_all:(nullable NSString *)cond;
-+ (nullable id)find:(NSInteger)id;
++ (BOOL)migrate:(NSArray<NSString *> *)array primaryKey:(NSString*)key;
+
+//+ (NSMutableArray<T> *)find_all;
+//+ (NSMutableArray<T> *)find_all:(nullable NSString *)cond;
+//+ (nullable T)find:(NSInteger)id;
 
 - (void)save;
 - (void)delete;
