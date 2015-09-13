@@ -7,6 +7,8 @@
 
 @class <%= cdef.class_name %>;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface <%= cdef.base_class_name %> : ORRecord
 
 <%
@@ -21,25 +23,25 @@
 // CRUD (Create/Read/Update/Delete) operations
 
 // Read operations (Finder)
-+ (<%= cdef.class_name %> *)find:(NSInteger)pid;
++ (nullable <%= cdef.class_name %> *)find:(NSInteger)pid;
 
 <%
   cdef.members.each do |m|
     type, mem = getObjcType(m.type)
 -%>
-+ (<%= cdef.class_name %> *)find_by_<%= m.field_name %>:(<%= type %>)key cond:(NSString*)cond;
-+ (<%= cdef.class_name %> *)find_by_<%= m.field_name %>:(<%= type %>)key;
++ (nullable <%= cdef.class_name %> *)find_by_<%= m.field_name %>:(<%= type %>)key cond:(nullable NSString*)cond;
++ (nullable <%= cdef.class_name %> *)find_by_<%= m.field_name %>:(<%= type %>)key;
 <% end -%>
 
-+ (NSMutableArray *)find_all:(NSString *)cond;
++ (NSMutableArray<<%= cdef.class_name %> *> *)find_all:(nullable NSString *)cond;
 
-+ (dbstmt *)gen_stmt:(NSString *)cond;
-+ (<%= cdef.class_name %> *)find_first_stmt:(dbstmt *)stmt;
-+ (NSMutableArray *)find_all_stmt:(dbstmt *)stmt;
++ (dbstmt *)gen_stmt:(nullable NSString *)cond;
++ (nullable <%= cdef.class_name %> *)find_first_stmt:(dbstmt *)stmt;
++ (NSMutableArray<<%= cdef.class_name %> *> *)find_all_stmt:(dbstmt *)stmt;
 
 // Delete operations
 - (void)delete;
-+ (void)delete_cond:(NSString *)cond;
++ (void)delete_cond:(nullable NSString *)cond;
 + (void)delete_all;
 
 // Dump SQL
@@ -47,3 +49,5 @@
 - (void)getInsertSql:(NSMutableString *)s;
 
 @end
+
+NS_ASSUME_NONNULL_END
