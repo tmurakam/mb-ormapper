@@ -97,9 +97,9 @@ class <%= cdef.base_class_name %> : ORRecord {
       @param cond Conditions (WHERE phrase and so on)
       @return array of records
     */
-    class func find_all(cond: String?) -> [<%= cdef.base_class_name %>] {
+    class func find_all(cond: String?) -> [<%= cdef.class_name %>] {
         let stmt = gen_stmt(cond)
-        return  find_all_stmt(stmt)
+        return find_all_stmt(stmt)
     }
 
     /**
@@ -138,8 +138,8 @@ class <%= cdef.base_class_name %> : ORRecord {
       @param stmt Statement
       @return array of records
     */
-    class func find_all_stmt(stmt: dbstmt) -> [<%= cdef.base_class_name %>] {
-        var array : [<%= cdef.base_class_name %>] = []
+    class func find_all_stmt(stmt: dbstmt) -> [<%= cdef.class_name %>] {
+        var array : [<%= cdef.class_name %>] = []
 
         while (stmt.step() == numericCast(SQLITE_ROW)) {
             //let e = self.class().new()

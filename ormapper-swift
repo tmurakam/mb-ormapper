@@ -87,15 +87,15 @@ end
 def getToString(type, var)
   case type
   when "INTEGER"
-    return "[NSString stringWithFormat:@\"%ld\", (long)#{var}]"
+    return "#{var}.description"
   when "LONG"
-    return "[NSString stringWithFormat:@\"%ld\", #{var}]"
+    return "#{var}.description"
   when "REAL"
-    return "[NSString stringWithFormat:@\"%f\", #{var}]"
+    return "#{var}.description"
   when "TEXT"
     return var
   when "DATE"
-    return "[[Database instance] stringFromDate:#{var}]"
+    return "Database.instance().stringFromDate(#{var})"
   else
     puts "#{type} not supported"
     exit 1
