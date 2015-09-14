@@ -8,10 +8,9 @@ class <%= cdef.base_class_name %> : ORRecord {
 
 <%
   cdef.members.each do |m|
-    type, mem = getSwiftType(m.type)
-    #type = type + "?" if mem == "strong"
+    type, defvalue = getSwiftType(m.type)
 -%>
-    var <%= m.prop_name %> : <%= type %>
+    var <%= m.prop_name %> : <%= type %> = <%= defvalue %>
 <% end -%>
 
     override init() {
@@ -50,7 +49,7 @@ class <%= cdef.base_class_name %> : ORRecord {
 
 <%
   cdef.members.each do |m|
-    type, mem = getSwiftType(m.type)
+    type, defvalue = getSwiftType(m.type)
 -%>
     /**
       finder with <%= m.field_name %>
@@ -60,13 +59,9 @@ class <%= cdef.base_class_name %> : ORRecord {
       @note If you specify WHERE conditions, you must start cond with "AND" keyword.
     */
     class func find_by_<%= m.field_name %>(key: <%= type %>, cond: String?) -> <%= cdef.class_name %>? {
-        let cond2 : String  
-        if (cond == nil) {
-            cond2 = "WHERE <%= m.field_name %> = ? LIMIT 1"
-        } else {
-            cond2 = "WHERE <%= m.field_name %> = ? \(cond!) LIMIT 1"
-        }
-        let stmt = gen_stmt(cond2)
+        let cond2 = cond ?? ""
+        let whr = "WHERE <%= m.field_name %> = ? \(cond2) LIMIT 1"
+        let stmt = gen_stmt(whr)
         stmt.bind<%= getMethodType(m.type) %>(0, val:key)
         return find_first_stmt(stmt)
     }

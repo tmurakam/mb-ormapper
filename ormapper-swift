@@ -51,15 +51,15 @@ end
 def getSwiftType(type)
   case type
   when "INTEGER"
-    return "Int", "assign"
+    return "Int", "0"
   when "LONG"
-    return "Int64", "assign"
+    return "Int64", "0"
   when "REAL"
-    return "Double", "assign"
+    return "Double", "0"
   when "TEXT"
-    return "String", "strong"
+    return "String", "\"\""
   when "DATE"
-    return "NSDate", "strong"
+    return "NSDate", "NSDate.dateWithTimeIntervalSince1970(0)"
   else
     puts "#{type} is not supported."
     exit 1
