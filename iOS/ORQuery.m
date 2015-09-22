@@ -10,7 +10,7 @@
 
     NSString *_tableName;
     NSString *_where;
-    NSArray *_whereParams;
+    NSArray<NSString *> *_whereParams;
     NSString *_order;
     NSInteger _limit;
     NSInteger _offset;
@@ -24,7 +24,7 @@
     return [[ORQuery alloc] initWithClass:class tableName:tableName];
 }
 
-- (id)initWithClass:(Class)class tableName:(NSString *)tableName
+- (instancetype)initWithClass:(Class)class tableName:(NSString *)tableName
 {
     self = [super init];
     if (self != nil) {
@@ -41,7 +41,7 @@
  * @return this
  * @note You can set only 1 where condition.
  */
-- (ORQuery *)where:(NSString *)where arguments:(NSArray *)args
+- (ORQuery *)where:(NSString *)where arguments:(NSArray<NSString *> *)args
 {
     _where = where;
     _whereParams = args;
@@ -107,8 +107,8 @@
     // bind arguments
     dbstmt *stmt = [[Database instance] prepare:sql];
     
-    for (NSInteger i = 0; i < [_whereParams count]; i++) {
-        [stmt bindString:i val:(NSString *)_whereParams[i]];
+    for (NSInteger i = 0; i < _whereParams.count; i++) {
+        [stmt bindString:i val:_whereParams[i]];
     }
 
     while ([stmt step] == SQLITE_ROW) {
@@ -128,10 +128,10 @@
     _limit = 1;
         
     NSMutableArray *ary = [self all];
-    if ([ary count] == 0) {
+    if (ary.count == 0) {
         return nil;
     }
-    return [ary objectAtIndex:0];
+    return ary[0];
 }
 
 /**

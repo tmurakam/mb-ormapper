@@ -4,7 +4,7 @@
   mb-ormapper : O/R Mapper library for iOS/Android
   https://github.com/tmurakam/mb-ormapper
 
-  Copyright (c) 2010-2013, Takuya Murakami. All rights reserved.
+  Copyright (c) 2010-2015, Takuya Murakami. All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are
@@ -32,11 +32,12 @@ require 'erb'
 ORMDIR = File.expand_path(File.dirname($0))
 $LOAD_PATH.push(ORMDIR)
 
-IS_SWIFT = false
+IS_SWIFT = true
 IS_IOS = true
+
 require "orschema.rb"
 
-VER = "2.2"
+VER = "2.3"
 
 def getSqlType(type)
   case type
@@ -47,18 +48,18 @@ def getSqlType(type)
   end
 end
 
-def getObjcType(type)
+def getSwiftType(type)
   case type
   when "INTEGER"
-    return "NSInteger", "assign"
+    return "Int", "0"
   when "LONG"
-    return "long", "assign"
+    return "Int64", "0"
   when "REAL"
-    return "double", "assign"
+    return "Double", "0"
   when "TEXT"
-    return "NSString*", "strong"
+    return "String", "\"\""
   when "DATE"
-    return "NSDate*", "strong"
+    return "NSDate", "NSDate.dateWithTimeIntervalSince1970(0)"
   else
     puts "#{type} is not supported."
     exit 1
@@ -86,30 +87,24 @@ end
 def getToString(type, var)
   case type
   when "INTEGER"
-    return "[NSString stringWithFormat:@\"%ld\", (long)#{var}]"
+    return "#{var}.description"
   when "LONG"
-    return "[NSString stringWithFormat:@\"%ld\", #{var}]"
+    return "#{var}.description"
   when "REAL"
-    return "[NSString stringWithFormat:@\"%f\", #{var}]"
+    return "#{var}.description"
   when "TEXT"
     return var
   when "DATE"
-    return "[[Database instance] stringFromDate:#{var}]"
+    return "Database.instance().stringFromDate(#{var})"
   else
     puts "#{type} not supported"
     exit 1
   end
 end
 
-# generate header
-def generateHeader(cdef, fh)
-  erb = ERB.new(File.read(ORMDIR + "/erb-ios/header.h.erb"), nil, '-')
-  fh.puts erb.result(binding)
-end
-
 # generate implementation
 def generateImplementation(cdef, fh)
-  erb = ERB.new(File.read(ORMDIR + "/erb-ios/implementation.m.erb"), nil, '-')
+  erb = ERB.new(File.read(ORMDIR + "/erb-swift/implementation.swift.erb"), nil, '-')
   fh.puts erb.result(binding)
 end
 
@@ -135,13 +130,8 @@ end
 
 # generate
 $class_defs.each do |cdef|
-  STDERR.puts "generate #{cdef.base_class_name}.h"
-  fh = open(cdef.base_class_name + ".h", "w")
-  generateHeader(cdef, fh)
-  fh.close
-
-  STDERR.puts "generate #{cdef.base_class_name}.m"
-  fh = open(cdef.base_class_name + ".m", "w")
+  STDERR.puts "generate #{cdef.base_class_name}.swift"
+  fh = open(cdef.base_class_name + ".swift", "w")
   generateImplementation(cdef, fh)
   fh.close
 end

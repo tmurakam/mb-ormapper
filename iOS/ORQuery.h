@@ -8,20 +8,20 @@ NS_ASSUME_NONNULL_BEGIN
 /**
    O/R query
  */
-@interface ORQuery : NSObject
+@interface ORQuery<T> : NSObject
 
 + (ORQuery *)getWithClass:(Class)class tableName:(NSString *)tableName;
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithClass:(Class)class tableName:(NSString *)tableName NS_DESIGNATED_INITIALIZER;
 
-- (ORQuery *)where:(NSString *)where arguments:(NSArray *)args;
+- (ORQuery *)where:(NSString *)where arguments:(NSArray<NSString *> *)args;
 - (ORQuery *)order:(NSString *)order;
 - (ORQuery *)limit:(NSInteger)limit;
 - (ORQuery *)offset:(NSInteger)limit;
 
-@property (nonatomic, readonly, copy) NSMutableArray *all;
-@property (nonatomic, readonly, strong) id first;
+@property (nonatomic, readonly, copy) NSMutableArray<T> *all;
+@property (nonatomic, readonly, strong, nullable) T first;
 
 @end
 
