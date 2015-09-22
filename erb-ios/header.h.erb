@@ -33,11 +33,11 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable <%= cdef.class_name %> *)find_by_<%= m.field_name %>:(<%= type %>)key;
 <% end -%>
 
-+ (NSMutableArray<<%= cdef.class_name %> *> *)find_all:(nullable NSString *)cond;
++ (NSArray<<%= cdef.class_name %> *> *)find_all:(nullable NSString *)cond;
 
 + (dbstmt *)gen_stmt:(nullable NSString *)cond;
 + (nullable <%= cdef.class_name %> *)find_first_stmt:(dbstmt *)stmt;
-+ (NSMutableArray<<%= cdef.class_name %> *> *)find_all_stmt:(dbstmt *)stmt;
++ (NSArray<<%= cdef.class_name %> *> *)find_all_stmt:(dbstmt *)stmt;
 
 // Delete operations
 - (void)delete;
