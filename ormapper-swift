@@ -37,7 +37,7 @@ IS_IOS = true
 
 require "orschema.rb"
 
-VER = "2.3"
+VER = "3.0"
 
 def getSqlType(type)
   case type
