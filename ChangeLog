@@ -1,5 +1,6 @@
 2015/09/13 : Takuya Murakami <tmurakam@tmurakam.org>
 
+	* ver 2.3
 	* iOS: Xcode7, nonnull/nullable, generics 対応
 
 2014/09/23 : Takuya Murakami <tmurakam@tmurakam.org>
