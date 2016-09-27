@@ -59,7 +59,7 @@ def getSwiftType(type)
   when "TEXT"
     return "String", "\"\""
   when "DATE"
-    return "NSDate", "NSDate(timeIntervalSince1970: 0)"
+    return "Date", "Date(timeIntervalSince1970: 0)"
   else
     puts "#{type} is not supported."
     exit 1
@@ -95,7 +95,7 @@ def getToString(type, var)
   when "TEXT"
     return var
   when "DATE"
-    return "Database.instance().stringFromDate(#{var})"
+    return "Database.instance().string(from: #{var})"
   else
     puts "#{type} not supported"
     exit 1

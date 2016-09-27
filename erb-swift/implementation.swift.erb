@@ -38,7 +38,7 @@ class <%= cdef.base_class_name %> : ORRecord {
       @param pid Primary key of the record
       @return record
     */
-    class func find(pid: Int) -> <%= cdef.class_name %>? {
+    class func find(_ pid: Int) -> <%= cdef.class_name %>? {
         let db = Database.instance()
 
         let stmt = db.prepare("SELECT * FROM <%= cdef.table_name %> WHERE <%= PKEY %> = ?;")
@@ -58,7 +58,7 @@ class <%= cdef.base_class_name %> : ORRecord {
       @param cond Conditions (ORDER BY etc)
       @note If you specify WHERE conditions, you must start cond with "AND" keyword.
     */
-    class func find_by_<%= m.field_name %>(key: <%= type %>, cond: String?) -> <%= cdef.class_name %>? {
+    class func find_by_<%= m.field_name %>(_ key: <%= type %>, cond: String?) -> <%= cdef.class_name %>? {
         let cond2 = cond ?? ""
         let whr = "WHERE <%= m.field_name %> = ? \(cond2) LIMIT 1"
         let stmt = gen_stmt(whr)
@@ -66,7 +66,7 @@ class <%= cdef.base_class_name %> : ORRecord {
         return find_first_stmt(stmt)
     }
 
-    class func find_by_<%= m.field_name %>(key: <%= type %>) -> <%= cdef.class_name %>? {
+    class func find_by_<%= m.field_name %>(_ key: <%= type %>) -> <%= cdef.class_name %>? {
         return find_by_<%= m.field_name %>(key, cond:nil)
     }
 
@@ -77,7 +77,7 @@ class <%= cdef.base_class_name %> : ORRecord {
       @param cond Conditions (WHERE phrase and so on)
       @return array of records
     */
-    class func find_first(cond: String?) -> <%= cdef.class_name %>? {
+    class func find_first(_ cond: String?) -> <%= cdef.class_name %>? {
         let cond2: String
         if (cond == nil) {
             cond2 = "LIMIT 1"
@@ -93,7 +93,7 @@ class <%= cdef.base_class_name %> : ORRecord {
       @param cond Conditions (WHERE phrase and so on)
       @return array of records
     */
-    class func find_all(cond: String?) -> [<%= cdef.class_name %>] {
+    class func find_all(_ cond: String?) -> [<%= cdef.class_name %>] {
         let stmt = gen_stmt(cond)
         return find_all_stmt(stmt)
     }
@@ -103,7 +103,7 @@ class <%= cdef.base_class_name %> : ORRecord {
       @param s condition
       @return dbstmt
     */
-    class func gen_stmt(cond: String?) -> dbstmt {
+    class func gen_stmt(_ cond: String?) -> dbstmt {
         let sql: String
         if (cond == nil) {
             sql = "SELECT * FROM <%= cdef.table_name %>;"
@@ -119,7 +119,7 @@ class <%= cdef.base_class_name %> : ORRecord {
       @param stmt Statement
       @return array of records
     */
-    class func find_first_stmt(stmt: dbstmt) -> <%= cdef.class_name %>? {
+    class func find_first_stmt(_ stmt: dbstmt) -> <%= cdef.class_name %>? {
         if (stmt.step() == numericCast(SQLITE_ROW)) {
             // e = [[self class] new]
             let e = <%= cdef.class_name %>()
@@ -134,7 +134,7 @@ class <%= cdef.base_class_name %> : ORRecord {
       @param stmt Statement
       @return array of records
     */
-    class func find_all_stmt(stmt: dbstmt) -> [<%= cdef.class_name %>] {
+    class func find_all_stmt(_ stmt: dbstmt) -> [<%= cdef.class_name %>] {
         var array : [<%= cdef.class_name %>] = []
 
         while (stmt.step() == numericCast(SQLITE_ROW)) {
@@ -146,7 +146,7 @@ class <%= cdef.base_class_name %> : ORRecord {
         return array;
     }
 
-    override func _loadRow(stmt: dbstmt) {
+    override func _loadRow(_ stmt: dbstmt) {
         self.pid = stmt.colInt(0)
 <%
     i = 1
@@ -248,7 +248,7 @@ class <%= cdef.base_class_name %> : ORRecord {
     /**
      Delete all records
     */
-    class func delete_cond(cond: String?) {
+    class func delete_cond(_ cond: String?) {
         let db = Database.instance()
 
         let cond2: String
@@ -270,32 +270,32 @@ class <%= cdef.base_class_name %> : ORRecord {
     /**
      * get table sql
      */
-    class func getTableSql(s: NSMutableString) {
-        s.appendString("DROP TABLE <%= cdef.table_name %>;\n")
-        s.appendString("CREATE TABLE <%= cdef.table_name %> (key INTEGER PRIMARY KEY")
+    class func getTableSql(_ s: NSMutableString) {
+        s.append("DROP TABLE <%= cdef.table_name %>;\n")
+        s.append("CREATE TABLE <%= cdef.table_name %> (key INTEGER PRIMARY KEY")
 
 <% cdef.members.each do |m| -%>
-        s.appendString(", <%= m.field_name %> <%= m.type %>")
+        s.append(", <%= m.field_name %> <%= m.type %>")
 <% end -%>    
-        s.appendString(");\n")
+        s.append(");\n")
 
         let ary = find_all(nil)
         for e in ary {
             e.getInsertSql(s)
-            s.appendString("\n")
+            s.append("\n")
         }
     }
 
     /**
      * get "INSERT" SQL
      */
-    func getInsertSql(s: NSMutableString) {
+    func getInsertSql(_ s: NSMutableString) {
         s.appendFormat("INSERT INTO <%= cdef.table_name %> VALUES(%ld", self.pid)
 <% cdef.members.each do |m| -%>
-        s.appendString(",")
-        s.appendString(quoteSqlString(<%= getToString(m.type, m.member_name) %>))
+        s.append(",")
+        s.append(quoteSqlString(<%= getToString(m.type, m.member_name) %>))
 <% end -%>
-        s.appendString(");")
+        s.append(");")
     }
 
     // MARK: - Internal functions
